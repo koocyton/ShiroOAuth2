@@ -1,2 +1,3 @@
-# ShiroOAuth2
-Shiro OAuth2 Server 
+# Chat Room Server
+
+Technical framework : undertow, spring mvc, mybatis, ehcache, jedis, shiro
