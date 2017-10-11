@@ -176,7 +176,7 @@ task release(type: Copy,dependsOn: [clearPj, copyJar, jar]) {
 
 apply plugin: 'idea'
 // apply plugin: 'eclipse'
-apply plugin: 'spring-boot'
+apply plugin: 'org.springframework.boot'
 
 buildscript {
 
