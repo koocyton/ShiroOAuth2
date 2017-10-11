@@ -9,12 +9,12 @@
        http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
 
     <!-- 自定义缓存管理器 -->
-    <bean id="cacheManager" class="com.doopp.gauss.api.utils.SpringCacheManagerWrapper">
+    <bean id="cacheManager" class="com.doopp.gauss.server.cache.SpringCacheManagerWrapper">
         <property name="cacheManager" ref="springCacheManager"/>
     </bean>
 
     <!-- 自定义凭证匹配器 -->
-    <bean id="credentialsMatcher" class="com.doopp.gauss.api.utils.RetryLimitHashedCredentialsMatcher">
+    <bean id="credentialsMatcher" class="com.doopp.gauss.server.shiro.RetryLimitHashedCredentialsMatcher">
         <constructor-arg ref="cacheManager"/>
         <property name="hashAlgorithmName" value="md5"/>
         <property name="hashIterations" value="2"/>
@@ -22,7 +22,7 @@
     </bean>
 
     <!-- Realm实现 -->
-    <bean id="userRealm" class="com.doopp.gauss.api.utils.ShrioAuthorizingRealm">
+    <bean id="userRealm" class="com.doopp.gauss.server.shiro.ShrioAuthorizingRealm">
         <property name="credentialsMatcher" ref="credentialsMatcher"/>
         <property name="cachingEnabled" value="false"/>
     </bean>
@@ -91,7 +91,7 @@
     </bean>
 
     <!-- 基于Form表单的身份验证过滤器 -->
-    <bean id="formAuthenticationFilter" class="com.doopp.gauss.api.utils.CustomFormAuthenticationFilter">
+    <bean id="formAuthenticationFilter" class="com.doopp.gauss.server.shiro.CustomFormAuthenticationFilter">
         <property name="usernameParam" value="username"/>
         <property name="passwordParam" value="password"/>
         <property name="rememberMeParam" value="rememberMe"/>
@@ -142,26 +142,15 @@
         <property name="filterChainDefinitions">
             <value>
                 / = anon
-                /admin/login = anon
-                /admin/sign_in = anon
-                /admin/sign_out = anon
+                /api/v1/login = anon
+                /api/v1/register = anon
+                /api/v1/logout = anon
                 /css/* = anon
                 /js/* = anon
                 /image/* = anon
                 /favicon.ico = anon
 
-                /api = anon
-                /oauth/register = anon
-                /oauth/login = authc
-                /oauth/form = anon
                 /web-socket = anon
-
-                /oauth/sign-in = authc
-                /oauth/sign-out = logout
-
-                /authorize=anon
-                /access-token=anon
-                /user-info=anon
 
                 /** = user
             </value>

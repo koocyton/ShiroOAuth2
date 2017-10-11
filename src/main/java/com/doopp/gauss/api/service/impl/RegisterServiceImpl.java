@@ -2,8 +2,8 @@ package com.doopp.gauss.api.service.impl;
 
 import com.doopp.gauss.api.dao.UserDao;
 import com.doopp.gauss.api.entity.UserEntity;
-import com.doopp.gauss.api.helper.EncryHelper;
-import com.doopp.gauss.api.helper.IdWorker;
+import com.doopp.gauss.api.utils.EncryHelper;
+import com.doopp.gauss.api.utils.IdWorker;
 import com.doopp.gauss.api.service.LoginService;
 import com.doopp.gauss.api.service.RegisterService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +17,7 @@ import java.util.regex.Pattern;
  * 注册用户实现
  * Created by henry on 2017/7/14.
  */
-@Service
+@Service("registerService")
 public class RegisterServiceImpl implements RegisterService {
 
     @Resource
@@ -26,10 +26,10 @@ public class RegisterServiceImpl implements RegisterService {
     @Autowired
     private LoginService loginService;
 
-    @Autowired
-    public RegisterServiceImpl() {
+    //@Autowired
+    //public RegisterServiceImpl() {
         // this.userDao = DBSession.getMapper(UserDao.class);
-    }
+    //}
 
     @Override
     public boolean registerUser(String account, String password) {
@@ -54,7 +54,7 @@ public class RegisterServiceImpl implements RegisterService {
             userEntity.setFriends("");
             userEntity.setPassword(loginService.hashPassword(userEntity, password));
             userEntity.setGender(0);
-            userEntity.setCreate_at(currentTime);
+            userEntity.setCreated_at(currentTime);
             // 创建
             userDao.create(userEntity);
         }
