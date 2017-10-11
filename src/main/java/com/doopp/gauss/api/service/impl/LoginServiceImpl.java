@@ -2,34 +2,41 @@ package com.doopp.gauss.api.service.impl;
 
 import com.doopp.gauss.api.dao.UserDao;
 import com.doopp.gauss.api.entity.UserEntity;
+import com.doopp.gauss.api.utils.RedisSessionHelper;
 import com.doopp.gauss.api.service.LoginService;
-import com.doopp.gauss.api.helper.EncryHelper;
-import com.doopp.gauss.api.service.WebSocketService;
+import com.doopp.gauss.api.utils.EncryHelper;
+import com.doopp.gauss.api.service.UserService;
+import com.doopp.gauss.api.service.MessageService;
+import org.apache.oltu.oauth2.as.issuer.MD5Generator;
+import org.apache.oltu.oauth2.as.issuer.OAuthIssuer;
+import org.apache.oltu.oauth2.as.issuer.OAuthIssuerImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.Cache;
-import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpSession;
 
 /**
  *
  * Created by henry on 2017/7/11.
  */
-@Service
-
+@Service("loginService")
 public class LoginServiceImpl implements LoginService {
 
-    private static final Logger logger = LoggerFactory.getLogger(LoginServiceImpl.class);
+    // private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Resource
     private UserDao userDao;
 
     @Autowired
-    private WebSocketService webSocketService;
+    private MessageService messageService;
+
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private RedisSessionHelper redisSessionHelper;
 
     //@Resource
     //private EhCacheCacheManager ehCacheCacheManager;
@@ -42,12 +49,12 @@ public class LoginServiceImpl implements LoginService {
 
     // private HttpServletRequest request;
 
-    @Autowired
-    public LoginServiceImpl(CacheManager cacheManager) {
+    //@Autowired
+    //public LoginServiceImpl(CacheManager cacheManager) {
         //this.userDao = DBSession.getMapper(UserDao.class);
         // this.cache   = cacheManager.getCache("access-token-cache");
         // this.request = request;
-    }
+    //}
 
     @Override
     public boolean checkLoginRequest(String account, String password) {
@@ -62,33 +69,33 @@ public class LoginServiceImpl implements LoginService {
     }
 
     @Override
-    public boolean registerLogin(String account, HttpSession httpSession) {
-        UserEntity currentUser = userDao.fetchByAccount(account);
-        httpSession.setAttribute("currentUser", currentUser);
-        logger.info(" >>> " + currentUser);
-        // 哈哈，尝试给长连接发一个消息
-        webSocketService.sendStringToUser(currentUser.getAccount() + " 重登录，连接被重置", currentUser.getId());
-        webSocketService.disconnectSocket(currentUser.getId());
-        webSocketService.sendStringToAll(account + " 登录");
-        return true;
-        /*
+    public String registerLogin(String account) { // , HttpSession httpSession) {
+
         try {
             OAuthIssuer oauthIssuerImpl = new OAuthIssuerImpl(new MD5Generator());
             String accessToken = oauthIssuerImpl.accessToken();
-            cache.put(accessToken, account);
-            this.accessToken = accessToken;
+
+            UserEntity currentUser = userDao.fetchByAccount(account);
+            redisSessionHelper.setUserByToken(accessToken, currentUser);
+            // 断开这个用户的长链接
+            messageService.disconnectSocket(currentUser.getId());
+            messageService.sendStringToUser(currentUser.getAccount() + " 重登录，连接被重置", currentUser.getId());
+            return accessToken;
         }
-        catch (OAuthSystemException e) {
-            return false;
+        catch (Exception e) {
+            return null;
         }
-        return true;
-         */
     }
 
     @Override
-    public boolean unregisterLogin(HttpSession httpSession) {
+    public boolean unregisterLogin(String accessToken) {
+
+        redisSessionHelper.delUserSessionCache(accessToken);
+
+        // UserEntity currentUser = userService.getUserByToken(accessToken);
+
         // SessionUserEntity currentUser = (SessionUserEntity) userDao.fetchByAccount(account);
-        httpSession.removeAttribute("currentUser");
+        // httpSession.removeAttribute("currentUser");
         return true;
         /*
         try {

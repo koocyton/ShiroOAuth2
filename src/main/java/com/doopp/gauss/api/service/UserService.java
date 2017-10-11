@@ -11,12 +11,27 @@ import java.util.Map;
  */
 public interface UserService {
 
+    // 从 Session Redis 里获取用户
+    UserEntity getUserByToken(String accessToken);
+
     // 获取用户信息
     UserEntity getUserInfo(Long userId);
 
     // 获取用户信息
     UserEntity getUserInfo(String account);
 
-    // 获取用户列表
-    List<Map<String, UserEntity>> getUserFriendList(Long userId);
+    // 获取用户好友列表
+    List<UserEntity> getUserFriendList(Long userId);
+
+    // 加为好友
+    boolean applyFriend(UserEntity userEntity, Long userId);
+
+    // 通过好友关系
+    boolean acceptFriend(UserEntity userEntity, Long userId);
+
+    // 通过好友关系
+    boolean rejectFriend(UserEntity userEntity, Long userId);
+
+    // 删除好友关系
+    boolean cancelFriend(UserEntity userEntity, Long userId);
 }
