@@ -53,11 +53,11 @@ public class SessionFilter extends OncePerRequestFilter {
             "/mobile-chat-room",
             "/chat-room",
             "/game-socket",
+            "/webjars",
             "/js",
             "/image",
             "/css",
             "/favicon.ico",
-            // "/webjars",
             "/d/druid"
         };
 

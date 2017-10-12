@@ -25,13 +25,11 @@
     <bean class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor" id="async-executor"/>
 
     <!-- 静态资源(js、image等)的访问-->
+    <!-- webjar -->
+    <mvc:resources mapping="/webjars/**" location="classpath:/META-INF/resources/webjars/" />
     <mvc:default-servlet-handler />
     <mvc:resources mapping="/**" location="classpath:/public/" />
 
-    <!-- webjar -->
-    <!--
-    <mvc:resources mapping="/webjars/**" location="/public/webjars/" />
-    -->
 
     <!--ViewResolver 视图解析器-->
     <!--用于支持Servlet、JSP视图解析-->
