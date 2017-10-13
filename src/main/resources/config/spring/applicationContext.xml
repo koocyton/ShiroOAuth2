@@ -31,7 +31,4 @@
     <!-- import task -->
     <import resource="classpath:config/task-executor/spring-task.xml"/>
 
-    <!-- import shiro -->
-    <!-- <import resource="classpath:config/shiro/spring-shiro.xml"/> -->
-
 </beans>
