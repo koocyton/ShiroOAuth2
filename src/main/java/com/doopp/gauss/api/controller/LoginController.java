@@ -25,16 +25,20 @@ import org.slf4j.LoggerFactory;
 @RequestMapping(value = "api/v1/")
 public class LoginController {
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final static Logger logger = LoggerFactory.getLogger(LoginController.class);
+
+    private final LoginService loginService;
+
+    private final RegisterService registerService;
+
+    private final RestResponseService restResponse;
 
     @Autowired
-    private LoginService loginService;
-
-    @Autowired
-    private RegisterService registerService;
-
-    @Autowired
-    private RestResponseService restResponse;
+    public LoginController(LoginService loginService, RegisterService registerService, RestResponseService restResponse) {
+        this.loginService = loginService;
+        this.registerService = registerService;
+        this.restResponse = restResponse;
+    }
 
     /*
      * 提交登录

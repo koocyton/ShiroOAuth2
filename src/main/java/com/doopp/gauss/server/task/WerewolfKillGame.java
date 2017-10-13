@@ -6,13 +6,27 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.task.TaskExecutor;
+import org.springframework.stereotype.Component;
 
-public class WolfKillGame {
+@Component
+public class WerewolfKillGame {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
+    private UserService userService;
+
+    private TaskExecutor taskExecutor;
+
     @Autowired
-    UserService userService;
+    public WerewolfKillGame(UserService userService, TaskExecutor taskExecutor) {
+        this.userService = userService;
+        this.taskExecutor = taskExecutor;
+        this.launchGame();
+    }
+
+    private void launchGame() {
+        taskExecutor.execute(new GameTask());
+    }
 
     private class GameTask implements Runnable {
 
@@ -35,16 +49,5 @@ public class WolfKillGame {
             }
         }
 
-    }
-
-    private TaskExecutor taskExecutor;
-
-    public WolfKillGame(TaskExecutor taskExecutor) {
-        this.taskExecutor = taskExecutor;
-        this.launch();
-    }
-
-    private void launch() {
-        taskExecutor.execute(new GameTask());
     }
 }

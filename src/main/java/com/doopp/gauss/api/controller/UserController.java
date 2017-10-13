@@ -4,10 +4,8 @@ import com.alibaba.fastjson.JSONObject;
 
 import com.doopp.gauss.api.entity.RoomEntity;
 import com.doopp.gauss.api.entity.UserEntity;
+import com.doopp.gauss.api.service.*;
 import com.doopp.gauss.api.utils.UploadFileHelper;
-import com.doopp.gauss.api.service.RestResponseService;
-import com.doopp.gauss.api.service.RoomService;
-import com.doopp.gauss.api.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,14 +27,18 @@ public class UserController {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
+
+    private final RoomService roomService;
+
+    private final RestResponseService restResponse;
 
     @Autowired
-    private RoomService roomService;
-
-    @Autowired
-    private RestResponseService restResponse;
+    public UserController(UserService userService, RoomService roomService, RestResponseService restResponse) {
+        this.userService = userService;
+        this.roomService = roomService;
+        this.restResponse = restResponse;
+    }
 
     /*
      * 获取当前用户信息

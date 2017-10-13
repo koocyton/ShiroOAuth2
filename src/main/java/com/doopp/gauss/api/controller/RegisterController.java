@@ -22,18 +22,22 @@ import javax.servlet.http.HttpSession;
 @RequestMapping(value = "api/v1/")
 public class RegisterController {
 
-    @Autowired
-    private LoginService loginService;
+    private final LoginService loginService;
+
+    private final RegisterService registerService;
+
+    private final RestResponseService restResponse;
 
     @Autowired
-    private RegisterService registerService;
-
-    @Autowired
-    private RestResponseService restResponse;
+    public RegisterController(LoginService loginService, RegisterService registerService, RestResponseService restResponse) {
+        this.loginService = loginService;
+        this.registerService = registerService;
+        this.restResponse = restResponse;
+    }
 
     /*
-     * 提交登录
-     */
+    * 提交登录
+    */
     @ResponseBody
     @RequestMapping(value = "register", method = RequestMethod.POST)
     public JSONObject register(HttpServletResponse response,

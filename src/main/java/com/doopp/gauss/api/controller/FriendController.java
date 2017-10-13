@@ -2,6 +2,8 @@ package com.doopp.gauss.api.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.doopp.gauss.api.entity.UserEntity;
+import com.doopp.gauss.api.service.LoginService;
+import com.doopp.gauss.api.service.RegisterService;
 import com.doopp.gauss.api.service.RestResponseService;
 import com.doopp.gauss.api.service.UserService;
 import com.doopp.gauss.api.service.impl.LoginServiceImpl;
@@ -30,11 +32,15 @@ public class FriendController {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
+
+    private final RestResponseService restResponseService;
 
     @Autowired
-    private RestResponseService restResponseService;
+    public FriendController(UserService userService, RestResponseService restResponseService) {
+        this.userService = userService;
+        this.restResponseService = restResponseService;
+    }
 
     /*
      * 好友列表
