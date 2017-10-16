@@ -2,6 +2,7 @@ package com.doopp.gauss.api.utils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 /*
  * Created by henry on 2017/4/23.

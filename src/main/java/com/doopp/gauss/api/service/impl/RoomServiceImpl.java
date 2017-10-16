@@ -3,10 +3,8 @@ package com.doopp.gauss.api.service.impl;
 import com.doopp.gauss.api.dao.RoomDao;
 import com.doopp.gauss.api.entity.RoomEntity;
 import com.doopp.gauss.api.entity.UserEntity;
-import com.doopp.gauss.api.service.RoomService;
 import com.doopp.gauss.api.service.MessageService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.doopp.gauss.api.service.RoomService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

@@ -1,10 +1,7 @@
 package com.doopp.gauss.api.service;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.doopp.gauss.api.entity.UserEntity;
-
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * Web socket service

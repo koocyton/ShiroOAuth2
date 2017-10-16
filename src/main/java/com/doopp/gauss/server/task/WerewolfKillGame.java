@@ -1,7 +1,6 @@
 package com.doopp.gauss.server.task;
 
 import com.doopp.gauss.api.entity.UserEntity;
-import com.doopp.gauss.api.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,13 +12,13 @@ public class WerewolfKillGame {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private UserService userService;
+    /// private UserService userService;
 
     private TaskExecutor taskExecutor;
 
     @Autowired
-    public WerewolfKillGame(UserService userService, TaskExecutor taskExecutor) {
-        this.userService = userService;
+    public WerewolfKillGame(TaskExecutor taskExecutor) {
+        // this.userService = userService;
         this.taskExecutor = taskExecutor;
         this.launchGame();
     }
@@ -33,20 +32,20 @@ public class WerewolfKillGame {
         public void run()  {
 
             // logger.info(" >>> Run GameTask " + userService);
-            while(true) {
-                if (userService==null) {
-                    continue;
-                }
-                UserEntity user = userService.getUserInfo("koocyton@gmail.com");
-                logger.info(" >>> Run GameTask " + user);
-                try {
-                    Thread.sleep(1000);
-                }
-                catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                break;
-            }
+//            while(true) {
+//                if (userService==null) {
+//                    continue;
+//                }
+//                UserEntity user = userService.getUserInfo("koocyton@gmail.com");
+//                logger.info(" >>> Run GameTask " + user);
+//                try {
+//                    Thread.sleep(1000);
+//                }
+//                catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+//                break;
+//            }
         }
 
     }

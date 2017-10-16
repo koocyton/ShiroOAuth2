@@ -1,6 +1,5 @@
 package com.doopp.gauss.server.undertow;
 
-import com.doopp.gauss.api.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
@@ -14,8 +13,8 @@ public class GuessDrawGame implements DisposableBean, Runnable {
 
     private volatile boolean runCondition = true;
 
-    @Autowired
-    UserService userService;
+    //@Autowired
+    //UserService userService;
 
     GuessDrawGame(){
         this.thread = new Thread(this);

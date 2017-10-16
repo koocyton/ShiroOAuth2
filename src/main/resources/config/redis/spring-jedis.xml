@@ -10,7 +10,7 @@
     <context:annotation-config />
 
     <!-- 引入属性文件 -->
-    <context:property-placeholder location="classpath:config/tomcat.webapp.root.properties" ignore-unresolvable="true" />
+    <context:property-placeholder location="classpath:config/webapp.properties" ignore-unresolvable="true" />
 
     <!-- 配置redis数据库连接池 -->
     <bean id="jedisPoolConfig" class="redis.clients.jedis.JedisPoolConfig">

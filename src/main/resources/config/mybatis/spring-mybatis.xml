@@ -15,12 +15,12 @@
     //-->
 
     <!-- 引入配置文件 -->
-    <context:property-placeholder location="classpath:config/tomcat.webapp.root.properties" />
+    <context:property-placeholder location="classpath:config/webapp.properties" />
 
     <!--
     <bean id="propertyConfigurer"
           class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-        <property name="location" value="classpath*:config/tomcat.webapp.root.properties" />
+        <property name="location" value="classpath*:config/webapp.properties" />
     </bean>
     //-->
 
