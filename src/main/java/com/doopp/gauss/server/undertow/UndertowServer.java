@@ -36,6 +36,7 @@ public class UndertowServer implements InitializingBean, DisposableBean {
     private String webAppName;
     private Resource webAppRoot;
     private int port = 8080;
+    private String host = "127.0.0.1";
     private ServletContainerInitializer servletContainerInitializer;
     // private WebSocketConnectionCallback socketConnectionCallback;
 
@@ -44,13 +45,16 @@ public class UndertowServer implements InitializingBean, DisposableBean {
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        // logger.info("Starting Undertow web server on port {}, serving web application '{}' having root at {}", port, webAppName, webAppRoot.getFile().getAbsolutePath());
-
         // web servlet
         InstanceFactory<? extends ServletContainerInitializer> instanceFactory = new ImmediateInstanceFactory<>(servletContainerInitializer);
         ServletContainerInitializerInfo sciInfo = new ServletContainerInitializerInfo(WebAppServletContainerInitializer.class, instanceFactory, new HashSet<>());
-        // System.out.print("\n 2 >>> " + sciInfo + "\n");
-        DeploymentInfo deploymentInfo = constructDeploymentInfo(sciInfo);
+        DeploymentInfo deploymentInfo = Servlets.deployment()
+            .addServletContainerInitalizer(sciInfo)
+            .setClassLoader(UndertowServer.class.getClassLoader())
+            .setContextPath(webAppName)
+            .setDeploymentName(webAppName + "-war")
+            .setResourceManager(new FileResourceManager(webAppRoot.getFile(), 0))
+            .addServlet(Servlets.servlet("default", DefaultServlet.class));
 
         // add webSocket
         final WebSocketDeploymentInfo wsInfo = new WebSocketDeploymentInfo();
@@ -60,10 +64,13 @@ public class UndertowServer implements InitializingBean, DisposableBean {
         manager.deploy();
         HttpHandler httpHandler = manager.start();
 
-        PathHandler pathHandler = constructPathHandler(httpHandler);
+        // PathHandler pathHandler = constructPathHandler(httpHandler);
+        RedirectHandler defaultHandler = Handlers.redirect("/");
+        PathHandler pathHandler = Handlers.path(defaultHandler);
+        pathHandler.addPrefixPath("/", httpHandler);
 
         server = Undertow.builder()
-            .addHttpListener(port, "localhost")
+            .addHttpListener(port, host)
             .setHandler(pathHandler)
             .build();
 
@@ -71,28 +78,6 @@ public class UndertowServer implements InitializingBean, DisposableBean {
 
         // logger.info("Undertow web server started; web application available at http://localhost:{}/{}", port, webAppName);
         logger.info("Undertow web server started; web application available at http://localhost:{}", port);
-    }
-
-    private DeploymentInfo constructDeploymentInfo(ServletContainerInitializerInfo sciInfo) throws IOException {
-
-        File webAppRootFile = webAppRoot.getFile();
-        return Servlets.deployment()
-            .addServletContainerInitalizer(sciInfo)
-            .setClassLoader(UndertowServer.class.getClassLoader())
-            .setContextPath(webAppName)
-            .setDeploymentName(webAppName + "-war")
-            .setResourceManager(new FileResourceManager(webAppRootFile, 0))
-            .addServlet(Servlets.servlet("default", DefaultServlet.class));
-    }
-
-    private PathHandler constructPathHandler(HttpHandler httpHandler) {
-        // RedirectHandler defaultHandler = Handlers.redirect("/" + webAppName);
-        RedirectHandler defaultHandler = Handlers.redirect("/");
-        PathHandler pathHandler = Handlers.path(defaultHandler);
-        // pathHandler.addPrefixPath("/" + webAppName, httpHandler);
-        pathHandler.addPrefixPath("/", httpHandler);
-        // pathHandler.addPrefixPath("/game-socket", websocket(socketConnectionCallback));
-        return pathHandler;
     }
 
     @Override
@@ -116,61 +101,11 @@ public class UndertowServer implements InitializingBean, DisposableBean {
         this.port = port;
     }
 
+    public void setHost(String host) {
+        this.host = host;
+    }
+
     public void setServletContainerInitializer(ServletContainerInitializer servletContainerInitializer) {
         this.servletContainerInitializer = servletContainerInitializer;
     }
-
-    // public void setSocketConnectionCallback(WebSocketConnectionCallback socketConnectionCallback) {
-    //     this.socketConnectionCallback = socketConnectionCallback;
-    // }
 }
-
-
-//public class UndertowServlet {
-//
-//    /**
-//     * Initialize, configure and start a server implementation.
-//     *
-//     * @param contextPath
-//     * @param deploymentName
-//     * @param servletName
-//     * @param contextConfigLocation
-//     * @param mapping
-//     * @param host
-//     * @param port
-//     */
-//    public UndertowServlet(final String contextPath, final String deploymentName, final String servletName, final String contextConfigLocation, final String mapping, final String host, final Integer port) {
-//
-//
-//        try {
-//
-//            final DeploymentInfo servletBuilder = deployment()
-//                .setClassLoader(KTApplication.class.getClassLoader())
-//                .setContextPath(contextPath)
-//                .setDeploymentName(deploymentName)
-//                .setMajorVersion(3)
-//                .setMinorVersion(0)
-//                .addInitParameter("contextConfigLocation", "classpath:config/spring/applicationContext.xml")
-//                .addListener(new ListenerInfo(ContextLoaderListener.class))
-//                .addServlet(
-//                    servlet(servletName, DispatcherServlet.class)
-//                        .addInitParam("contextConfigLocation", "classpath:config/spring-mvc/mvc-dispatcher-servlet.xml")
-//                        .addMapping(mapping)
-//                        .setLoadOnStartup(1)
-//                        .setAsyncSupported(true));
-//
-//            final DeploymentManager manager = defaultContainer().addDeployment(servletBuilder);
-//            manager.deploy();
-//
-//            final Undertow server = Undertow.builder()
-//                .addHttpListener(port, host)
-//                // .addListener(port, host)
-//                .setHandler(manager.start())
-//                .build();
-//
-//            server.start();
-//        } catch (ServletException e) {
-//            throw new RuntimeException(e);
-//        }
-//    }
-//}

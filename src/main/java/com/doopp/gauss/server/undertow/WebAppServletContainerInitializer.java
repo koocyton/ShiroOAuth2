@@ -18,19 +18,8 @@ public class WebAppServletContainerInitializer implements ServletContainerInitia
 
     private ApplicationContext applicationContext;
 
-
     @Override
     public void onStartup(Set<Class<?>> c, ServletContext ctx) throws ServletException {
-
-        // set log4j , 配置文件，放 resources 目录下了，不需要这么配置了
-        //ctx.setInitParameter("log4jConfigLocation", "classpath:config/log4j/log4j.properties");
-        //ctx.setInitParameter("log4jRefreshInterval", "6000");
-        //ctx.addListener(org.springframework.web.util.Log4jConfigListener.class);
-
-        // springSecurityFilterChain
-        //FilterRegistration.Dynamic shiroFilter = ctx.addFilter("shiroFilter", DelegatingFilterProxy.class);
-        // springSecurityFilterChain.addMappingForServletNames(EnumSet.allOf(DispatcherType.class), false, "admin");
-        //shiroFilter.addMappingForUrlPatterns(EnumSet.allOf(DispatcherType.class), false, "/*");
 
         // session filter
         FilterRegistration.Dynamic sessionFilter = ctx.addFilter("sessionFilter", SessionFilter.class);
@@ -56,8 +45,8 @@ public class WebAppServletContainerInitializer implements ServletContainerInitia
         dispatcher.addMapping("/*");
 
         // 添加 druid sql 监控
-        ServletRegistration.Dynamic druidDispatcher = ctx.addServlet("DruidStatView", com.alibaba.druid.support.http.StatViewServlet.class);
-        druidDispatcher.addMapping("/d/*");
+        // ServletRegistration.Dynamic druidDispatcher = ctx.addServlet("DruidStatView", com.alibaba.druid.support.http.StatViewServlet.class);
+        // druidDispatcher.addMapping("/d/*");
     }
 
     @Override

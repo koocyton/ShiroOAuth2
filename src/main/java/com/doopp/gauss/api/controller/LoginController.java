@@ -1,16 +1,13 @@
 package com.doopp.gauss.api.controller;
 
-import com.alibaba.fastjson.JSONObject;
 import com.doopp.gauss.api.entity.UserEntity;
-import com.doopp.gauss.api.service.LoginService;
-import com.doopp.gauss.api.service.RestResponseService;
+import com.doopp.gauss.api.entity.dto.AccessTokenDTO;
+import com.doopp.gauss.api.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpServletResponse;
 
 /**
  * 登录界面
@@ -23,35 +20,26 @@ public class LoginController {
 
     private final static Logger logger = LoggerFactory.getLogger(LoginController.class);
 
-    private LoginService loginService;
-
-    private RestResponseService restResponseService;
-
     @Autowired
-    public LoginController (LoginService loginService, RestResponseService restResponseService) {
-        this.loginService = loginService;
-        this.restResponseService = restResponseService;
-    }
+    private UserService userService;
+
     /*
      * 提交登录
      */
     @ResponseBody
     @RequestMapping(value = "login", method = RequestMethod.POST)
-    public JSONObject login(HttpServletResponse response,
-                            @RequestParam("account") String account,
-                            @RequestParam("password") String password) {
+    public AccessTokenDTO login(@RequestParam("account") String account, @RequestParam("password") String password) throws Exception {
 
         // 校验用户名，密码
-        if (!loginService.checkAccountPassword(account, password)) {
-            // 告诉客户端密码错误
-            return restResponseService.error(response, 404, "Account or password is failed");
+        UserEntity user = userService.getByAccentPassword(account, password);
+        if (user==null) {
+            throw new Exception("server can not login");
         }
         // 注册一个登录用户，生成 access token ，并缓存这个 key 对应的值 (account)
-        String accessToken = loginService.createSessionToken(account);
-        if (accessToken==null) {
-            return restResponseService.error(response, 500, "can not login");
-        }
+        String accessToken = loginService.createSessionToken(user);
         // 下发 access token
-        return restResponseService.data(accessToken);
+        AccessTokenDTO accessTokenDTO = new AccessTokenDTO();
+        accessTokenDTO.setAccessToken(accessToken);
+        return accessTokenDTO;
     }
 }
