@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.task.TaskExecutor;
 
-public class WolfKillGame {
+public class WerewolfGame {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -39,7 +39,7 @@ public class WolfKillGame {
 
     private TaskExecutor taskExecutor;
 
-    public WolfKillGame(TaskExecutor taskExecutor) {
+    public WerewolfGame(TaskExecutor taskExecutor) {
         this.taskExecutor = taskExecutor;
         this.launch();
     }

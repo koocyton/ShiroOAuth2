@@ -24,13 +24,4 @@ public interface RestResponseService {
     JSONObject data(Object data);
 
     JSONObject loginSuccess(String accessToken);
-
-    static void writeErrorResponse(HttpServletResponse response, String message) throws IOException {
-        response.setStatus(501);
-        String data = "{\"errcode\":501, \"errmsg\":\"" + message + "\"}";
-        response.setCharacterEncoding("UTF-8");
-        response.setContentType("application/json;charset=UTF-8");
-        PrintWriter out = response.getWriter();
-        out.write(data);
-    }
 }

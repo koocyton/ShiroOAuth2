@@ -1,6 +1,7 @@
 package com.doopp.gauss.server.filter;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletContext;
@@ -8,9 +9,11 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.alibaba.fastjson.JSONObject;
 import com.doopp.gauss.api.entity.UserEntity;
 import com.doopp.gauss.api.utils.RedisSessionHelper;
 import org.springframework.context.ApplicationContext;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import com.doopp.gauss.api.service.RestResponseService;
@@ -23,7 +26,7 @@ import org.slf4j.LoggerFactory;
 /*
  * Created by henry on 2017/4/16.
  */
-@Service
+@Component
 public class SessionFilter extends OncePerRequestFilter {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -61,7 +64,6 @@ public class SessionFilter extends OncePerRequestFilter {
             "/d/druid"
         };
 
-
         // 请求的uri
         String uri = request.getRequestURI();
 
@@ -93,13 +95,13 @@ public class SessionFilter extends OncePerRequestFilter {
                     }
                     // 如果不能找到用户
                     else {
-                        RestResponseService.writeErrorResponse(response, "Session failed");
+                        writeErrorResponse(response, "Session failed");
                         return;
                     }
                 }
                 // 如果 token 不对
                 else {
-                    RestResponseService.writeErrorResponse(response, "Session failed");
+                    writeErrorResponse(response, "Session failed");
                     return;
                 }
             }
@@ -107,8 +109,18 @@ public class SessionFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
         }
         catch(Exception e) {
-            e.printStackTrace();
-            RestResponseService.writeErrorResponse(response, e.getMessage());
+            logger.info(" >>> e.getMessage : " +  e.getMessage());
+            // e.printStackTrace();
+            writeErrorResponse(response, e.getMessage());
         }
+    }
+
+    private static void writeErrorResponse(HttpServletResponse response, String message) throws IOException {
+        response.setStatus(501);
+        String data = "{\"errcode\":501, \"errmsg\":\"" + message + "\"}";
+        response.setCharacterEncoding("UTF-8");
+        response.setContentType("application/json;charset=UTF-8");
+        PrintWriter out = response.getWriter();
+        out.write(data);
     }
 }

@@ -9,20 +9,8 @@
                            http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
                            http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd">
 
-    <!-- 自动扫描 -->
-    <!--
-    <context:component-scan base-package="com.doopp.gauss.api" />
-    //-->
-
     <!-- 引入配置文件 -->
     <context:property-placeholder location="classpath:config/application.properties" />
-
-    <!--
-    <bean id="propertyConfigurer"
-          class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-        <property name="location" value="classpath*:config/application.properties" />
-    </bean>
-    //-->
 
     <!--
     <bean id="userDataSource" class="com.doopp.gauss.server.database.SafeBasicDataSource" destroy-method="close">
@@ -61,14 +49,16 @@
         <property name="maxPoolPreparedStatementPerConnectionSize" value="20" />
 
         <!-- 配置监控统计拦截的filters -->
-        <property name="filters" value="stat,log4j" />
+        <!-- <property name="filters" value="stat,log4j" /> -->
     </bean>
 
     <!-- 慢SQL记录 -->
+    <!--
     <bean id="stat-filter" class="com.alibaba.druid.filter.stat.StatFilter">
         <property name="slowSqlMillis" value="200" />
         <property name="logSlowSql" value="true" />
     </bean>
+    -->
 
     <!-- spring和MyBatis完美整合，不需要mybatis的配置映射文件 -->
     <bean id="userSqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">

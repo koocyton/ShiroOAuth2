@@ -1,13 +1,8 @@
 package com.doopp.gauss.server.undertow;
 
-import io.undertow.Handlers;
 import io.undertow.Undertow;
 import io.undertow.server.HttpHandler;
 
-import static io.undertow.Handlers.path;
-
-import io.undertow.server.handlers.PathHandler;
-import io.undertow.server.handlers.RedirectHandler;
 import io.undertow.server.handlers.resource.FileResourceManager;
 import io.undertow.servlet.Servlets;
 import io.undertow.servlet.api.DeploymentInfo;
@@ -25,8 +20,6 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
 
 import javax.servlet.ServletContainerInitializer;
-import java.io.File;
-import java.io.IOException;
 import java.util.HashSet;
 
 public class UndertowServer implements InitializingBean, DisposableBean {
@@ -38,20 +31,22 @@ public class UndertowServer implements InitializingBean, DisposableBean {
     private String host = "127.0.0.1";
     private int port = 8080;
     private ServletContainerInitializer servletContainerInitializer;
-    // private WebSocketConnectionCallback socketConnectionCallback;
 
     private Undertow server;
     private DeploymentManager manager;
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        // logger.info("Starting Undertow web server on port {}, serving web application '{}' having root at {}", port, webAppName, webAppRoot.getFile().getAbsolutePath());
-
         // web servlet
         InstanceFactory<? extends ServletContainerInitializer> instanceFactory = new ImmediateInstanceFactory<>(servletContainerInitializer);
         ServletContainerInitializerInfo sciInfo = new ServletContainerInitializerInfo(WebAppServletContainerInitializer.class, instanceFactory, new HashSet<>());
-        // System.out.print("\n 2 >>> " + sciInfo + "\n");
-        DeploymentInfo deploymentInfo = constructDeploymentInfo(sciInfo);
+        DeploymentInfo deploymentInfo = Servlets.deployment()
+                .addServletContainerInitalizer(sciInfo)
+                .setClassLoader(UndertowServer.class.getClassLoader())
+                .setContextPath(webAppName)
+                .setDeploymentName(webAppName + "-war")
+                .setResourceManager(new FileResourceManager(webAppRoot.getFile(), 0))
+                .addServlet(Servlets.servlet("default", DefaultServlet.class));
 
         // add webSocket
         final WebSocketDeploymentInfo wsInfo = new WebSocketDeploymentInfo();
@@ -61,39 +56,18 @@ public class UndertowServer implements InitializingBean, DisposableBean {
         manager.deploy();
         HttpHandler httpHandler = manager.start();
 
-        PathHandler pathHandler = constructPathHandler(httpHandler);
+        //RedirectHandler defaultHandler = Handlers.redirect("/");
+        //PathHandler pathHandler = Handlers.path(defaultHandler);
+        //pathHandler.addPrefixPath("/", httpHandler);
 
         server = Undertow.builder()
             .addHttpListener(port, "localhost")
-            .setHandler(pathHandler)
+            .setHandler(httpHandler)
             .build();
 
         server.start();
 
-        // logger.info("Undertow web server started; web application available at http://localhost:{}/{}", port, webAppName);
         logger.info("Undertow web server started; web application available at http://localhost:{}", port);
-    }
-
-    private DeploymentInfo constructDeploymentInfo(ServletContainerInitializerInfo sciInfo) throws IOException {
-
-        File webAppRootFile = webAppRoot.getFile();
-        return Servlets.deployment()
-            .addServletContainerInitalizer(sciInfo)
-            .setClassLoader(UndertowServer.class.getClassLoader())
-            .setContextPath(webAppName)
-            .setDeploymentName(webAppName + "-war")
-            .setResourceManager(new FileResourceManager(webAppRootFile, 0))
-            .addServlet(Servlets.servlet("default", DefaultServlet.class));
-    }
-
-    private PathHandler constructPathHandler(HttpHandler httpHandler) {
-        // RedirectHandler defaultHandler = Handlers.redirect("/" + webAppName);
-        RedirectHandler defaultHandler = Handlers.redirect("/");
-        PathHandler pathHandler = Handlers.path(defaultHandler);
-        // pathHandler.addPrefixPath("/" + webAppName, httpHandler);
-        pathHandler.addPrefixPath("/", httpHandler);
-        // pathHandler.addPrefixPath("/game-socket", websocket(socketConnectionCallback));
-        return pathHandler;
     }
 
     @Override
