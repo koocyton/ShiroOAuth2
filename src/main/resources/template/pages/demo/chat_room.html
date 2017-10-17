@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<title>Chat Room</title>
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8"/>
+    <meta content="yes" name="apple-mobile-web-app-capable"/>
+    <meta content="yes" name="apple-touch-fullscreen"/>
+    <meta content="telephone=no" name="format-detection"/>
+    <meta content="black" name="apple-mobile-web-app-status-bar-style">
+    <meta content="#ffffff" name="msapplication-TileColor"/>
+    <meta http-equiv="Expires" content="-1">
+    <meta http-equiv="Cache-Control" content="no-store">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
+    <script src="/webjars/jquery/1.11.1/jquery.min.js"></script>
+    <script src="/webjars/bootstrap/3.3.7-1/js/bootstrap.min.js"></script>
+    <script src="/webjars/angular/1.6.6/angular.js"></script>
+    <link href="/webjars/bootstrap/3.3.7-1/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body ng-controller="myCtrl">
+
+<div class="container">
+    <table class="table table-hover table-bordered">
+
+        <tr ng-repeat="list in lists">
+            <td ng-bind="list.name" />
+        </tr>
+
+    </table>
+</div>
+
+<script>
+    var app=angular.module("myApp",[]);
+    app.controller("myCtrl", function($scope) {
+        $scope.lists = [
+            {"id": "1", "name": "张三", "age": 22, "phoneNum": "18298705786"},
+            {"id": "2", "name": "王五", "age": 28, "phoneNum": "18456705786"},
+            {"id": "3", "name": "张三", "age": 29, "phoneNum": "18291235786"},
+            {"id": "4", "name": "蔡雄", "age": 22, "phoneNum": "18298705786"},
+            {"id": "5", "name": "张三", "age": 26, "phoneNum": "18759705786"},
+            {"id": "6", "name": "张楚", "age": 22, "phoneNum": "18298705786"}
+        ]
+    });
+</script>
+</body>
+</html>
