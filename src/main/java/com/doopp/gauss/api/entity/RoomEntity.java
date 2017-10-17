@@ -1,6 +1,9 @@
 package com.doopp.gauss.api.entity;
 
+import com.doopp.gauss.api.service.impl.RoomServiceImpl;
 import lombok.Data;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 import java.util.ArrayList;

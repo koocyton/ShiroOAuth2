@@ -1,10 +1,14 @@
 package com.doopp.gauss.api.utils;
 
 import com.google.common.base.Strings;
+import org.modelmapper.ModelMapper;
 
 import javax.servlet.http.HttpServletRequest;
 
-public final class CommonUtil {
+public class CommonUtils {
+
+    // Data Object to Out Object
+    private final static ModelMapper modelMapper = new ModelMapper();
 
     /**
      * Returns 是否是移动客户端
@@ -54,5 +58,9 @@ public final class CommonUtil {
             return ip;
         }
         return request.getRemoteAddr();
+    }
+
+    public static <D> D modelMap(Object source, Class<D> destinationType) {
+        return modelMapper.map(source, destinationType);
     }
 }

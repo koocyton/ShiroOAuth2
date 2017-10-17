@@ -1,13 +1,17 @@
 package com.doopp.gauss.api.controller;
 
-import com.doopp.gauss.api.entity.UserEntity;
-import com.doopp.gauss.api.entity.dto.AccessTokenDTO;
-import com.doopp.gauss.api.service.UserService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.alibaba.fastjson.JSONObject;
+import com.doopp.gauss.api.entity.dto.SessionKeyDTO;
+import com.doopp.gauss.api.entity.dto.UserDTO;
+import com.doopp.gauss.api.service.LoginService;
+import com.doopp.gauss.api.service.RegisterService;
+import com.doopp.gauss.api.service.RestResponseService;
+import com.doopp.gauss.api.utils.CommonUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * 登录界面
@@ -18,28 +22,76 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping(value = "api/v1/")
 public class LoginController {
 
-    private final static Logger logger = LoggerFactory.getLogger(LoginController.class);
+    // private final Logger logger = LoggerFactory.getLogger(getClass());
+
+    private final LoginService loginService;
+
+    private final RegisterService registerService;
+
+    private final RestResponseService restService;
 
     @Autowired
-    private UserService userService;
+    public LoginController(LoginService loginService, RegisterService registerService, RestResponseService restService) {
+        this.loginService = loginService;
+        this.registerService = registerService;
+        this.restService = restService;
+    }
 
     /*
      * 提交登录
      */
     @ResponseBody
     @RequestMapping(value = "login", method = RequestMethod.POST)
-    public AccessTokenDTO login(@RequestParam("account") String account, @RequestParam("password") String password) throws Exception {
+    public JSONObject login(HttpServletResponse response,
+                            @RequestParam("account") String account,
+                            @RequestParam("password") String password) throws Exception {
 
         // 校验用户名，密码
-        UserEntity user = userService.getByAccentPassword(account, password);
-        if (user==null) {
-            throw new Exception("server can not login");
+        if (!loginService.checkLoginRequest(account, password)) {
+            throw new Exception("Account or password is failed");
         }
         // 注册一个登录用户，生成 access token ，并缓存这个 key 对应的值 (account)
-        String accessToken = loginService.createSessionToken(user);
+        String accessToken = loginService.registerLogin(account);
+        if (accessToken==null) {
+            throw new Exception("can not login");
+        }
         // 下发 access token
-        AccessTokenDTO accessTokenDTO = new AccessTokenDTO();
-        accessTokenDTO.setAccessToken(accessToken);
-        return accessTokenDTO;
+        // return CommonUtils.modelMap(accessToken, SessionKeyDTO.class);
+        return restService.loginSuccess(accessToken);
+    }
+
+    /*
+     * 退出登录
+     */
+    @ResponseBody
+    @RequestMapping(value = "logout", method = RequestMethod.GET)
+    public JSONObject logout(HttpServletResponse response,
+                             @RequestHeader("access-token") String accessToken) {
+
+        // 当前用户
+        // UserEntity currentUser = userService.getUserByToken(accessToken);
+
+        // 清空 cookie
+        if (!loginService.unregisterLogin(accessToken)) {
+            // 退出登录失败
+            return restService.error(response, 500, "logout failed");
+        }
+        // 退出登录成功
+        return restService.success();
+    }
+
+    /*
+     * 快速登录，并进入房间
+     */
+    @ResponseBody
+    @RequestMapping(value = "fast-login", method = RequestMethod.POST)
+    public JSONObject fastLogin(@RequestParam("account") String account) {
+        // 尝试注册一个用户
+        registerService.registerUser(account, "a12345678");
+        // 登录这个用户
+        String accessToken = loginService.registerLogin(account);
+        // 下发 access token
+        // return CommonUtils.modelMap(accessToken, SessionKeyDTO.class);
+        return restService.loginSuccess(accessToken);
     }
 }

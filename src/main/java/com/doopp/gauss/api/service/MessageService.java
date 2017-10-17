@@ -11,7 +11,7 @@ import com.doopp.gauss.api.entity.UserEntity;
 public interface MessageService {
 
     // 发送消息给所有人
-    // void sendStringToAll(String message);
+    void sendStringToAll(String message);
 
     // 将消息发送到房间
     void sendStringToRoom(String message, int targetRoomId);

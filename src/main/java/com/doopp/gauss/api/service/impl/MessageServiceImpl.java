@@ -4,9 +4,12 @@ import com.alibaba.fastjson.JSONObject;
 import com.doopp.gauss.api.dao.RoomDao;
 import com.doopp.gauss.api.entity.RoomEntity;
 import com.doopp.gauss.api.entity.UserEntity;
-import com.doopp.gauss.api.service.MessageService;
 import com.doopp.gauss.api.service.RestResponseService;
+import com.doopp.gauss.api.service.ChatService;
+import com.doopp.gauss.api.service.MessageService;
 import com.doopp.gauss.server.websocket.handler.GameSocketHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.TextMessage;
@@ -24,24 +27,19 @@ public class MessageServiceImpl implements MessageService {
 
     // private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    @Resource
+    @Autowired
     private GameSocketHandler gameSocketHandler;
 
     @Autowired
-    private RestResponseService restResponseService;
+    private ChatService chatService;
 
-    //@Autowired
-    //ChatService chatService;
+    @Autowired
+    private RoomDao roomDao;
 
-    @Resource
-    RoomDao roomDao;
-
-    /*
     @Override
     public void sendStringToAll(String message){
         gameSocketHandler.sendMessageToAll(new TextMessage(message));
     }
-    */
 
     @Override
     public void sendStringToUser(String message, Long... targetUsersId){
@@ -79,31 +77,31 @@ public class MessageServiceImpl implements MessageService {
     @Override
     public void callMessageService(UserEntity currentUser, String action, JSONObject actionData) {
         // 按 action 调用不同 service
-//        switch(action) {
-//            // 房间内发送消息
-//            case "room-chat":
-//                chatService.roomChat(
-//                    currentUser,
-//                    action,
-//                    actionData
-//                );
-//                break;
-//            // 房间内私聊
-//            case "room-private-chat" :
-//                chatService.roomPersonChat(
-//                    currentUser,
-//                    action,
-//                    actionData
-//                );
-//                break;
-//            // P2P 给某某发送消息
-//            case "person-chat" :
-//                chatService.personChat(
-//                    currentUser,
-//                    action,
-//                    actionData
-//                );
-//                break;
-//        }
+        switch(action) {
+            // 房间内发送消息
+            case "room-chat":
+                chatService.roomChat(
+                    currentUser,
+                    action,
+                    actionData
+                );
+                break;
+            // 房间内私聊
+            case "room-private-chat" :
+                chatService.roomPersonChat(
+                    currentUser,
+                    action,
+                    actionData
+                );
+                break;
+            // P2P 给某某发送消息
+            case "person-chat" :
+                chatService.personChat(
+                    currentUser,
+                    action,
+                    actionData
+                );
+                break;
+        }
     }
 }

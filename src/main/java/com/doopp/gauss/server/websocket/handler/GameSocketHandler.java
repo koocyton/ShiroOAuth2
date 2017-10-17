@@ -5,11 +5,12 @@ import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 import com.doopp.gauss.api.entity.RoomEntity;
 import com.doopp.gauss.api.entity.UserEntity;
-import com.doopp.gauss.api.service.MessageService;
 import com.doopp.gauss.api.service.RoomService;
+import com.doopp.gauss.api.service.MessageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.web.socket.*;
 
 import java.io.IOException;
@@ -21,6 +22,7 @@ import java.util.Map;
  *
  * Created by henry on 2017/7/20.
  */
+@Component
 public class GameSocketHandler implements WebSocketHandler {
 
     @Autowired

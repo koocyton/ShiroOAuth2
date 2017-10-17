@@ -16,12 +16,6 @@
                                 expression="org.springframework.web.bind.annotation.ControllerAdvice" />
     </context:component-scan>
 
-    <!-- import cache -->
-    <import resource="classpath:config/ehcache/spring-cache.xml"/>
-
-    <!-- import websocket -->
-    <import resource="classpath:config/websocket/spring-websocket.xml" />
-
     <!-- import spring-data-redis.xml -->
     <import resource="classpath:config/redis/spring-jedis.xml"/>
 

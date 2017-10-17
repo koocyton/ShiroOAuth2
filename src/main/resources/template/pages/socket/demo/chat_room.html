@@ -9,7 +9,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="white" />
     <script src="/webjars/jquery/1.11.3/jquery.min.js"></script>
     <script src="/webjars/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-    <link rel='stylesheet' href='/webjars/bootstrap/3.3.7/css/bootstrap.min.css'>
+    <link href="/webjars/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
     <script>
         let msg = [];
         let addMsg = [];
@@ -54,7 +54,7 @@
                 "processData" : false,
                 "headers" : {"access-token":accessToken},
                 "success" : function(responseText) {
-                    if (typeof(responseText)==="object" && typeof(responseText.data.id)==="number") {
+                    if (typeof(responseText)==="object" && typeof(responseText.id)==="number") {
                         socketConnect();
                     }
                 },
@@ -354,7 +354,13 @@
                 Undertow Embedded Server
             </li>
             <li>
-                Ehcache
+                Google Gauva
+            </li>
+            <li>
+                webjar
+            </li>
+            <li>
+                model mapper
             </li>
             <li>
                 WebSocket

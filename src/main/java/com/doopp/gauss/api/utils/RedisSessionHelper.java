@@ -20,6 +20,7 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class RedisSessionHelper {
 
+
     // private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private static ApplicationContext applicationContext = new ClassPathXmlApplicationContext("config/redis/spring-jedis.xml");
@@ -36,7 +37,7 @@ public class RedisSessionHelper {
 
     /*
      * Properties properties = new Properties();
-     * FileInputStream fileInputStream = new FileInputStream("/data/app/conf/webapp.properties")
+     * FileInputStream fileInputStream = new FileInputStream("/data/app/conf/application.properties")
      * InputStream inputStream = new BufferedInputStream(fileInputStream);
      * properties.load(inputStream);
      * String staticHost = properties.getProperty("public.host");
