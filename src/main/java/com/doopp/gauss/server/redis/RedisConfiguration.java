@@ -32,18 +32,13 @@ public class RedisConfiguration {
         return this.shardedJedis(jedisPoolConfig, "redis://127.0.0.1:6379/3", "redis://127.0.0.1:6379/4");
     }
 
-    // (@Qualifier("jedisConnectionFactory") JedisConnectionFactory connectionFactory)
     @Bean
-    public ShardedJedis sessionRedis(@Qualifier("jedisPoolConfig") JedisPoolConfig jedisPoolConfig)
+    public CustomShadedJedis sessionRedis(@Qualifier("jedisPoolConfig") JedisPoolConfig jedisPoolConfig)
     {
-        // shard redis
-        return this.shardedJedis(jedisPoolConfig, "redis://127.0.0.1:6379/3", "redis://127.0.0.1:6379/4");
-        //RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
-        //redisTemplate.setConnectionFactory(connectionFactory);
-        //redisTemplate.setKeySerializer(new StringRedisSerializer());
-        //redisTemplate.setValueSerializer(new JdkSerializationRedisSerializer());
-        //redisTemplate.setHashKeySerializer(new StringRedisSerializer());
-        //return redisTemplate;
+        ShardedJedis shardedJedis = this.shardedJedis(jedisPoolConfig, "redis://127.0.0.1:6379/5", "redis://127.0.0.1:6379/6");
+        CustomShadedJedis customShadedJedis = new CustomShadedJedis();
+        customShadedJedis.setShardedJedis(shardedJedis);
+        return customShadedJedis;
     }
 
     @Bean
@@ -76,9 +71,20 @@ public class RedisConfiguration {
         jedisConnectionFactory.setHostName("127.0.0.1");
         jedisConnectionFactory.setPort(6379);
         jedisConnectionFactory.setPassword("");
-        jedisConnectionFactory.setDatabase(1);
+        jedisConnectionFactory.setDatabase(7);
         jedisConnectionFactory.setTimeout(2000);
         return jedisConnectionFactory;
+    }
+
+    @Bean
+    public RedisTemplate templateRedis(@Qualifier("jedisConnectionFactory") JedisConnectionFactory connectionFactory)
+    {
+        RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setConnectionFactory(connectionFactory);
+        redisTemplate.setKeySerializer(new StringRedisSerializer());
+        redisTemplate.setValueSerializer(new JdkSerializationRedisSerializer());
+        redisTemplate.setHashKeySerializer(new StringRedisSerializer());
+        return redisTemplate;
     }
 
     private ShardedJedis shardedJedis(JedisPoolConfig jedisPoolConfig, String... hosts)

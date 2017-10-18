@@ -12,6 +12,9 @@ import javax.servlet.http.HttpServletResponse;
 import com.alibaba.fastjson.JSONObject;
 import com.doopp.gauss.api.entity.UserEntity;
 import com.doopp.gauss.api.utils.RedisSessionHelper;
+import com.doopp.gauss.server.redis.CustomShadedJedis;
+import org.ehcache.core.spi.time.SystemTimeSource;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
@@ -22,6 +25,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import redis.clients.jedis.ShardedJedis;
 
 /*
  * Created by henry on 2017/4/16.
@@ -32,6 +36,9 @@ public class SessionFilter extends OncePerRequestFilter {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     // private final RedisSessionHelper redisSessionHelper = new RedisSessionHelper();
+
+    //@Autowired
+    //private ShardedJedis sessionRedis;
 
     /*
      * 登录验证过滤器
@@ -46,6 +53,9 @@ public class SessionFilter extends OncePerRequestFilter {
         ServletContext context = request.getServletContext();
         ApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(context);
         RedisSessionHelper redisSessionHelper = ctx.getBean(RedisSessionHelper.class);
+
+        CustomShadedJedis sessionRedis = (CustomShadedJedis) ctx.getBean("sessionRedis");
+
 
         // 不过滤的uri
         String[] notFilters = new String[] {
@@ -67,7 +77,7 @@ public class SessionFilter extends OncePerRequestFilter {
         // 请求的uri
         String uri = request.getRequestURI();
 
-        logger.info(" >>> request.getRequestURI() : " + uri);
+        logger.info(" >>> request.getRequestURI() : " + uri + " sessionRedis " + sessionRedis);
 
         // 是否过滤
         boolean doFilter = true;
@@ -87,7 +97,7 @@ public class SessionFilter extends OncePerRequestFilter {
                 String accessToken = request.getHeader("access-token");
                 // 如果 token 存在，且长度正确
                 if (accessToken!=null && accessToken.length()>=32) {
-                    UserEntity userEntity = redisSessionHelper.getUserByToken(accessToken);
+                    UserEntity userEntity = (UserEntity) sessionRedis.get(accessToken.getBytes());
                     // 如果能找到用户
                     if (userEntity!=null) {
                         filterChain.doFilter(request, response);
