@@ -20,7 +20,4 @@
     <!-- import mybatis -->
     <import resource="classpath:config/mybatis/spring-mybatis.xml"/>
 
-    <!-- import task -->
-    <import resource="classpath:config/task-executor/spring-task.xml"/>
-
 </beans>

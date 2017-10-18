@@ -10,6 +10,6 @@ public class DemoController {
 
     @RequestMapping(value = "/chat-room")
     public String chatRoom(HttpServletRequest request) {
-        return "demo/chat_room";
+        return "demo/old_chat_room";
     }
 }

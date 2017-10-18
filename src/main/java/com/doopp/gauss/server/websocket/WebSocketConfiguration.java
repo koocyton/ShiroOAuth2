@@ -18,18 +18,19 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 @Configuration
 @EnableWebMvc
 @EnableWebSocket
-public class WebSocketConfig extends WebMvcConfigurerAdapter implements WebSocketConfigurer{
+public class WebSocketConfiguration extends WebMvcConfigurerAdapter implements WebSocketConfigurer{
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        //registry.addHandler(webSocketHandshakeInterceptor(),"/game-socket");
-        //registry.addHandler(webSocketHandshakeInterceptor(),"/game-socket/socketjs").setAllowedOrigins("*").withSockJS();
-        //registry.addHandler(systemWebSocketHandler(),"/webSocketServer").addInterceptors(new WebSocketHandshakeInterceptor());
-        //registry.addHandler(systemWebSocketHandler(), "/sockjs/webSocketServer").addInterceptors(new WebSocketHandshakeInterceptor()).withSockJS();
-        //registry.addHandler(systemWebSocketHandler(), "/webSocketServer/sockjs").withSockJS();
-        registry.addHandler(systemWebSocketHandler(),"/game-socket").addInterceptors(new WebSocketHandshakeInterceptor());
-        registry.addHandler(systemWebSocketHandler(),"/game-socket/sockjs").addInterceptors(new WebSocketHandshakeInterceptor())
-                    .withSockJS();
+
+        registry.addHandler(systemWebSocketHandler(),"/game-socket")
+                .addInterceptors(new WebSocketHandshakeInterceptor())
+                .setAllowedOrigins("*");
+
+        registry.addHandler(systemWebSocketHandler(),"/game-socket/sockjs")
+                .addInterceptors(new WebSocketHandshakeInterceptor())
+                .setAllowedOrigins("*")
+                .withSockJS();
     }
 
     @Bean
