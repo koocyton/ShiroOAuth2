@@ -14,7 +14,4 @@
                                 expression="org.springframework.web.bind.annotation.ControllerAdvice" />
     </context:component-scan>
 
-    <!-- import mybatis -->
-    <import resource="classpath:config/mybatis/spring-mybatis.xml"/>
-
 </beans>
