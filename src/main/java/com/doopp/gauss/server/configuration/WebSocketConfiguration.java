@@ -1,5 +1,6 @@
-package com.doopp.gauss.server.websocket;
+package com.doopp.gauss.server.configuration;
 
+import com.doopp.gauss.server.websocket.WebSocketHandshakeInterceptor;
 import com.doopp.gauss.server.websocket.handler.GameSocketHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

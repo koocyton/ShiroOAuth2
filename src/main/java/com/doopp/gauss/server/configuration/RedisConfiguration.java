@@ -1,5 +1,6 @@
-package com.doopp.gauss.server.redis;
+package com.doopp.gauss.server.configuration;
 
+import com.doopp.gauss.server.redis.CustomShadedJedis;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

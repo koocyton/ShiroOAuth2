@@ -1,6 +1,7 @@
-package com.doopp.gauss.server.task;
+package com.doopp.gauss.server.configuration;
 
 
+import com.doopp.gauss.server.task.WerewolfGame;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -1,4 +1,4 @@
-package com.doopp.gauss.server.mybatis;
+package com.doopp.gauss.server.configuration;
 
 import com.alibaba.druid.filter.stat.StatFilter;
 import com.alibaba.druid.pool.DruidDataSource;
