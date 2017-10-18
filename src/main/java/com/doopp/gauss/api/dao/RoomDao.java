@@ -89,8 +89,10 @@ public class RoomDao {
 
     // 查询用户在哪个房间
     public RoomEntity fetchByUserId(Long userId) {
+        logger.info(" >>> userId " + userId);
         // 获取房间
         RoomEntity roomEntity = this.getRoomByUserId(userId);
+        logger.info(" >>> roomEntity " + roomEntity);
         // 判断一下
         if (roomEntity!=null) {
             // 如果房间里能找到这个用户
@@ -159,6 +161,7 @@ public class RoomDao {
 
     // set room index
     private void setUserIndex(Long userId, int roomId) {
+        logger.info(" >>> userId " + userId + " >> roomId " + roomId);
         roomIndexRedis.set(userPrefix + userId, "" + roomId);
         //ShardedJedis shardedJedis = roomIndexJedis.getResource();
         //shardedJedis.set(userPrefix + userId, "" + roomId);
@@ -167,10 +170,10 @@ public class RoomDao {
 
     // get room index
     private RoomEntity getRoomByUserId(Long userId) {
-        logger.info("" + userId);
         String roomId = roomIndexRedis.get(userPrefix + userId);
         if (roomId!=null) {
             Object roomObject = roomRedis.get(roomId.getBytes());
+            logger.info(" >>> ccccc " + roomObject);
             if (roomObject!=null) {
                 return (RoomEntity) roomObject;
             }
