@@ -1,7 +1,5 @@
 package com.doopp.gauss.api.controller;
 
-import com.alibaba.fastjson.JSONObject;
-
 import com.doopp.gauss.api.entity.RoomEntity;
 import com.doopp.gauss.api.entity.UserEntity;
 import com.doopp.gauss.api.entity.dto.RoomDTO;
@@ -19,6 +17,9 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * 用户的 Api Controller
  *
@@ -28,7 +29,7 @@ import java.io.IOException;
 @RequestMapping(value = "api/v1/")
 public class UserController {
 
-    // private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final static Logger logger = LoggerFactory.getLogger(UserController.class);
 
     private final UserService userService;
 
@@ -118,9 +119,10 @@ public class UserController {
     public RoomDTO randomJoinRoom(@RequestHeader("access-token") String accessToken) {
         // 当前用户
         UserEntity currentUser = userService.getUserByToken(accessToken);
-        // logger.info(" >>> " + currentUser);
+        logger.info(" >>> " + currentUser);
         // 用户加入到指定 ID 的房间
         RoomEntity roomEntity = roomService.userJoinFreeRoom(currentUser);
+        logger.info(" >>> " + currentUser);
         //
         return CommonUtils.modelMap(roomEntity, RoomDTO.class);
     }

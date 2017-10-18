@@ -1,11 +1,14 @@
 package com.doopp.gauss.server.websocket;
 
 import com.doopp.gauss.api.entity.UserEntity;
-import com.doopp.gauss.api.utils.RedisSessionHelper;
+import com.doopp.gauss.server.redis.CustomShadedJedis;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
+import org.springframework.web.context.ContextLoader;
+import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.server.support.HttpSessionHandshakeInterceptor;
 
@@ -19,13 +22,20 @@ public class WebSocketHandshakeInterceptor extends HttpSessionHandshakeIntercept
 
     private static final Logger logger = LoggerFactory.getLogger(WebSocketHandshakeInterceptor.class);
 
-    private final RedisSessionHelper redisSessionHelper = new RedisSessionHelper();
+    // private final RedisSessionHelper redisSessionHelper = new RedisSessionHelper();
+
+    @Autowired
+    private CustomShadedJedis sessionRedis;
 
     @Override
     public boolean beforeHandshake(ServerHttpRequest request,
                                    ServerHttpResponse response,
                                    WebSocketHandler wsHandler,
                                    Map<String, Object> attributes) throws Exception {
+
+
+        WebApplicationContext ctx = ContextLoader.getCurrentWebApplicationContext();
+        CustomShadedJedis sessionRedis = (CustomShadedJedis) ctx.getBean("sessionRedis");
 
         // 默认从 url query 里获取 access token
         String accessToken = null;
@@ -36,19 +46,11 @@ public class WebSocketHandshakeInterceptor extends HttpSessionHandshakeIntercept
             accessToken = uriQuery.substring(beginOffset, beginOffset + 32);
         }
 
-        // 从 header 里获取 access token
-        /*
-        if (accessToken==null) {
-            List<String> tokens = request.getHeaders().get("access-token");
-            if (tokens!=null) {
-                accessToken = tokens.get(0);
-            }
-        }
-        */
+        logger.info(" >>> sessionRedis " + sessionRedis);
 
         // 有 token
         if (accessToken!=null) {
-            UserEntity currentUser = redisSessionHelper.getUserByToken(accessToken);
+            UserEntity currentUser = (UserEntity) sessionRedis.get(accessToken.getBytes());
             // 在会话里加入当前用户信息
             attributes.put("currentUser", currentUser);
             return currentUser!=null && super.beforeHandshake(request, response, wsHandler, attributes);
@@ -65,16 +67,4 @@ public class WebSocketHandshakeInterceptor extends HttpSessionHandshakeIntercept
                                Exception ex) {
         super.afterHandshake(request, response, wsHandler, ex);
     }
-
-    /*
-    private HttpSession getSession(ServerHttpRequest request) {
-        if (request instanceof ServletServerHttpRequest) {
-            ServletServerHttpRequest serverRequest = (ServletServerHttpRequest) request;
-            logger.info(" >>> serverRequest " + serverRequest);
-            logger.info(" >>> serverRequest.getServletRequest() " + serverRequest.getServletRequest().getSession());
-            return serverRequest.getServletRequest().getSession(true);
-        }
-        return null;
-    }
-    */
 }

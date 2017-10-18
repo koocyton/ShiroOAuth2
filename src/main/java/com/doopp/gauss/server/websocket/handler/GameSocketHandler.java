@@ -123,7 +123,7 @@ public class GameSocketHandler implements WebSocketHandler {
      */
     public void closeSocketConnect (String sessionId) throws Exception {
         WebSocketSession session = socketSessions.get(sessionId);
-        if (session.isOpen()) {
+        if (session!=null && session.isOpen()) {
             session.close();
         }
         socketSessions.remove(sessionId);

@@ -2,10 +2,10 @@ package com.doopp.gauss.api.service.impl;
 
 import com.doopp.gauss.api.dao.UserDao;
 import com.doopp.gauss.api.entity.UserEntity;
-import com.doopp.gauss.api.utils.RedisSessionHelper;
 import com.doopp.gauss.api.service.LoginService;
 import com.doopp.gauss.api.utils.EncryHelper;
 import com.doopp.gauss.api.service.MessageService;
+import com.doopp.gauss.server.redis.CustomShadedJedis;
 import org.apache.oltu.oauth2.as.issuer.MD5Generator;
 import org.apache.oltu.oauth2.as.issuer.OAuthIssuer;
 import org.apache.oltu.oauth2.as.issuer.OAuthIssuerImpl;
@@ -20,20 +20,15 @@ import org.springframework.stereotype.Service;
 @Service("loginService")
 public class LoginServiceImpl implements LoginService {
 
-    private final UserDao userDao;
-
-    private final MessageService messageService;
-
-    private final RedisSessionHelper redisSessionHelper;
+    @Autowired
+    private UserDao userDao;
 
     @Autowired
-    public LoginServiceImpl(UserDao userDao,
-                            MessageService messageService,
-                            RedisSessionHelper redisSessionHelper) {
-        this.userDao = userDao;
-        this.messageService = messageService;
-        this.redisSessionHelper = redisSessionHelper;
-    }
+    private MessageService messageService;
+
+    @Autowired
+    private CustomShadedJedis sessionRedis;
+
 
     @Override
     public boolean checkLoginRequest(String account, String password) {
@@ -55,7 +50,10 @@ public class LoginServiceImpl implements LoginService {
             String accessToken = oauthIssuerImpl.accessToken();
 
             UserEntity currentUser = userDao.fetchByAccount(account);
-            redisSessionHelper.setUserByToken(accessToken, currentUser);
+
+            sessionRedis.set(accessToken.getBytes(), currentUser);
+
+            // redisSessionHelper.setUserByToken(accessToken, currentUser);
             // 断开这个用户的长链接
             messageService.disconnectSocket(currentUser.getId());
             messageService.sendStringToUser(currentUser.getAccount() + " 重登录，连接被重置", currentUser.getId());
@@ -68,32 +66,12 @@ public class LoginServiceImpl implements LoginService {
 
     @Override
     public boolean unregisterLogin(String accessToken) {
-
-        redisSessionHelper.delUserSessionCache(accessToken);
-
-        // UserEntity currentUser = userService.getUserByToken(accessToken);
-
-        // SessionUserEntity currentUser = (SessionUserEntity) userDao.fetchByAccount(account);
-        // httpSession.removeAttribute("currentUser");
+        sessionRedis.del(accessToken);
         return true;
-        /*
-        try {
-            String account = (String) cache.get(accessToken).get();
-            if (account == null) {
-                return false;
-            }
-            cache.evict(accessToken);
-            // 删除成功返回 true
-            return cache.get(accessToken) == null;
-        }
-        catch(Exception e) {
-            return false;
-        }
-        */
     }
 
     @Override
     public String getAccessToken() {
-        return "";//this.accessToken;
+        return "";
     }
 }

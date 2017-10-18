@@ -5,6 +5,7 @@ import com.doopp.gauss.api.entity.UserEntity;
 
 import javax.annotation.Resource;
 
+import com.doopp.gauss.server.redis.CustomShadedJedis;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer;
@@ -23,10 +24,10 @@ public class RoomDao {
     private static final Logger logger = LoggerFactory.getLogger(RoomDao.class);
 
     @Resource
-    private ShardedJedisPool roomJedis;
+    private CustomShadedJedis roomRedis;
 
     @Resource
-    private ShardedJedisPool roomIndexJedis;
+    private CustomShadedJedis roomIndexRedis;
 
     private final JdkSerializationRedisSerializer jsrs = new JdkSerializationRedisSerializer();
 
@@ -128,63 +129,78 @@ public class RoomDao {
     // set room info
     private void setRoom(int roomId, RoomEntity roomEntity) {
         byte[] byteRoomKey = (roomPrefix + roomId).getBytes();
-        byte[] byteRoom = jsrs.serialize(roomEntity);
-        ShardedJedis shardedJedis = roomJedis.getResource();
-        shardedJedis.set(byteRoomKey, byteRoom);
-        shardedJedis.close();
+        roomRedis.set(byteRoomKey, roomEntity);
+        //byte[] byteRoom = jsrs.serialize(roomEntity);
+        //ShardedJedis shardedJedis = roomJedis.getResource();
+        //shardedJedis.set(byteRoomKey, byteRoom);
+        //shardedJedis.close();
     }
 
     // get room info
     private RoomEntity getRoom(int roomId) {
-        ShardedJedis shardedJedis = roomJedis.getResource();
+        //ShardedJedis shardedJedis = roomJedis.getResource();
         byte[] byteRoomKey = (roomPrefix + roomId).getBytes();
-        byte[] byteRoom = shardedJedis.get(byteRoomKey);
-        shardedJedis.close();
-        return (RoomEntity) jsrs.deserialize(byteRoom);
+        return (RoomEntity) roomRedis.get(byteRoomKey);
+        //byte[] byteRoom = shardedJedis.get(byteRoomKey);
+        //shardedJedis.close();
+        //return (RoomEntity) jsrs.deserialize(byteRoom);
     }
 
     // del room info
     private void delRoom(int... roomsId) {
-        ShardedJedis shardedJedis = roomJedis.getResource();
-        for (int roomId : roomsId) {
-            byte[] byteRoomKey = (roomPrefix + roomId).getBytes();
-            shardedJedis.del(byteRoomKey);
-        }
-        shardedJedis.close();
+        roomRedis.del(roomsId);
+        //ShardedJedis shardedJedis = roomJedis.getResource();
+        //for (int roomId : roomsId) {
+        //    byte[] byteRoomKey = (roomPrefix + roomId).getBytes();
+        //    shardedJedis.del(byteRoomKey);
+        //}
+        //shardedJedis.close();
     }
 
     // set room index
     private void setUserIndex(Long userId, int roomId) {
-        ShardedJedis shardedJedis = roomIndexJedis.getResource();
-        shardedJedis.set(userPrefix + userId, "" + roomId);
-        shardedJedis.close();
+        roomIndexRedis.set(userPrefix + userId, "" + roomId);
+        //ShardedJedis shardedJedis = roomIndexJedis.getResource();
+        //shardedJedis.set(userPrefix + userId, "" + roomId);
+        //shardedJedis.close();
     }
 
     // get room index
     private RoomEntity getRoomByUserId(Long userId) {
-        ShardedJedis shardedJedis = roomIndexJedis.getResource();
-        String sRoomId = shardedJedis.get(userPrefix + userId);
-        shardedJedis.close();
-        if (sRoomId==null) {
-            return null;
+        logger.info("" + userId);
+        String roomId = roomIndexRedis.get(userPrefix + userId);
+        if (roomId!=null) {
+            Object roomObject = roomRedis.get(roomId.getBytes());
+            if (roomObject!=null) {
+                return (RoomEntity) roomObject;
+            }
         }
-        return this.getRoom(Integer.parseInt(sRoomId));
+        return null;
+        //ShardedJedis shardedJedis = roomIndexJedis.getResource();
+        //String sRoomId = shardedJedis.get(userPrefix + userId);
+        //shardedJedis.close();
+        //if (sRoomId==null) {
+        //    return null;
+        //}
+        //return this.getRoom(Integer.parseInt(sRoomId));
     }
 
     // del room index
     public void delUserIndex(Long userId) {
-        ShardedJedis shardedJedis = roomIndexJedis.getResource();
-        shardedJedis.del(userPrefix + userId);
-        shardedJedis.close();
+        roomIndexRedis.del(userPrefix + userId);
+        //ShardedJedis shardedJedis = roomIndexJedis.getResource();
+        //shardedJedis.del(userPrefix + userId);
+        //shardedJedis.close();
     }
 
 
 
     // 设置空闲房间
     private void setFreeRoomIndex(int roomId) {
-        ShardedJedis shardedJedis = roomIndexJedis.getResource();
-        shardedJedis.hset(roomPrefix + "*", "" + roomId, "");
-        shardedJedis.close();
+        roomIndexRedis.hset(roomPrefix + "*", "" + roomId, "");
+        //ShardedJedis shardedJedis = roomIndexJedis.getResource();
+        //shardedJedis.hset(roomPrefix + "*", "" + roomId, "");
+        //shardedJedis.close();
     }
 
     // 随机取得一个空闲房间
@@ -216,16 +232,18 @@ public class RoomDao {
 
     // 取得空闲房间的 id 列表
     private List<String> getFreeRoomsId() {
-        ShardedJedis shardedJedis = roomIndexJedis.getResource();
-        Set<String> keys = shardedJedis.hkeys(roomPrefix + "*");
-        shardedJedis.close();
+        Set<String> keys = roomIndexRedis.hkeys(roomPrefix + "*");
+        // ShardedJedis shardedJedis = roomIndexJedis.getResource();
+        // Set<String> keys = shardedJedis.hkeys(roomPrefix + "*");
+        // shardedJedis.close();
         return new ArrayList<>(keys);
     }
 
     // 删除空闲的房间的索引
     private void delFreeRoomIndex(int roomId) {
-        ShardedJedis shardedJedis = roomIndexJedis.getResource();
-        shardedJedis.hdel(roomPrefix + "*", "" + roomId);
-        shardedJedis.close();
+        roomIndexRedis.hdel(roomPrefix + "*", "" + roomId);
+        //ShardedJedis shardedJedis = roomIndexJedis.getResource();
+        //shardedJedis.hdel(roomPrefix + "*", "" + roomId);
+        //shardedJedis.close();
     }
 }

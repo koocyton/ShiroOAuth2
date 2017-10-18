@@ -14,9 +14,6 @@
                                 expression="org.springframework.web.bind.annotation.ControllerAdvice" />
     </context:component-scan>
 
-    <!-- import spring-data-redis.xml -->
-    <import resource="classpath:config/redis/spring-jedis.xml"/>
-
     <!-- import mybatis -->
     <import resource="classpath:config/mybatis/spring-mybatis.xml"/>
 

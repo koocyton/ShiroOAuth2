@@ -2,12 +2,15 @@ package com.doopp.gauss.api.service.impl;
 
 import com.doopp.gauss.api.dao.UserDao;
 import com.doopp.gauss.api.entity.UserEntity;
-import com.doopp.gauss.api.utils.RedisSessionHelper;
 import com.doopp.gauss.api.service.UserService;
+import com.doopp.gauss.server.redis.CustomShadedJedis;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -16,21 +19,23 @@ import java.util.List;
 @Service("userService")
 public class UserServiceImpl implements UserService {
 
-    // private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final static Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
 
     private final UserDao userDao;
 
-    private final RedisSessionHelper redisSessionHelper;
+    private final CustomShadedJedis sessionRedis;
 
     @Autowired
-    public UserServiceImpl(UserDao userDao, RedisSessionHelper redisSessionHelper) {
+    public UserServiceImpl(UserDao userDao, CustomShadedJedis sessionRedis) {
         this.userDao = userDao;
-        this.redisSessionHelper = redisSessionHelper;
+        this.sessionRedis = sessionRedis;
     }
 
     @Override
     public UserEntity getUserByToken(String accessToken){
-        return redisSessionHelper.getUserByToken(accessToken);
+        return (UserEntity)sessionRedis.get(accessToken.getBytes());
+        // logger.info(">>>" + accessToken);
+        // return redisSessionHelper.getUserByToken(accessToken);
     }
 
     @Override

@@ -3,13 +3,8 @@ package com.doopp.gauss.server.redis;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer;
-import org.springframework.data.redis.serializer.StringRedisSerializer;
 import redis.clients.jedis.JedisPoolConfig;
 import redis.clients.jedis.JedisShardInfo;
-import redis.clients.jedis.ShardedJedis;
 import redis.clients.jedis.ShardedJedisPool;
 
 import java.util.ArrayList;
@@ -19,25 +14,31 @@ import java.util.List;
 public class RedisConfiguration {
 
     @Bean
-    public ShardedJedis roomRedis(@Qualifier("jedisPoolConfig") JedisPoolConfig jedisPoolConfig)
+    public CustomShadedJedis roomRedis(@Qualifier("jedisPoolConfig") JedisPoolConfig jedisPoolConfig)
     {
         // shard redis
-        return this.shardedJedis(jedisPoolConfig, "redis://127.0.0.1:6379/1", "redis://127.0.0.1:6379/2");
+        ShardedJedisPool shardedJedisPool = this.shardedJedisPool(jedisPoolConfig, "redis://127.0.0.1:6379/1", "redis://127.0.0.1:6379/2");
+        CustomShadedJedis customShadedJedis = new CustomShadedJedis();
+        customShadedJedis.setShardedJedisPool(shardedJedisPool);
+        return customShadedJedis;
     }
 
     @Bean
-    public ShardedJedis roomIndexRedis(@Qualifier("jedisPoolConfig") JedisPoolConfig jedisPoolConfig)
+    public CustomShadedJedis roomIndexRedis(@Qualifier("jedisPoolConfig") JedisPoolConfig jedisPoolConfig)
     {
         // shard redis
-        return this.shardedJedis(jedisPoolConfig, "redis://127.0.0.1:6379/3", "redis://127.0.0.1:6379/4");
+        ShardedJedisPool shardedJedisPool = this.shardedJedisPool(jedisPoolConfig, "redis://127.0.0.1:6379/3", "redis://127.0.0.1:6379/4");
+        CustomShadedJedis customShadedJedis = new CustomShadedJedis();
+        customShadedJedis.setShardedJedisPool(shardedJedisPool);
+        return customShadedJedis;
     }
 
     @Bean
     public CustomShadedJedis sessionRedis(@Qualifier("jedisPoolConfig") JedisPoolConfig jedisPoolConfig)
     {
-        ShardedJedis shardedJedis = this.shardedJedis(jedisPoolConfig, "redis://127.0.0.1:6379/5", "redis://127.0.0.1:6379/6");
+        ShardedJedisPool shardedJedisPool = this.shardedJedisPool(jedisPoolConfig, "redis://127.0.0.1:6379/5", "redis://127.0.0.1:6379/6");
         CustomShadedJedis customShadedJedis = new CustomShadedJedis();
-        customShadedJedis.setShardedJedis(shardedJedis);
+        customShadedJedis.setShardedJedisPool(shardedJedisPool);
         return customShadedJedis;
     }
 
@@ -62,32 +63,32 @@ public class RedisConfiguration {
         return config;
     }
 
-    @Bean
-    public JedisConnectionFactory jedisConnectionFactory(@Qualifier("jedisPoolConfig") JedisPoolConfig jedisPoolConfig)
-    {
-        // JedisConnectionFactory setting
-        JedisConnectionFactory jedisConnectionFactory = new JedisConnectionFactory();
-        jedisConnectionFactory.setPoolConfig(jedisPoolConfig);
-        jedisConnectionFactory.setHostName("127.0.0.1");
-        jedisConnectionFactory.setPort(6379);
-        jedisConnectionFactory.setPassword("");
-        jedisConnectionFactory.setDatabase(7);
-        jedisConnectionFactory.setTimeout(2000);
-        return jedisConnectionFactory;
-    }
+    //    @Bean
+    //    public JedisConnectionFactory jedisConnectionFactory(@Qualifier("jedisPoolConfig") JedisPoolConfig jedisPoolConfig)
+    //    {
+    //        // JedisConnectionFactory setting
+    //        JedisConnectionFactory jedisConnectionFactory = new JedisConnectionFactory();
+    //        jedisConnectionFactory.setPoolConfig(jedisPoolConfig);
+    //        jedisConnectionFactory.setHostName("127.0.0.1");
+    //        jedisConnectionFactory.setPort(6379);
+    //        jedisConnectionFactory.setPassword("");
+    //        jedisConnectionFactory.setDatabase(7);
+    //        jedisConnectionFactory.setTimeout(2000);
+    //        return jedisConnectionFactory;
+    //    }
+    //
+    //    @Bean
+    //    public RedisTemplate templateRedis(@Qualifier("jedisConnectionFactory") JedisConnectionFactory connectionFactory)
+    //    {
+    //        RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
+    //        redisTemplate.setConnectionFactory(connectionFactory);
+    //        redisTemplate.setKeySerializer(new StringRedisSerializer());
+    //        redisTemplate.setValueSerializer(new JdkSerializationRedisSerializer());
+    //        redisTemplate.setHashKeySerializer(new StringRedisSerializer());
+    //        return redisTemplate;
+    //    }
 
-    @Bean
-    public RedisTemplate templateRedis(@Qualifier("jedisConnectionFactory") JedisConnectionFactory connectionFactory)
-    {
-        RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
-        redisTemplate.setConnectionFactory(connectionFactory);
-        redisTemplate.setKeySerializer(new StringRedisSerializer());
-        redisTemplate.setValueSerializer(new JdkSerializationRedisSerializer());
-        redisTemplate.setHashKeySerializer(new StringRedisSerializer());
-        return redisTemplate;
-    }
-
-    private ShardedJedis shardedJedis(JedisPoolConfig jedisPoolConfig, String... hosts)
+    private ShardedJedisPool shardedJedisPool(JedisPoolConfig jedisPoolConfig, String... hosts)
     {
         // map host
         List<JedisShardInfo> jedisInfoList =new ArrayList<>(hosts.length);
@@ -98,9 +99,7 @@ public class RedisConfiguration {
             jedisShardInfo.setSoTimeout(2000);
             jedisInfoList.add(jedisShardInfo);
         }
-        // shard redis pool
-        ShardedJedisPool shardedJedisPool = new ShardedJedisPool(jedisPoolConfig, jedisInfoList);
-        // return shard redis
-        return shardedJedisPool.getResource();
+        // return ShardedJedisPool
+        return new ShardedJedisPool(jedisPoolConfig, jedisInfoList);
     }
 }

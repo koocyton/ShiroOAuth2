@@ -9,23 +9,16 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.alibaba.fastjson.JSONObject;
 import com.doopp.gauss.api.entity.UserEntity;
-import com.doopp.gauss.api.utils.RedisSessionHelper;
 import com.doopp.gauss.server.redis.CustomShadedJedis;
-import org.ehcache.core.spi.time.SystemTimeSource;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
-import com.doopp.gauss.api.service.RestResponseService;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import redis.clients.jedis.ShardedJedis;
 
 /*
  * Created by henry on 2017/4/16.
@@ -52,10 +45,7 @@ public class SessionFilter extends OncePerRequestFilter {
         // get bean
         ServletContext context = request.getServletContext();
         ApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(context);
-        RedisSessionHelper redisSessionHelper = ctx.getBean(RedisSessionHelper.class);
-
         CustomShadedJedis sessionRedis = (CustomShadedJedis) ctx.getBean("sessionRedis");
-
 
         // 不过滤的uri
         String[] notFilters = new String[] {
@@ -119,8 +109,8 @@ public class SessionFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
         }
         catch(Exception e) {
-            logger.info(" >>> e.getMessage : " +  e.getMessage());
-            // e.printStackTrace();
+            // logger.info(" >>> e.getMessage : " +  e.getMessage());
+            e.printStackTrace();
             writeErrorResponse(response, e.getMessage());
         }
     }
