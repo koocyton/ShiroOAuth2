@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.doopp.gauss.api.entity.UserEntity;
+import com.doopp.gauss.api.service.AccountService;
 import com.doopp.gauss.server.redis.CustomShadedJedis;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
@@ -43,9 +44,9 @@ public class SessionFilter extends OncePerRequestFilter {
         throws ServletException, IOException {
 
         // get bean
-        ServletContext context = request.getServletContext();
-        ApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(context);
-        CustomShadedJedis sessionRedis = (CustomShadedJedis) ctx.getBean("sessionRedis");
+        ServletContext servletContext = request.getServletContext();
+        ApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(servletContext);
+        AccountService accountService = (AccountService) ctx.getBean("accountService");
 
         // 不过滤的uri
         String[] notFilters = new String[] {
@@ -54,7 +55,6 @@ public class SessionFilter extends OncePerRequestFilter {
             "/api/v1/fast-login",
             "/api/v1/logout",
             "/chat-room",
-            // "/game-socket",
             "/js",
             "/image",
             "/css",
@@ -92,10 +92,10 @@ public class SessionFilter extends OncePerRequestFilter {
 
                 // 如果 token 存在，且长度正确
                 if (accessToken!=null && accessToken.length()>=32) {
-                    UserEntity userEntity = (UserEntity) sessionRedis.get(accessToken.getBytes());
+                    UserEntity user = accountService.getUserByToken(accessToken);
                     // 如果能找到用户
-                    if (userEntity!=null) {
-                        request.getSession().setAttribute("currentUser", userEntity);
+                    if (user!=null) {
+                        request.setAttribute("currentUser", user);
                         filterChain.doFilter(request, response);
                         return;
                     }

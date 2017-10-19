@@ -3,7 +3,6 @@ package com.doopp.gauss.server.configuration;
 import com.doopp.gauss.server.redis.CustomShadedJedis;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import redis.clients.jedis.JedisPoolConfig;
 import redis.clients.jedis.JedisShardInfo;
 import redis.clients.jedis.ShardedJedisPool;
@@ -38,6 +37,15 @@ public class RedisConfiguration {
     public CustomShadedJedis sessionRedis(@Qualifier("jedisPoolConfig") JedisPoolConfig jedisPoolConfig)
     {
         ShardedJedisPool shardedJedisPool = this.shardedJedisPool(jedisPoolConfig, "redis://127.0.0.1:6379/5", "redis://127.0.0.1:6379/6");
+        CustomShadedJedis customShadedJedis = new CustomShadedJedis();
+        customShadedJedis.setShardedJedisPool(shardedJedisPool);
+        return customShadedJedis;
+    }
+
+    @Bean
+    public CustomShadedJedis userRedis(@Qualifier("jedisPoolConfig") JedisPoolConfig jedisPoolConfig)
+    {
+        ShardedJedisPool shardedJedisPool = this.shardedJedisPool(jedisPoolConfig, "redis://127.0.0.1:6379/7", "redis://127.0.0.1:6379/8");
         CustomShadedJedis customShadedJedis = new CustomShadedJedis();
         customShadedJedis.setShardedJedisPool(shardedJedisPool);
         return customShadedJedis;

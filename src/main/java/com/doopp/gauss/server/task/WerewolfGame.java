@@ -1,7 +1,7 @@
 package com.doopp.gauss.server.task;
 
 import com.doopp.gauss.api.entity.UserEntity;
-import com.doopp.gauss.api.service.UserService;
+import com.doopp.gauss.api.service.AccountService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +12,7 @@ public class WerewolfGame {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
-    UserService userService;
+    AccountService accountService;
 
     private class GameTask implements Runnable {
 
@@ -20,11 +20,11 @@ public class WerewolfGame {
 
             // logger.info(" >>> Run GameTask " + userService);
             while(true) {
-                if (userService==null) {
+                if (accountService==null) {
                     continue;
                 }
-                UserEntity user = userService.getUserInfo("koocyton@gmail.com");
-                logger.info(" >>> Run GameTask " + user);
+                // UserEntity user = accountService.getUserByToken();
+                logger.info(" >>> Run GameTask - AccountService : " + accountService);
                 try {
                     Thread.sleep(1000);
                 }
