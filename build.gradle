@@ -42,8 +42,9 @@ dependencies {
     compile 'org.springframework:spring-messaging:4.3.11.RELEASE'
 
     // Ehcache
-    compile 'org.ehcache:ehcache:3.3.1'
+    // compile 'org.ehcache:ehcache:3.3.1'
     compile 'net.sf.ehcache:ehcache-core:2.6.11'
+    // compile 'net.sf.ehcache:ehcache:2.10.4'
 
     // JSON
     compile 'com.alibaba:fastjson:1.2.31'
