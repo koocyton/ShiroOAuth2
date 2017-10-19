@@ -13,22 +13,9 @@ import javax.servlet.*;
 import java.util.EnumSet;
 import java.util.Set;
 
-
-//import org.springframework.context.annotation.ComponentScan;
-//import org.springframework.context.annotation.FilterType;
-//@ComponentScan(
-//        basePackages={"com.doopp.gauss"},
-//        excludeFilters={
-//                @ComponentScan.Filter(type = FilterType.ANNOTATION, classes={
-//                        org.springframework.stereotype.Controller.class,
-//                        org.springframework.web.bind.annotation.ControllerAdvice.class
-//                })
-//        })
-
 public class WebAppServletContainerInitializer implements ServletContainerInitializer, ApplicationContextAware {
 
     private ApplicationContext applicationContext;
-
 
     @Override
     public void onStartup(Set<Class<?>> c, ServletContext ctx) throws ServletException {
