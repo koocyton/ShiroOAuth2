@@ -53,9 +53,8 @@ public class SessionFilter extends OncePerRequestFilter {
             "/api/v1/login",
             "/api/v1/fast-login",
             "/api/v1/logout",
-            "/mobile-chat-room",
             "/chat-room",
-            "/game-socket",
+            // "/game-socket",
             "/js",
             "/image",
             "/css",
@@ -67,7 +66,7 @@ public class SessionFilter extends OncePerRequestFilter {
         // 请求的uri
         String uri = request.getRequestURI();
 
-        logger.info(" >>> request.getRequestURI() : " + uri + " sessionRedis " + sessionRedis);
+        logger.info(" >>> request uri : " + uri);
 
         // 是否过滤
         boolean doFilter = true;
@@ -85,11 +84,18 @@ public class SessionFilter extends OncePerRequestFilter {
             if (doFilter) {
                 // 从 header 里拿到 access token
                 String accessToken = request.getHeader("access-token");
+
+                // 从 url query 里获取 access token
+                if (accessToken==null) {
+                    accessToken = request.getParameter("access-token");
+                }
+
                 // 如果 token 存在，且长度正确
                 if (accessToken!=null && accessToken.length()>=32) {
                     UserEntity userEntity = (UserEntity) sessionRedis.get(accessToken.getBytes());
                     // 如果能找到用户
                     if (userEntity!=null) {
+                        request.getSession().setAttribute("currentUser", userEntity);
                         filterChain.doFilter(request, response);
                         return;
                     }
@@ -101,7 +107,7 @@ public class SessionFilter extends OncePerRequestFilter {
                 }
                 // 如果 token 不对
                 else {
-                    writeErrorResponse(response, "Session failed");
+                    writeErrorResponse(response, "token failed");
                     return;
                 }
             }
@@ -110,7 +116,7 @@ public class SessionFilter extends OncePerRequestFilter {
         }
         catch(Exception e) {
             // logger.info(" >>> e.getMessage : " +  e.getMessage());
-            e.printStackTrace();
+            // e.printStackTrace();
             writeErrorResponse(response, e.getMessage());
         }
     }
