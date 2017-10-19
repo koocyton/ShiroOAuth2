@@ -52,7 +52,7 @@
 
 
     <!-- access-token 缓存 -->
-    <cache name="access-token-cache"
+    <cache name="session"
            maxEntriesLocalHeap="2000"
            maxElementsInMemory="10"
            maxElementsOnDisk="10"

@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
 @Component
 public class SessionFilter extends OncePerRequestFilter {
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger(SessionFilter.class);
 
     // private final RedisSessionHelper redisSessionHelper = new RedisSessionHelper();
 
@@ -116,7 +116,7 @@ public class SessionFilter extends OncePerRequestFilter {
         }
         catch(Exception e) {
             // logger.info(" >>> e.getMessage : " +  e.getMessage());
-            // e.printStackTrace();
+            e.printStackTrace();
             writeErrorResponse(response, e.getMessage());
         }
     }

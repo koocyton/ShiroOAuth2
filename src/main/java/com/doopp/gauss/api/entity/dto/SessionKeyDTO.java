@@ -11,5 +11,9 @@ import lombok.Data;
 public class SessionKeyDTO {
 
     // access-token
-    private int accessToken;
+    private String accessToken;
+
+    public SessionKeyDTO(String accessToken) {
+        this.accessToken = accessToken;
+    }
 }

@@ -1,8 +1,10 @@
 package com.doopp.gauss.api.controller;
 
 import com.alibaba.fastjson.JSONObject;
+import com.doopp.gauss.api.entity.UserEntity;
 import com.doopp.gauss.api.entity.dto.SessionKeyDTO;
 import com.doopp.gauss.api.entity.dto.UserDTO;
+import com.doopp.gauss.api.service.AccountService;
 import com.doopp.gauss.api.service.LoginService;
 import com.doopp.gauss.api.service.RegisterService;
 import com.doopp.gauss.api.service.RestResponseService;
@@ -29,6 +31,9 @@ public class LoginController {
     private final RegisterService registerService;
 
     private final RestResponseService restService;
+
+    @Autowired
+    private AccountService accountService;
 
     @Autowired
     public LoginController(LoginService loginService, RegisterService registerService, RestResponseService restService) {
@@ -93,5 +98,16 @@ public class LoginController {
         // 下发 access token
         // return CommonUtils.modelMap(accessToken, SessionKeyDTO.class);
         return restService.loginSuccess(accessToken);
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "login2", method = RequestMethod.POST)
+    public SessionKeyDTO login(@RequestParam("account") String account,
+                            @RequestParam("password") String password) throws Exception {
+
+        // GET user
+        UserEntity user = accountService.getUserOnLogin(account, password);
+        String accessToken = accountService.registerSession(user);
+        return new SessionKeyDTO(accessToken);
     }
 }

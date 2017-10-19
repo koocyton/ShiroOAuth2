@@ -1,14 +1,13 @@
 package com.doopp.gauss.server.configuration;
 
-import org.springframework.cache.CacheManager;
-import org.springframework.cache.annotation.EnableCaching;
-import org.springframework.cache.ehcache.EhCacheCacheManager;
+
+import net.sf.ehcache.Ehcache;
+import org.springframework.cache.ehcache.EhCacheFactoryBean;
 import org.springframework.cache.ehcache.EhCacheManagerFactoryBean;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 
-//@Configuration
+// @Configuration
 // @EnableCaching
 public class EhcacheConfiguration {
 
@@ -16,13 +15,17 @@ public class EhcacheConfiguration {
     public EhCacheManagerFactoryBean ehCacheManagerFactoryBean() {
         EhCacheManagerFactoryBean ehCacheManagerFactoryBean = new EhCacheManagerFactoryBean();
         ehCacheManagerFactoryBean.setConfigLocation(new ClassPathResource("config/ehcache/ehcache.xml"));
+        ehCacheManagerFactoryBean.setCacheManagerName("cacheManager");
         return ehCacheManagerFactoryBean;
     }
 
     @Bean
-    public CacheManager cacheManager() {
-        EhCacheCacheManager cacheManager = new EhCacheCacheManager();
-        cacheManager.setCacheManager(ehCacheManagerFactoryBean().getObject());
-        return cacheManager;
+    public Ehcache sessionCache() {
+        EhCacheFactoryBean cache = new EhCacheFactoryBean();
+        cache.setCacheManager(ehCacheManagerFactoryBean().getObject());
+        cache.setCacheName("session");
+        return cache.getObject();
     }
+
+
 }
