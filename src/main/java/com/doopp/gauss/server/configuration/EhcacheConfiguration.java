@@ -5,8 +5,6 @@ import org.springframework.cache.ehcache.EhCacheManagerFactoryBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.ClassPathResource;
 
-// @Configuration
-// @EnableCaching
 public class EhcacheConfiguration {
 
 
@@ -23,6 +21,4 @@ public class EhcacheConfiguration {
         cacheManager.setCacheManager(ehcacheManager.getObject());
         return cacheManager;
     }
-
-
 }

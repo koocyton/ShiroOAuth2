@@ -10,7 +10,6 @@ import redis.clients.jedis.ShardedJedisPool;
 import java.util.ArrayList;
 import java.util.List;
 
-// @Configuration
 public class RedisConfiguration {
 
     @Bean

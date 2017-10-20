@@ -28,6 +28,14 @@ public class AccountServiceImpl implements AccountService {
     @Autowired
     private CustomShadedJedis userRedis;
 
+    /**
+     * 通过账号，密码获取用户信息
+     *
+     * @param account 用户账号
+     * @param password 用户密码
+     * @return 用户信息
+     * @throws Exception 登录异常
+     */
     @Override
     public UserEntity getUserOnLogin(String account, String password) throws Exception {
         UserEntity user = userDao.fetchByAccount(account);
@@ -41,11 +49,25 @@ public class AccountServiceImpl implements AccountService {
         return user;
     }
 
+    /**
+     * 将密码 Hash
+     *
+     * @param user 用户实体
+     * @param newPassword 用户密码
+     * @return hash 后的密码
+     */
     @Override
     public String hashPassword(UserEntity user, String newPassword) {
         return EncryHelper.md5(user.getAccount() + " " + newPassword + " " + user.getSalt());
     }
 
+    /**
+     * 将用户注册登录，返回 accessToken
+     *
+     * @param user 用户
+     * @return accessToken
+     * @throws Exception 异常
+     */
     @Override
     public String registerSession(UserEntity user) throws Exception {
         // create access token
@@ -56,6 +78,12 @@ public class AccountServiceImpl implements AccountService {
         return accessToken;
     }
 
+    /**
+     * 通过 access-token 获取用户信息
+     *
+     * @param accessToken token
+     * @return 用户信息
+     */
     @Override
     @Cacheable(cacheNames = "session", key = "#accessToken" )
     public UserEntity getUserByToken(String accessToken) {

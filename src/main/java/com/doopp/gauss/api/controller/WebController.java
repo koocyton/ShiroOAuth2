@@ -8,6 +8,9 @@ import javax.servlet.http.HttpServletRequest;
 @Controller
 public class WebController {
 
+    /*
+     * web 测试
+     */
     @RequestMapping(value = "/chat-room")
     public String chatRoom() {
         return "demo/old_chat_room";

@@ -19,6 +19,13 @@ public class LoginController {
     @Autowired
     private AccountService accountService;
 
+    /**
+     * 用户登录，获取 access token
+     * @param account 用户的账号
+     * @param password 用户的密码
+     * @return accessToken
+     * @throws Exception 账号或密码错误
+     */
     @ResponseBody
     @RequestMapping(value = "login", method = RequestMethod.POST)
     public SessionKeyDTO login(@RequestParam("account") String account, @RequestParam("password") String password) throws Exception {
