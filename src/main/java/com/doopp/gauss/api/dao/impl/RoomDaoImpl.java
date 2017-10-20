@@ -2,6 +2,7 @@ package com.doopp.gauss.api.dao.impl;
 
 import com.doopp.gauss.api.dao.RoomDao;
 import com.doopp.gauss.api.entity.RoomEntity;
+import com.doopp.gauss.api.service.impl.RoomServiceImpl;
 import com.doopp.gauss.server.redis.CustomShadedJedis;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -27,6 +28,17 @@ public class RoomDaoImpl implements RoomDao {
 
     @Override
     public void create(RoomEntity room) {
+        // 自增长的 id
+        synchronized (RoomDaoImpl.class) {
+            String lastRoomId = roomRedis.get("newRoomId");
+            if (lastRoomId==null) {
+                lastRoomId = "10086";
+            }
+            int newRoomId = 1 + Integer.valueOf(lastRoomId);
+            roomRedis.set("newRoomId", String.valueOf(newRoomId));
+            // 设定房间编号
+            room.setId(newRoomId);
+        }
         byte[] roomKey = String.valueOf(room.getId()).getBytes();
         roomRedis.set(roomKey, room);
     }

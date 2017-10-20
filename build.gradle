@@ -82,7 +82,7 @@ dependencies {
 
     // public resources, ref. http://www.webjars.org/
     // compile 'org.webjars:jquery:3.2.1'
-    compile 'org.webjars:bootstrap:3.3.7-1'
+    // compile 'org.webjars:bootstrap:3.3.7-1'
     compile 'org.webjars.bower:angular:1.6.6'
     // compile 'org.webjars:webjars-locator:+'
     // compile 'org.webjars:vue:2.1.3'

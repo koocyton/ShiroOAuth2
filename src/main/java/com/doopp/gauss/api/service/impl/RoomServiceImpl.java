@@ -19,7 +19,6 @@ public class RoomServiceImpl implements RoomService {
     public RoomEntity createRoom(UserEntity user, String roomName) {
         this.leaveRoom(user);
         RoomEntity room = new RoomEntity();
-        room.setId(1000);
         room.setName(roomName);
         room.setOwner(user);
         roomDao.create(room);
