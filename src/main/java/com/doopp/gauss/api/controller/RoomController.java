@@ -60,6 +60,19 @@ public class RoomController {
     }
 
     /**
+     * 目前所在房间
+     *
+     * @param currentUser 当前用户
+     * @return 加入的房间信息
+     */
+    @ResponseBody
+    @RequestMapping(value = "/room/living-room", method = RequestMethod.GET)
+    public RoomDTO livingRoom(@RequestAttribute("currentUser") UserEntity currentUser) {
+        RoomEntity room = roomService.userLivingRoom(currentUser);
+        return CommonUtils.modelMap(room, RoomDTO.class);
+    }
+
+    /**
      * 返回房间列表
      *
      * @return 房间列表

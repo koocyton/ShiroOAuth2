@@ -63,6 +63,12 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
+    public RoomEntity userLivingRoom(UserEntity user) {
+        int roomId = roomDao.getUserIndex(user.getId());
+        return roomDao.fetchById(roomId);
+    }
+
+    @Override
     public Map<Integer, RoomEntity> roomList(int pageNumber) {
         return null;
     }

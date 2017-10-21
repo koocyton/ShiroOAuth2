@@ -32,6 +32,7 @@ public class CustomShadedJedis {
     public void set(byte[] key, Object object) {
         ShardedJedis shardedJedis = shardedJedisPool.getResource();
         byte[] _byte = redisSerializer.serialize(object);
+        logger.info(" >>> set " + _byte);
         shardedJedis.set(key, _byte);
         shardedJedis.close();
     }
@@ -39,8 +40,8 @@ public class CustomShadedJedis {
     public Object get(byte[] key) {
         ShardedJedis shardedJedis = shardedJedisPool.getResource();
         byte[] _byte = shardedJedis.get(key);
+        logger.info(" >>> get " + _byte);
         Object _object = redisSerializer.deserialize(_byte);
-        logger.info(" >>> redisSerializer.deserialize(_byte) " + _object);
         shardedJedis.close();
         return _object;
     }

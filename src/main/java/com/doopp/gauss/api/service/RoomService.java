@@ -35,6 +35,13 @@ public interface RoomService {
     void leaveRoom(UserEntity user);
 
     /**
+     * 用户当前所在间
+     *
+     * @param user 用户
+     */
+    RoomEntity userLivingRoom(UserEntity user);
+
+    /**
      * 列出当前房间列表
      *
      * @param pageNumber 第几页
