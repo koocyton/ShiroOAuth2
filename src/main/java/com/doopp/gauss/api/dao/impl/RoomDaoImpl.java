@@ -2,12 +2,11 @@ package com.doopp.gauss.api.dao.impl;
 
 import com.doopp.gauss.api.dao.RoomDao;
 import com.doopp.gauss.api.entity.RoomEntity;
-import com.doopp.gauss.api.service.impl.RoomServiceImpl;
 import com.doopp.gauss.server.redis.CustomShadedJedis;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-@Repository("roomDao")
+@Repository
 public class RoomDaoImpl implements RoomDao {
 
     @Autowired

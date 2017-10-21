@@ -54,7 +54,7 @@ public class SessionFilter extends OncePerRequestFilter {
             "/api/v1/login",
             "/api/v1/fast-login",
             "/api/v1/logout",
-            "/chat-room",
+            "/demo",
             "/js",
             "/image",
             "/css",
