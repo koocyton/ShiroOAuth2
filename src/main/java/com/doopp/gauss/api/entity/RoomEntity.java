@@ -1,7 +1,10 @@
 package com.doopp.gauss.api.entity;
 
+import com.doopp.gauss.api.service.impl.AccountServiceImpl;
 import lombok.Getter;
 import lombok.Setter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -13,6 +16,8 @@ import java.util.Map;
  * Created by Henry on 2017/8/26.
  */
 public class RoomEntity implements Serializable {
+
+    private final Logger logger = LoggerFactory.getLogger(RoomEntity.class);
 
     // 房间 ID
     @Getter @Setter private int id;
@@ -27,20 +32,29 @@ public class RoomEntity implements Serializable {
     @Getter @Setter private UserEntity owner;
 
     // 前排玩家
-    @Getter private Map<Long, UserEntity> frontUsers = new HashMap<>();
+    @Getter private Map<String, UserEntity> frontUsers = new HashMap<>();
 
     // 围观玩家
-    @Getter private Map<Long, UserEntity> watchUsers = new HashMap<>();
+    @Getter private Map<String, UserEntity> watchUsers = new HashMap<>();
 
     // 加入到前排
     public void joinFront(UserEntity user) {
-        this.frontUsers.put(user.getId(), user);
-        this.watchUsers.remove(user.getId());
+        this.frontUsers.put(String.valueOf(user.getId()), user);
+        this.watchUsers.remove(String.valueOf(user.getId()));
     }
 
     // 加入到围观玩家
     public void joinWatch(UserEntity user) {
-        this.frontUsers.remove(user.getId());
-        this.watchUsers.put(user.getId(), user);
+        this.frontUsers.remove(String.valueOf(user.getId()));
+        this.watchUsers.put(String.valueOf(user.getId()), user);
+    }
+
+    // 离开房间
+    public void userLeave(UserEntity user) {
+        if (this.owner!=null && this.owner.getId().equals(user.getId())) {
+            this.owner = null;
+        }
+        this.frontUsers.remove(String.valueOf(user.getId()));
+        this.watchUsers.remove(String.valueOf(user.getId()), user);
     }
 }

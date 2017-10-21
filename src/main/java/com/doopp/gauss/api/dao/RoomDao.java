@@ -17,4 +17,10 @@ public interface RoomDao {
     void update(RoomEntity room);
 
     void delete(int id);
+
+    int getUserIndex(Long userId);
+
+    void setUserIndex(Long userId, int roomId);
+
+    void delUserIndex(Long userId);
 }

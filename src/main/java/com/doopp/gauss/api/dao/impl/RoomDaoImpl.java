@@ -2,14 +2,20 @@ package com.doopp.gauss.api.dao.impl;
 
 import com.doopp.gauss.api.dao.RoomDao;
 import com.doopp.gauss.api.entity.RoomEntity;
+import com.doopp.gauss.api.entity.UserEntity;
 import com.doopp.gauss.server.redis.CustomShadedJedis;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 
 @Repository
 public class RoomDaoImpl implements RoomDao {
+
+    private final Logger logger = LoggerFactory.getLogger(RoomDaoImpl.class);
 
     @Autowired
     CustomShadedJedis roomRedis;
@@ -64,6 +70,25 @@ public class RoomDaoImpl implements RoomDao {
     public void update(RoomEntity room) {
         byte[] roomKey = String.valueOf(room.getId()).getBytes();
         roomRedis.set(roomKey, room);
+    }
+
+    @Override
+    public int getUserIndex(Long userId) {
+        String roomId = roomIndexRedis.get(userId.toString());
+        if (roomId==null) {
+            return 0;
+        }
+        return Integer.valueOf(roomId);
+    }
+
+    @Override
+    public void setUserIndex(Long userId, int roomId) {
+        roomIndexRedis.set(String.valueOf(userId), String.valueOf(roomId));
+    }
+
+    @Override
+    public void delUserIndex(Long userId) {
+        roomIndexRedis.del(String.valueOf(userId));
     }
 
     @Override
