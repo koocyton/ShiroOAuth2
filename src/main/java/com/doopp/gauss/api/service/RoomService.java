@@ -14,7 +14,7 @@ public interface RoomService {
      * @param roomName 房间名
      * @return 房间信息
      */
-    RoomEntity createRoom(UserEntity user, String roomName);
+    RoomEntity createRoom(UserEntity user, String roomName) throws Exception;
 
 
     /**

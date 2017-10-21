@@ -13,21 +13,27 @@ import java.util.Map;
 public class RoomServiceImpl implements RoomService {
 
     @Autowired
-    RoomDaoImpl roomDao;
+    private RoomDaoImpl roomDao;
 
     @Override
-    public RoomEntity createRoom(UserEntity user, String roomName) {
+    public RoomEntity createRoom(UserEntity user, String roomName) throws Exception {
         this.leaveRoom(user);
-        RoomEntity room = new RoomEntity();
+        RoomEntity room = roomDao.constructOne();
         room.setName(roomName);
         room.setOwner(user);
-        roomDao.create(room);
-        return room;
+        return roomDao.create(room);
     }
 
     @Override
     public RoomEntity joinRoom(int roomId, UserEntity user) {
-        return null;
+        this.leaveRoom(user);
+        RoomEntity room;
+        synchronized (String.valueOf(roomId)) {
+            room = roomDao.fetchById(roomId);
+            room.joinWatch(user);
+            roomDao.update(room);
+        }
+        return room;
     }
 
     @Override

@@ -31,7 +31,7 @@ public interface UserDao {
 
     UserEntity fetchByAccount(String account);
 
-    List<UserEntity> fetchList(@Param("offset") int offset, @Param("limit") int limit);
+    List<UserEntity> get(@Param("offset") int offset, @Param("limit") int limit);
 
-    List<UserEntity> fetchList(@Param("where") String where, @Param("offset") int offset, @Param("limit") int limit);
+    List<UserEntity> get(@Param("where") String where, @Param("offset") int offset, @Param("limit") int limit);
 }

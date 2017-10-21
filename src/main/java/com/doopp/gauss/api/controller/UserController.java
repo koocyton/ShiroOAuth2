@@ -1,7 +1,7 @@
 package com.doopp.gauss.api.controller;
 
 import com.doopp.gauss.api.entity.UserEntity;
-import com.doopp.gauss.api.entity.dto.UserDTO;
+import com.doopp.gauss.api.entity.dto.UserMeDTO;
 import com.doopp.gauss.api.utils.CommonUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -23,8 +23,8 @@ public class UserController {
      */
     @ResponseBody
     @RequestMapping(value = "user/me", method = RequestMethod.GET)
-    public UserDTO myInfo(@RequestAttribute("currentUser") UserEntity currentUser) {
+    public UserMeDTO myInfo(@RequestAttribute("currentUser") UserEntity currentUser) {
         // GET user
-        return CommonUtils.modelMap(currentUser, UserDTO.class);
+        return CommonUtils.modelMap(currentUser, UserMeDTO.class);
     }
 }

@@ -6,6 +6,8 @@ import com.doopp.gauss.server.redis.CustomShadedJedis;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public class RoomDaoImpl implements RoomDao {
 
@@ -26,20 +28,36 @@ public class RoomDaoImpl implements RoomDao {
     }
 
     @Override
-    public void create(RoomEntity room) {
+    public RoomEntity constructOne() {
+        RoomEntity room = new RoomEntity();
         // 自增长的 id
-        synchronized (RoomDaoImpl.class) {
-            String lastRoomId = roomRedis.get("newRoomId");
+        synchronized ("constructOneRoom") {
+            String lastRoomId = roomIndexRedis.get("lastRoomId");
             if (lastRoomId==null) {
                 lastRoomId = "10086";
             }
             int newRoomId = 1 + Integer.valueOf(lastRoomId);
-            roomRedis.set("newRoomId", String.valueOf(newRoomId));
+            roomIndexRedis.set("lastRoomId", String.valueOf(newRoomId));
             // 设定房间编号
             room.setId(newRoomId);
         }
+        return room;
+    }
+
+    @Override
+    public List<RoomEntity> fetchList(int offset, int limit) {
+        return null;
+    }
+
+    @Override
+    public RoomEntity create(RoomEntity room) throws Exception {
         byte[] roomKey = String.valueOf(room.getId()).getBytes();
         roomRedis.set(roomKey, room);
+        Object roomObject = roomRedis.get(roomKey);
+        if (roomObject==null) {
+            throw new Exception("can not save room info");
+        }
+        return (RoomEntity) roomObject;
     }
 
     @Override

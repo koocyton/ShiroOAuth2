@@ -2,11 +2,17 @@ package com.doopp.gauss.api.dao;
 
 import com.doopp.gauss.api.entity.RoomEntity;
 
+import java.util.List;
+
 public interface RoomDao {
 
-    RoomEntity fetchById(int id);
+    RoomEntity constructOne();
 
-    void create(RoomEntity room);
+    List<RoomEntity> fetchList(int offset, int limit);
+
+    RoomEntity create(RoomEntity room) throws Exception;
+
+    RoomEntity fetchById(int id);
 
     void update(RoomEntity room);
 

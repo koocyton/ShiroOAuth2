@@ -2,8 +2,12 @@ package com.doopp.gauss.api.entity.dto;
 
 import com.doopp.gauss.api.entity.UserEntity;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 房间的实体
@@ -16,12 +20,18 @@ public class RoomDTO {
     // 房间 ID
     private int id;
 
+    // 房间有多少个座位，即最多坐多少人
+    // private int seatCount;
+
     // 房间名
     private String name;
 
     // 房主
-    private Long owner;
+    private UserDTO owner;
 
-    // 房间里坐下的人员列表
-    private ArrayList<UserEntity> userList = new ArrayList<>();
+    // 前排玩家
+    private Map<Long, UserDTO> frontUsers = new HashMap<>();
+
+    // 围观玩家
+    private Map<Long, UserDTO> watchUsers = new HashMap<>();
 }

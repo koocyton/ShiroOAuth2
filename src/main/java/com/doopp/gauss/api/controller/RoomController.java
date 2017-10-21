@@ -17,7 +17,7 @@ import java.util.Map;
  * Created by henry on 2017/10/20.
  */
 @Controller
-@RequestMapping(value = "api/v1/")
+@RequestMapping(value = "/api/v1")
 public class RoomController {
 
     @Autowired
@@ -32,8 +32,8 @@ public class RoomController {
      * @throws Exception 如果不能创建房间
      */
     @ResponseBody
-    @RequestMapping(value = "create-room", method = RequestMethod.GET)
-    public RoomDTO createRoom(@RequestAttribute("currentUser") UserEntity currentUser, @RequestParam("roomName") String roomName) throws Exception {
+    @RequestMapping(value = "/room/create", method = RequestMethod.POST)
+    public RoomDTO createRoom(@RequestParam("roomName") String roomName, @RequestAttribute("currentUser") UserEntity currentUser) throws Exception {
         RoomEntity room = roomService.createRoom(currentUser, roomName);
         if (room==null) {
             throw new Exception("can not create room");
@@ -50,11 +50,11 @@ public class RoomController {
      * @throws Exception 进入房间失败
      */
     @ResponseBody
-    @RequestMapping(value = "join-room", method = RequestMethod.GET)
-    public RoomDTO joinRoom(@RequestParam("room") int roomId, @RequestAttribute("currentUser") UserEntity currentUser) throws Exception {
+    @RequestMapping(value = "/room/join", method = RequestMethod.POST)
+    public RoomDTO joinRoom(@RequestParam("roomId") int roomId, @RequestAttribute("currentUser") UserEntity currentUser) throws Exception {
         RoomEntity room = roomService.joinRoom(roomId, currentUser);
         if (room==null) {
-            throw new Exception("can not create room");
+            throw new Exception("can not join room");
         }
         return CommonUtils.modelMap(room, RoomDTO.class);
     }
@@ -65,7 +65,7 @@ public class RoomController {
      * @return 房间列表
      */
     @ResponseBody
-    @RequestMapping(value = "room-list", method = RequestMethod.GET)
+    @RequestMapping(value = "/room/list", method = RequestMethod.GET)
     public Map<Integer, RoomDTO> roomList() {
         return null;
     }

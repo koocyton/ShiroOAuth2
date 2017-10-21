@@ -8,12 +8,12 @@ import lombok.Data;
  *
  */
 @Data
-public class UserDTO {
+public class UserFriendDTO {
 
     // 编号
     private Long id;
 
-    // 用户名
+    // 账号
     // private String account;
 
     // 昵称
@@ -26,5 +26,5 @@ public class UserDTO {
     private String portrait;
 
     // 好友
-    // private String friends;
+    private String friends;
 }
