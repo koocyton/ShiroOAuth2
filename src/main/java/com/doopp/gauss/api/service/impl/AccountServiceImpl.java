@@ -125,7 +125,7 @@ public class AccountServiceImpl implements AccountService {
      * @return 用户信息
      */
     @Override
-    @Cacheable(cacheNames = "session", key = "#accessToken" )
+    // @Cacheable(cacheNames = "session", key = "#accessToken" )
     public UserEntity getUserByToken(String accessToken) {
         // get cache by access token
         String userId = sessionRedis.get(accessToken);
