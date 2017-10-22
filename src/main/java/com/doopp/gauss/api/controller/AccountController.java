@@ -46,7 +46,7 @@ public class AccountController {
     @RequestMapping(value = "register", method = RequestMethod.POST)
     public SessionKeyDTO register(@RequestParam("account") String account, @RequestParam("password") String password) throws Exception {
         // GET user
-        UserEntity user = accountService.getUserOnRegister(account, password);
+        UserEntity user = accountService.registerThenGetUser(account, password);
         String accessToken = accountService.registerSession(user);
         return new SessionKeyDTO(accessToken);
     }

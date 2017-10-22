@@ -61,7 +61,7 @@ public class AccountServiceImpl implements AccountService {
      * @throws Exception 注册异常，账号或密码不合格
      */
     @Override
-    public UserEntity getUserOnRegister(String account, String password) throws Exception
+    public UserEntity registerThenGetUser(String account, String password) throws Exception
     {
         // 当前时间
         int currentTime = (int)(System.currentTimeMillis() / 1000);
