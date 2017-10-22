@@ -40,7 +40,9 @@ public class CustomShadedJedis {
     public Object get(byte[] key) {
         ShardedJedis shardedJedis = shardedJedisPool.getResource();
         byte[] _byte = shardedJedis.get(key);
-        logger.info(" >>> get " + _byte);
+        if (_byte==null) {
+            return null;
+        }
         Object _object = redisSerializer.deserialize(_byte);
         shardedJedis.close();
         return _object;

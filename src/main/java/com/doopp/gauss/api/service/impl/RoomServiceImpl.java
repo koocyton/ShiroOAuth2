@@ -1,5 +1,6 @@
 package com.doopp.gauss.api.service.impl;
 
+import com.doopp.gauss.api.Exception.EmptyException;
 import com.doopp.gauss.api.dao.impl.RoomDaoImpl;
 import com.doopp.gauss.api.entity.RoomEntity;
 import com.doopp.gauss.api.entity.UserEntity;
@@ -9,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.rmi.server.ExportException;
 import java.util.Map;
 
 @Service("roomService")
@@ -30,11 +32,14 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
-    public RoomEntity joinRoom(int roomId, UserEntity user) {
+    public RoomEntity joinRoom(int roomId, UserEntity user) throws EmptyException {
         this.leaveRoom(user);
         RoomEntity room;
         synchronized (String.valueOf(roomId)) {
             room = roomDao.fetchById(roomId);
+            if (room==null) {
+                throw new EmptyException("not found room");
+            }
             room.joinWatch(user);
             roomDao.update(room);
         }
@@ -63,9 +68,11 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
-    public RoomEntity userLivingRoom(UserEntity user) {
+    public RoomEntity userCurrentRoom(UserEntity user) {
+        logger.info(" >>> 1 " + user);
         int roomId = roomDao.getUserIndex(user.getId());
-        return roomDao.fetchById(roomId);
+        logger.info(" >>> 2 " + roomId);
+        return (roomId==0) ? null : roomDao.fetchById(roomId);
     }
 
     @Override

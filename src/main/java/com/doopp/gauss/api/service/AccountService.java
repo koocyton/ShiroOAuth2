@@ -15,6 +15,15 @@ public interface AccountService {
      */
     UserEntity getUserOnLogin(String account, String password) throws Exception;
 
+    /**
+     * 注册成功，返回用户信息
+     *
+     * @param account 用户账号
+     * @param password 用户密码
+     * @return 用户信息
+     * @throws Exception 注册异常，账号或密码不合格
+     */
+    UserEntity getUserOnRegister(String account, String password) throws Exception;
 
     /**
      * 通过 access-token 获取用户信息

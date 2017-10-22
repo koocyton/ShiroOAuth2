@@ -1,5 +1,6 @@
 package com.doopp.gauss.api.controller;
 
+import com.doopp.gauss.api.Exception.EmptyException;
 import com.doopp.gauss.api.entity.RoomEntity;
 import com.doopp.gauss.api.entity.UserEntity;
 import com.doopp.gauss.api.entity.dto.RoomDTO;
@@ -51,10 +52,11 @@ public class RoomController {
      */
     @ResponseBody
     @RequestMapping(value = "/room/join", method = RequestMethod.POST)
-    public RoomDTO joinRoom(@RequestParam("roomId") int roomId, @RequestAttribute("currentUser") UserEntity currentUser) throws Exception {
+    public RoomDTO joinRoom(@RequestParam("roomId") int roomId,
+                            @RequestAttribute("currentUser") UserEntity currentUser) throws EmptyException {
         RoomEntity room = roomService.joinRoom(roomId, currentUser);
         if (room==null) {
-            throw new Exception("can not join room");
+            throw new EmptyException("can not join room : " + roomId);
         }
         return CommonUtils.modelMap(room, RoomDTO.class);
     }
@@ -66,10 +68,10 @@ public class RoomController {
      * @return 加入的房间信息
      */
     @ResponseBody
-    @RequestMapping(value = "/room/living-room", method = RequestMethod.GET)
-    public RoomDTO livingRoom(@RequestAttribute("currentUser") UserEntity currentUser) {
-        RoomEntity room = roomService.userLivingRoom(currentUser);
-        return CommonUtils.modelMap(room, RoomDTO.class);
+    @RequestMapping(value = "/user/current-room", method = RequestMethod.GET)
+    public RoomDTO currentRoom(@RequestAttribute("currentUser") UserEntity currentUser) {
+        RoomEntity room = roomService.userCurrentRoom(currentUser);
+        return (room==null) ? null : CommonUtils.modelMap(room, RoomDTO.class);
     }
 
     /**

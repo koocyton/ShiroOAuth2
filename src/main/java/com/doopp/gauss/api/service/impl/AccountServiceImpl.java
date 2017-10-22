@@ -4,6 +4,7 @@ import com.doopp.gauss.api.dao.UserDao;
 import com.doopp.gauss.api.entity.UserEntity;
 import com.doopp.gauss.api.service.AccountService;
 import com.doopp.gauss.api.utils.EncryHelper;
+import com.doopp.gauss.api.utils.IdWorker;
 import com.doopp.gauss.server.redis.CustomShadedJedis;
 import org.apache.oltu.oauth2.as.issuer.MD5Generator;
 import org.apache.oltu.oauth2.as.issuer.OAuthIssuer;
@@ -28,6 +29,8 @@ public class AccountServiceImpl implements AccountService {
     @Autowired
     private CustomShadedJedis userRedis;
 
+    private final static IdWorker idWorker = new IdWorker(1, 1);
+
     /**
      * 通过账号，密码获取用户信息
      *
@@ -46,6 +49,37 @@ public class AccountServiceImpl implements AccountService {
         if (!user.getPassword().equals(hashPassword)) {
             throw new Exception("password is error");
         }
+        return user;
+    }
+
+    /**
+     * 注册成功，返回用户信息
+     *
+     * @param account 用户账号
+     * @param password 用户密码
+     * @return 用户信息
+     * @throws Exception 注册异常，账号或密码不合格
+     */
+    @Override
+    public UserEntity getUserOnRegister(String account, String password) throws Exception
+    {
+        // 当前时间
+        int currentTime = (int)(System.currentTimeMillis() / 1000);
+        // 密码混淆的值
+        String salt = EncryHelper.md5(String.valueOf(currentTime));
+        // 用户实体
+        UserEntity user = new UserEntity();
+        user.setId(idWorker.nextId());
+        user.setAccount(account);
+        user.setSalt(salt);
+        user.setPassword(this.hashPassword(user, password));
+        user.setCreated_at(currentTime);
+        user.setNickname("");
+        user.setPortrait("");
+        user.setFriends("");
+        // 保存用户
+        userDao.create(user);
+        //
         return user;
     }
 

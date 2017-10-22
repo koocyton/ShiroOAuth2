@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @Controller
 @RequestMapping(value = "api/v1/")
-public class LoginController {
+public class AccountController {
 
     @Autowired
     private AccountService accountService;
@@ -31,6 +31,22 @@ public class LoginController {
     public SessionKeyDTO login(@RequestParam("account") String account, @RequestParam("password") String password) throws Exception {
         // GET user
         UserEntity user = accountService.getUserOnLogin(account, password);
+        String accessToken = accountService.registerSession(user);
+        return new SessionKeyDTO(accessToken);
+    }
+
+    /**
+     * 用户注册，获取 access token
+     * @param account 用户的账号
+     * @param password 用户的密码
+     * @return accessToken
+     * @throws Exception 账号已经存在，或密码不合格
+     */
+    @ResponseBody
+    @RequestMapping(value = "register", method = RequestMethod.POST)
+    public SessionKeyDTO register(@RequestParam("account") String account, @RequestParam("password") String password) throws Exception {
+        // GET user
+        UserEntity user = accountService.getUserOnRegister(account, password);
         String accessToken = accountService.registerSession(user);
         return new SessionKeyDTO(accessToken);
     }

@@ -9,6 +9,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.doopp.gauss.api.Exception.EmptyException;
 import com.doopp.gauss.api.entity.UserEntity;
 import com.doopp.gauss.api.service.AccountService;
 import com.doopp.gauss.server.redis.CustomShadedJedis;
@@ -101,13 +102,13 @@ public class SessionFilter extends OncePerRequestFilter {
                     }
                     // 如果不能找到用户
                     else {
-                        writeErrorResponse(response, "Session failed");
+                        writeErrorResponse(404, response, "not found user");
                         return;
                     }
                 }
                 // 如果 token 不对
                 else {
-                    writeErrorResponse(response, "token failed");
+                    writeErrorResponse(501, response, "token failed");
                     return;
                 }
             }
@@ -117,15 +118,15 @@ public class SessionFilter extends OncePerRequestFilter {
         catch(Exception e) {
             // logger.info(" >>> e.getMessage : " +  e.getMessage());
             e.printStackTrace();
-            writeErrorResponse(response, e.getMessage());
+            writeErrorResponse(501, response, e.getMessage());
         }
     }
 
-    private static void writeErrorResponse(HttpServletResponse response, String message) throws IOException {
-        response.setStatus(501);
-        String data = "{\"errcode\":501, \"errmsg\":\"" + message + "\"}";
+    private static void writeErrorResponse(int errorCode, HttpServletResponse response, String message) throws IOException {
+        response.setStatus(errorCode);
+        String data = "{\"errcode\":" + errorCode + ", \"errmsg\":\"" + message + "\"}";
         response.setCharacterEncoding("UTF-8");
-        response.setContentType("application/json;charset=UTF-8");
+        response.setContentType("application/json; charset=UTF-8");
         PrintWriter out = response.getWriter();
         out.write(data);
     }

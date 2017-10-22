@@ -1,5 +1,6 @@
 package com.doopp.gauss.api.service;
 
+import com.doopp.gauss.api.Exception.EmptyException;
 import com.doopp.gauss.api.entity.RoomEntity;
 import com.doopp.gauss.api.entity.UserEntity;
 import java.util.Map;
@@ -24,7 +25,7 @@ public interface RoomService {
      * @param user 加入的人
      * @return 房间信息
      */
-    RoomEntity joinRoom(int roomId, UserEntity user);
+    RoomEntity joinRoom(int roomId, UserEntity user) throws EmptyException;
 
 
     /**
@@ -39,7 +40,7 @@ public interface RoomService {
      *
      * @param user 用户
      */
-    RoomEntity userLivingRoom(UserEntity user);
+    RoomEntity userCurrentRoom(UserEntity user);
 
     /**
      * 列出当前房间列表
