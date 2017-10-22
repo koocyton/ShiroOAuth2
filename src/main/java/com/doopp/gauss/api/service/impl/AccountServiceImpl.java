@@ -107,8 +107,14 @@ public class AccountServiceImpl implements AccountService {
         // create access token
         OAuthIssuer oauthIssuerImpl = new OAuthIssuerImpl(new MD5Generator());
         String accessToken = oauthIssuerImpl.accessToken();
+        // clean last token cache
+        String lastToken = sessionRedis.get(user.getId().toString());
+        if (lastToken!=null) {
+            sessionRedis.del(lastToken);
+        }
         // cache access token
         sessionRedis.set(accessToken, user.getId().toString());
+        sessionRedis.set(user.getId().toString(), accessToken);
         return accessToken;
     }
 
