@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.rmi.server.ExportException;
+import java.util.List;
 import java.util.Map;
 
 @Service("roomService")
@@ -69,14 +70,12 @@ public class RoomServiceImpl implements RoomService {
 
     @Override
     public RoomEntity userCurrentRoom(UserEntity user) {
-        logger.info(" >>> 1 " + user);
         int roomId = roomDao.getUserIndex(user.getId());
-        logger.info(" >>> 2 " + roomId);
         return (roomId==0) ? null : roomDao.fetchById(roomId);
     }
 
     @Override
-    public Map<Integer, RoomEntity> roomList(int pageNumber) {
+    public List<RoomEntity> roomList(String rule, int pageNumber) {
         return null;
     }
 }

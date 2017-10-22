@@ -3,6 +3,8 @@ package com.doopp.gauss.api.service;
 import com.doopp.gauss.api.Exception.EmptyException;
 import com.doopp.gauss.api.entity.RoomEntity;
 import com.doopp.gauss.api.entity.UserEntity;
+
+import java.util.List;
 import java.util.Map;
 
 public interface RoomService {
@@ -48,5 +50,5 @@ public interface RoomService {
      * @param pageNumber 第几页
      * @return 列表
      */
-    Map<Integer, RoomEntity> roomList(int pageNumber);
+    List<RoomEntity> roomList(String rule, int pageNumber);
 }

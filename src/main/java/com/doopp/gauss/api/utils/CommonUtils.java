@@ -63,4 +63,8 @@ public class CommonUtils {
     public static <D> D modelMap(Object source, Class<D> destinationType) {
         return modelMapper.map(source, destinationType);
     }
+
+    public static <D> D modelMap(Object source, Class<D> destinationType, String typeMapName) {
+        return modelMapper.map(source, destinationType, typeMapName);
+    }
 }

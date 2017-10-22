@@ -29,70 +29,38 @@ public class CustomShadedJedis {
         return value;
     }
 
+    public void del(String... keys) {
+        ShardedJedis shardedJedis = shardedJedisPool.getResource();
+        for (String key : keys) {
+            shardedJedis.del(key);
+        }
+        shardedJedis.close();
+    }
+
     public void set(byte[] key, Object object) {
         ShardedJedis shardedJedis = shardedJedisPool.getResource();
-        byte[] _byte = redisSerializer.serialize(object);
-        logger.info(" >>> set " + _byte);
-        shardedJedis.set(key, _byte);
+        byte[] _object = redisSerializer.serialize(object);
+        shardedJedis.set(key, _object);
         shardedJedis.close();
     }
 
     public Object get(byte[] key) {
         ShardedJedis shardedJedis = shardedJedisPool.getResource();
-        byte[] _byte = shardedJedis.get(key);
-        if (_byte==null) {
+        byte[] _object = shardedJedis.get(key);
+        if (_object==null) {
             return null;
         }
-        Object _object = redisSerializer.deserialize(_byte);
+        Object object = redisSerializer.deserialize(_object);
         shardedJedis.close();
-        return _object;
+        return object;
     }
 
-    public void del(String... keys) {
+    public void del(byte[]... keys) {
         ShardedJedis shardedJedis = shardedJedisPool.getResource();
-        for (String key : keys) {
-            byte[] _key = key.getBytes();
-            shardedJedis.del(_key);
+        for (byte[] key : keys) {
+            shardedJedis.del(key);
         }
         shardedJedis.close();
-    }
-
-    public void del(int... keys) {
-        ShardedJedis shardedJedis = shardedJedisPool.getResource();
-        for (int key : keys) {
-            byte[] _key = String.valueOf(key).getBytes();
-            shardedJedis.del(_key);
-        }
-        shardedJedis.close();
-    }
-
-    // 设置空闲房间
-    public Long hset(String key, String field, String value) {
-        ShardedJedis shardedJedis = shardedJedisPool.getResource();
-        Long result = shardedJedis.hset(key, field, value);
-        shardedJedis.close();
-        return result;
-    }
-
-    public String hget(String key, String field) {
-        ShardedJedis shardedJedis = shardedJedisPool.getResource();
-        String result = shardedJedis.hget(key, field);
-        shardedJedis.close();
-        return result;
-    }
-
-    public Long hdel(String key, String... fields) {
-        ShardedJedis shardedJedis = shardedJedisPool.getResource();
-        Long result = shardedJedis.hdel(key, fields);
-        shardedJedis.close();
-        return result;
-    }
-
-    public Set<String> hkeys(String key) {
-        ShardedJedis shardedJedis = shardedJedisPool.getResource();
-        Set<String> keys = shardedJedis.hkeys(key);
-        shardedJedis.close();
-        return keys;
     }
 
     public void setShardedJedisPool(ShardedJedisPool shardedJedisPool) {

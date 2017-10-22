@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -75,13 +76,15 @@ public class RoomController {
     }
 
     /**
-     * 返回房间列表
      *
-     * @return 房间列表
+     * @param rule recommend hot near new
+     * @return List
      */
     @ResponseBody
-    @RequestMapping(value = "/room/list", method = RequestMethod.GET)
-    public Map<Integer, RoomDTO> roomList() {
-        return null;
+    @RequestMapping(value = "/room/{rule}-list", method = RequestMethod.GET)
+    public List<RoomDTO> roomList(@PathVariable("rule") String rule) {
+        List<RoomEntity> rooms = roomService.roomList(rule, 0 );
+        return CommonUtils.modelMap(rooms, List.class, RoomDTO.class.getTypeName());
+        // return aa;
     }
 }
