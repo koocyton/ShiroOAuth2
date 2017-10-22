@@ -1,10 +1,5 @@
-<h1>list</h1>
-<a href="#/login">room login</a>
-
 <table class="table table-hover table-bordered" ng-controller="listCtl">
-
     <tr ng-repeat="list in lists">
         <td ng-bind="list.name" ng-click="joinChatRoom(list.id)" />
     </tr>
-
 </table>
