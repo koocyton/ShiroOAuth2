@@ -93,7 +93,8 @@ public class RoomDaoImpl implements RoomDao {
 
     @Override
     public void delete(int id) {
-        String roomKey = String.valueOf(id);
+        byte[] roomKey = String.valueOf(id).getBytes();
+        // String roomKey = String.valueOf(id);
         roomRedis.del(roomKey);
     }
 }
