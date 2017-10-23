@@ -3,19 +3,20 @@
 /*
  * token 的操作，校验
  */
-let TokenService = function() {
+let TokenService = function($cookieStore) {
+    this.cookieStore = $cookieStore;
 };
 TokenService.prototype.cacheToken = function(token) {
-    $cookieStore.put("access-token", token);
+    this.cookieStore.put("access-token", token);
 };
 TokenService.prototype.removeToken = function() {
-    $cookieStore.remove("access-token");
+    this.cookieStore.remove("access-token");
 };
 TokenService.prototype.getToken = function() {
-    $cookieStore.get("access-token");
+    this.cookieStore.get("access-token");
 };
 TokenService.prototype.checkToken = function(successCall, errorCall) {
-    let accessToken = $cookieStore.get("access-token");
+    let accessToken = this.cookieStore.get("access-token");
     if (typeof accessToken!=="string" || accessToken.length<32) {
         errorCall(null);
         return;
@@ -37,12 +38,7 @@ TokenService.prototype.checkToken = function(successCall, errorCall) {
 let hallController = function($scope, $http, $location, $cookieStore) {
     $scope.lists = [];
 
-    let accessToken = $cookieStore.get("access-token");
-    if (typeof accessToken==="undefined" || accessToken==="") {
-        $location.path("/login")
-    }
-    else {
-
+    $scope.openHall = function(accessToken) {
         $http({
             method: 'GET',
             url: '/api/v1/room/hot-list',
@@ -59,7 +55,18 @@ let hallController = function($scope, $http, $location, $cookieStore) {
                 console.log(res);
             }
         );
-    }
+    };
+
+    let tokenService = new TokenService($cookieStore);
+    let accessToken = tokenService.getToken();
+    tokenService.checkToken(
+        function successCallback(res){
+            $scope.openHall(accessToken);
+        },
+        function errorCallback(res){
+            $location.path("/login");
+        }
+    );
 };
 
 let loginController = function($scope, $http, $location, $cookieStore) {
