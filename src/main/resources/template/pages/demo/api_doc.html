@@ -1,0 +1,10 @@
+<table class="table table-hover table-bordered" ng-controller="listCtl">
+    <tr>
+        <td>API 接口</td>
+        <td>API 说明</td>
+    </tr>
+    <tr ng-repeat="api in apis">
+        <td ng-bind="api.uri"/>
+        <td ng-bind="api.info"/>
+    </tr>
+</table>

@@ -4,30 +4,61 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
-@RequestMapping(value = "/demo")
 public class WebController {
 
     /*
-     * web 测试
+     * 聊天 Demo 界面
      */
-    @RequestMapping(value = "/chat-room")
+    @RequestMapping(value = "/demo/main")
+    public String demoMain() {
+        return "demo/main";
+    }
+
+    /*
+     * 登录界面
+     */
+    @RequestMapping(value = "/demo/login")
+    public String login() {
+        return "demo/login";
+    }
+
+    /*
+     * 注册用户界面
+     */
+    @RequestMapping(value = "/demo/register")
+    public String register() {
+        return "demo/register";
+    }
+
+    /*
+     * 房间列表
+     */
+    @RequestMapping(value = "/demo/hall")
+    public String roomList() {
+        return "demo/hall";
+    }
+
+    /*
+     * 创建房间
+     */
+    @RequestMapping(value = "/demo/create-room")
     public String chatRoom() {
-        return "demo/chat_room";
+        return "demo/create_room";
     }
 
     /*
-     * web 测试
+     * 进入房间
      */
-    @RequestMapping(value = "/chat-room/login")
-    public String chatRoomLogin() {
-        return "demo/chat_room_login";
+    @RequestMapping(value = "/demo/room/{roomId}")
+    public String joinRoom(@PathVariable("roomId") int ruroomIdle) {
+        return "demo/room";
     }
 
     /*
-     * web 测试
+     * API 列表
      */
-    @RequestMapping(value = "/chat-room/list")
-    public String chatRoomList() {
-        return "demo/chat_room_list";
+    @RequestMapping(value = "/demo/api-doc")
+    public String showApi() {
+        return "demo/api_doc";
     }
 }

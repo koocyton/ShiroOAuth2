@@ -1,6 +1,6 @@
 "use strict";
 
-let listController = function($scope, $http, $location, $cookieStore) {
+let hallController = function($scope, $http, $location, $cookieStore) {
     $scope.lists = [];
 
     let accessToken = $cookieStore.get("access-token");
@@ -82,9 +82,25 @@ let loginController = function($scope, $http, $location, $cookieStore) {
     }
 };
 
+let registerController = function($scope, $http, $location, $cookieStore) {
+};
+
+let roomController = function($scope, $http, $location, $cookieStore) {
+};
+
+let createRoomController = function($scope, $http, $location, $cookieStore) {
+};
+
+let apiDocController = function($scope, $http, $location, $cookieStore) {
+};
+
 angular.module('ngRouteChatApp', ['ngRoute', 'ngCookies'])
-    .controller("listCtl", listController)
-    .controller("loginCtl", loginController)
+    .controller("loginCtrl", loginController)
+    .controller("hallCtrl", hallController)
+    .controller("registerCtrl", registerController)
+    .controller("roomCtrl", roomController)
+    .controller("createRoomCtrl", createRoomController)
+    .controller("apiDocCtrl", apiDocController)
     .config([
         '$routeProvider',
         '$locationProvider',
@@ -92,8 +108,12 @@ angular.module('ngRouteChatApp', ['ngRoute', 'ngCookies'])
         {
             $locationProvider.hashPrefix('');
             $routeProvider
-                .when('/login', {templateUrl: '/demo/chat-room/login', controller:"loginCtl"})
-                .when('/list', {templateUrl: '/demo/chat-room/list', controller:"listCtl"})
+                .when('/login', {templateUrl: '/demo/login', controller:"loginCtrl"})
+                .when('/register', {templateUrl: '/demo/register', controller:"registerCtrl"})
+                .when('/hall', {templateUrl: '/demo/hall', controller:"hallCtrl"})
+                .when('/room', {templateUrl: '/demo/room', controller:"roomCtrl"})
+                .when('/create-room', {templateUrl: '/demo/create-room', controller:"createRoomCtrl"})
+                .when('/api-doc', {templateUrl: '/demo/api-doc', controller:"apiDocCtrl"})
                 .otherwise({redirectTo: '/login'});
         }
     ]
