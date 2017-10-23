@@ -1,10 +1,22 @@
-<table class="table table-hover table-bordered" ng-controller="listCtl">
-    <tr>
-        <td>API 接口</td>
-        <td>API 说明</td>
-    </tr>
-    <tr ng-repeat="api in apis">
-        <td ng-bind="api.uri"/>
-        <td ng-bind="api.info"/>
-    </tr>
+<table class="table table-hover table-bordered">
+    <thead>
+        <tr style="background-color:#cccccc;">
+            <td>API 接口</td>
+            <td>API 说明</td>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>[POST] /api/v1/login</td>
+            <td>登录 account={account}&password={password}</td>
+        </tr>
+        <tr>
+            <td>[POST] /api/v1/register</td>
+            <td>注册 account={account}&password={password}</td>
+        </tr>
+        <tr>
+            <td>[POST] /api/v1/create-room</td>
+            <td>创建房间 name={roomName}</td>
+        </tr>
+    </tbody>
 </table>

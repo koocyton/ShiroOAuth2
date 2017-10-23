@@ -1,7 +1,41 @@
 "use strict";
 
+/*
+ * token 的操作，校验
+ */
+let TokenService = function() {
+};
+TokenService.prototype.cacheToken = function(token) {
+    $cookieStore.put("access-token", token);
+};
+TokenService.prototype.removeToken = function() {
+    $cookieStore.remove("access-token");
+};
+TokenService.prototype.getToken = function() {
+    $cookieStore.get("access-token");
+};
+TokenService.prototype.checkToken = function(successCall, errorCall) {
+    let accessToken = $cookieStore.get("access-token");
+    if (typeof accessToken!=="string" || accessToken.length<32) {
+        errorCall(null);
+        return;
+    }
+    $http({
+        method: 'GET',
+        url: '/api/v1/user/me',
+        headers: {'access-token': accessToken}
+    }).then(
+        function successCallback(res) {
+            successCall(res)
+        },
+        function errorCallback(res) {
+            errorCall(res);
+        }
+    );
+};
+
 let hallController = function($scope, $http, $location, $cookieStore) {
-    /*$scope.lists = [];
+    $scope.lists = [];
 
     let accessToken = $cookieStore.get("access-token");
     if (typeof accessToken==="undefined" || accessToken==="") {
@@ -25,7 +59,7 @@ let hallController = function($scope, $http, $location, $cookieStore) {
                 console.log(res);
             }
         );
-    }*/
+    }
 };
 
 let loginController = function($scope, $http, $location, $cookieStore) {
@@ -89,6 +123,14 @@ let roomController = function($scope, $http, $location, $cookieStore) {
 };
 
 let createRoomController = function($scope, $http, $location, $cookieStore) {
+    let tokenService = new TokenService($cookieStore);
+    tokenService.checkToken(
+        function successCallback(res){
+        },
+        function errorCallback(res){
+            $location.path("/login");
+        }
+    );
 };
 
 let apiDocController = function($scope, $http, $location, $cookieStore) {
