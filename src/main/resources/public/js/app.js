@@ -1,7 +1,7 @@
 "use strict";
 
 let hallController = function($scope, $http, $location, $cookieStore) {
-    $scope.lists = [];
+    /*$scope.lists = [];
 
     let accessToken = $cookieStore.get("access-token");
     if (typeof accessToken==="undefined" || accessToken==="") {
@@ -25,7 +25,7 @@ let hallController = function($scope, $http, $location, $cookieStore) {
                 console.log(res);
             }
         );
-    }
+    }*/
 };
 
 let loginController = function($scope, $http, $location, $cookieStore) {
