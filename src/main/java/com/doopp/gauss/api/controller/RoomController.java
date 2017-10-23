@@ -1,6 +1,7 @@
 package com.doopp.gauss.api.controller;
 
 import com.doopp.gauss.api.Exception.EmptyException;
+import com.doopp.gauss.api.entity.RoomAbstractEntity;
 import com.doopp.gauss.api.entity.RoomEntity;
 import com.doopp.gauss.api.entity.UserEntity;
 import com.doopp.gauss.api.entity.dto.RoomDTO;
@@ -82,9 +83,9 @@ public class RoomController {
      */
     @ResponseBody
     @RequestMapping(value = "/room/{rule}-list", method = RequestMethod.GET)
-    public List<RoomDTO> roomList(@PathVariable("rule") String rule) {
-        List<RoomEntity> rooms = roomService.roomList(rule, 0 );
-        return CommonUtils.modelMap(rooms, List.class, RoomDTO.class.getTypeName());
+    public Map<Integer, RoomAbstractEntity> roomList(@PathVariable("rule") String rule) {
+        return roomService.roomList(rule, 0 );
+        // return CommonUtils.modelMap(rooms, List.class, RoomDTO.class.getTypeName());
         // return aa;
     }
 }

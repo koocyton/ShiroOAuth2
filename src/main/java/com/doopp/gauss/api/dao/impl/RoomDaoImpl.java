@@ -1,6 +1,7 @@
 package com.doopp.gauss.api.dao.impl;
 
 import com.doopp.gauss.api.dao.RoomDao;
+import com.doopp.gauss.api.entity.RoomAbstractEntity;
 import com.doopp.gauss.api.entity.RoomEntity;
 import com.doopp.gauss.api.entity.UserEntity;
 import com.doopp.gauss.server.redis.CustomShadedJedis;
@@ -96,5 +97,16 @@ public class RoomDaoImpl implements RoomDao {
         byte[] roomKey = String.valueOf(id).getBytes();
         // String roomKey = String.valueOf(id);
         roomRedis.del(roomKey);
+    }
+
+    @Override
+    public RoomAbstractEntity getRoomAbstract(RoomEntity room) {
+        RoomAbstractEntity roomAbstract = new RoomAbstractEntity();
+        roomAbstract.setId(room.getId());
+        roomAbstract.setName(room.getName());
+        roomAbstract.setOwnerName(room.getOwner().getNickname());
+        roomAbstract.setUserNumber(1);
+        roomAbstract.setHot(0);
+        return roomAbstract;
     }
 }

@@ -1,5 +1,6 @@
 package com.doopp.gauss.api.dao;
 
+import com.doopp.gauss.api.entity.RoomAbstractEntity;
 import com.doopp.gauss.api.entity.RoomEntity;
 
 import java.util.List;
@@ -23,4 +24,6 @@ public interface RoomDao {
     void setUserIndex(Long userId, int roomId);
 
     void delUserIndex(Long userId);
+
+    RoomAbstractEntity getRoomAbstract(RoomEntity room);
 }
