@@ -4,7 +4,6 @@ let listController = function($scope, $http, $location, $cookieStore) {
     $scope.lists = [];
 
     let accessToken = $cookieStore.get("access-token");
-
     if (typeof accessToken==="undefined" || accessToken==="") {
         $location.path("/login")
     }
@@ -44,7 +43,7 @@ let loginController = function($scope, $http, $location, $cookieStore) {
             function successCallback(res)
             {
                 console.log(res.data);
-                $location.path("/list")
+                // $location.path("/list");
             },
             function errorCallback(res){}
         );
