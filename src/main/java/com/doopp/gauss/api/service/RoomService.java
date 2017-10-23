@@ -51,5 +51,5 @@ public interface RoomService {
      * @param pageNumber 第几页
      * @return 列表
      */
-    Map<Integer, RoomAbstractEntity> roomList(String rule, int pageNumber);
+    Map<String, RoomAbstractEntity> roomList(String rule, int pageNumber);
 }

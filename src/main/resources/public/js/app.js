@@ -1,23 +1,41 @@
 "use strict";
 
-let listController = function($scope, $location) {
-    $scope.lists = [
-        {"id": "1", "name": "张三", "age": 22, "phoneNum": "18298705786"},
-        {"id": "2", "name": "王五", "age": 28, "phoneNum": "18456705786"},
-        {"id": "3", "name": "张三", "age": 29, "phoneNum": "18291235786"},
-        {"id": "4", "name": "蔡雄", "age": 22, "phoneNum": "18298705786"},
-        {"id": "5", "name": "张三", "age": 26, "phoneNum": "18759705786"},
-        {"id": "6", "name": "张楚", "age": 22, "phoneNum": "18298705786"}
-    ];
-    $scope.joinChatRoom = function(roomId) {
-        $location.path("/login");
+let listController = function($scope, $http, $location, $cookieStore) {
+    $scope.lists = [];
+
+    let accessToken = $cookieStore.get("access-token");
+
+    if (typeof accessToken==="undefined" || accessToken==="") {
+        $location.path("/login")
+    }
+    else {
+
+        $http({
+            method: 'GET',
+            url: '/api/v1/room/hot-list',
+            headers: {'access-token': accessToken}
+        }).then(
+            function successCallback(res) {
+                let rooms = [];
+                for (let key in res.data) {
+                    rooms[rooms.length] = res.data[key];
+                }
+                $scope.lists = rooms;
+            },
+            function errorCallback(res) {
+                console.log(res);
+            }
+        );
     }
 };
 
-let loginController = function($scope, $http, $location) {
+let loginController = function($scope, $http, $location, $cookieStore) {
     $scope.formData = {};
     $scope.responseInfo = "";
+    $scope.accessToken = "";
+
     $scope.getUserInfo = function(accessToken) {
+        $cookieStore.put("access-token", accessToken);
         $http({
             method  : 'GET',
             url     : '/api/v1/user/me',
@@ -31,6 +49,7 @@ let loginController = function($scope, $http, $location) {
             function errorCallback(res){}
         );
     };
+
     $scope.requestLogin = function() {
         if (typeof $scope.formData.account==="undefined") {
             alert("请输入账号");
@@ -51,6 +70,7 @@ let loginController = function($scope, $http, $location) {
                 if (typeof res.data==="object" && typeof res.data.accessToken==="string") {
                     $scope.responseInfo = "Access Token : " + res.data.accessToken;
                     $scope.getUserInfo(res.data.accessToken);
+                    // $scope.showRoomList(res.data.accessToken);
                 }
             },
             function errorCallback(res)
@@ -63,7 +83,7 @@ let loginController = function($scope, $http, $location) {
     }
 };
 
-angular.module('ngRouteChatApp', ['ngRoute'])
+angular.module('ngRouteChatApp', ['ngRoute', 'ngCookies'])
     .controller("listCtl", listController)
     .controller("loginCtl", loginController)
     .config([

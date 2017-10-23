@@ -19,7 +19,7 @@ public class RoomServiceImpl implements RoomService {
 
     private final Logger logger = LoggerFactory.getLogger(RoomServiceImpl.class);
 
-    private Map<Integer, RoomAbstractEntity> roomList = new HashMap<>();
+    private Map<String, RoomAbstractEntity> roomList = new HashMap<>();
 
     @Autowired
     private RoomDaoImpl roomDao;
@@ -35,7 +35,7 @@ public class RoomServiceImpl implements RoomService {
         // 应该用面向切面，稍后改
         // 房间摘要信息
         RoomAbstractEntity roomAbstract = roomDao.getRoomAbstract(room);
-        roomList.put(room.getId(), roomAbstract);
+        roomList.put(String.valueOf(room.getId()), roomAbstract);
 
         //
         return roomDao.create(room);
@@ -57,10 +57,10 @@ public class RoomServiceImpl implements RoomService {
 
         // 应该用面向切面，稍后改
         // change user number
-        RoomAbstractEntity roomAbstract = roomList.get(roomId);
+        RoomAbstractEntity roomAbstract = roomList.get(String.valueOf(roomId));
         int userNumber = roomAbstract.getUserNumber();
         roomAbstract.setUserNumber(userNumber+1);
-        roomList.put(roomId, roomAbstract);
+        roomList.put(String.valueOf(roomId), roomAbstract);
 
         //
         return room;
@@ -79,7 +79,7 @@ public class RoomServiceImpl implements RoomService {
                     roomDao.delete(roomId);
 
                     // 房间空了，就删除房间的摘要
-                    roomList.remove(roomId);
+                    roomList.remove(String.valueOf(roomId));
                 }
                 // 如果还有人，就更新房间
                 else {
@@ -87,10 +87,10 @@ public class RoomServiceImpl implements RoomService {
 
                     // 应该用面向切面，稍后改
                     // change user number
-                    RoomAbstractEntity roomAbstract = roomList.get(roomId);
+                    RoomAbstractEntity roomAbstract = roomList.get(String.valueOf(roomId));
                     int userNumber = roomAbstract.getUserNumber();
                     roomAbstract.setUserNumber(userNumber-1);
-                    roomList.put(roomId, roomAbstract);
+                    roomList.put(String.valueOf(roomId), roomAbstract);
                 }
             }
         }
@@ -104,7 +104,7 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
-    public Map<Integer, RoomAbstractEntity> roomList(String rule, int pageNumber) {
+    public Map<String, RoomAbstractEntity> roomList(String rule, int pageNumber) {
         return roomList;
     }
 }

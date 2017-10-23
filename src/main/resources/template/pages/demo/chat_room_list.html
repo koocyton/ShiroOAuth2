@@ -1,5 +1,5 @@
 <table class="table table-hover table-bordered" ng-controller="listCtl">
-    <tr ng-repeat="list in lists">
-        <td ng-bind="list.name" ng-click="joinChatRoom(list.id)" />
+    <tr ng-repeat="(key, room) in lists">
+        <td ng-bind="room.name" ng-click="joinChatRoom(room.id)" />
     </tr>
 </table>

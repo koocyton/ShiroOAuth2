@@ -83,7 +83,7 @@ public class RoomController {
      */
     @ResponseBody
     @RequestMapping(value = "/room/{rule}-list", method = RequestMethod.GET)
-    public Map<Integer, RoomAbstractEntity> roomList(@PathVariable("rule") String rule) {
+    public Map<String, RoomAbstractEntity> roomList(@PathVariable("rule") String rule) {
         return roomService.roomList(rule, 0 );
         // return CommonUtils.modelMap(rooms, List.class, RoomDTO.class.getTypeName());
         // return aa;

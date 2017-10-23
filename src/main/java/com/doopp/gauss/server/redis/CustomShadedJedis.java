@@ -63,6 +63,12 @@ public class CustomShadedJedis {
         shardedJedis.close();
     }
 
+    public void test() {
+        ShardedJedis shardedJedis = shardedJedisPool.getResource();
+        // shardedJedis.get
+        shardedJedis.close();
+    }
+
     public void setShardedJedisPool(ShardedJedisPool shardedJedisPool) {
         this.shardedJedisPool = shardedJedisPool;
     }

@@ -2,6 +2,7 @@ package com.doopp.gauss.server.task;
 
 import com.doopp.gauss.api.entity.UserEntity;
 import com.doopp.gauss.api.service.AccountService;
+import com.doopp.gauss.server.redis.CustomShadedJedis;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,9 @@ public class WerewolfGame {
     @Autowired
     AccountService accountService;
 
+    @Autowired
+    CustomShadedJedis roomRedis;
+
     private class GameTask implements Runnable {
 
         public void run()  {
@@ -25,6 +29,7 @@ public class WerewolfGame {
                 }
                 // UserEntity user = accountService.getUserByToken();
                 logger.info(" >>> Run GameTask - AccountService : " + accountService);
+                roomRedis.test();
                 try {
                     Thread.sleep(1000);
                 }
