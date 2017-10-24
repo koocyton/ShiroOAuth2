@@ -1,9 +1,12 @@
 *.class
 .DS_Store
 
+
+/out
 /build
 /.gradle
 /.idea
+/*.iml
 
 ckeditor
 MANIFEST.MF
