@@ -13,6 +13,30 @@ let HallController = function($scope, $http, $location, $cookieStore) {
 };
 
 let RoomController = function($scope, $http, $location, $cookieStore) {
+
+    $scope.formData = [];
+
+    $scope.chatData = [];
+
+    $scope.requestConnect = function() {
+        $http({
+            method: 'POST',
+            url: '/api/v1/room/join',
+            data    : "roomId=" + $scope.formData.roomId,
+            headers: {'access-token': $scope.formData.accessToken, 'Content-Type': 'application/x-www-form-urlencoded'}
+        }).then(
+            function successCallback(res) {
+                console.log(res);
+            },
+            function errorCallback(res) {
+                console.log(res);
+            }
+        );
+    };
+
+    $scope.chatRoomSpeak = function () {
+
+    };
 };
 
 angular.module('ngRouteChatApp', ['ngRoute', 'ngCookies'])

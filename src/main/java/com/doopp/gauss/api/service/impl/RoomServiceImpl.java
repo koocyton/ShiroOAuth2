@@ -2,7 +2,6 @@ package com.doopp.gauss.api.service.impl;
 
 import com.doopp.gauss.api.Exception.EmptyException;
 import com.doopp.gauss.api.dao.RoomDao;
-import com.doopp.gauss.api.dao.impl.RoomDaoImpl;
 import com.doopp.gauss.api.entity.RoomAbstractEntity;
 import com.doopp.gauss.api.entity.RoomEntity;
 import com.doopp.gauss.api.entity.UserEntity;

@@ -15,27 +15,40 @@
 </div>
 
 <div class="container">
-    <table class="table table-bordered">
-        <thead>
-        <tr class="active">
-            <th>
-                接口说明
-            </th>
-        </tr>
-        </thead>
-
-        <tbody>
-        <tr>
-            <td>
 <pre>
-    API URL : ws://127.0.0.1:8081/room-socket
-    POST 参数 :
-        account : 账号
-        password : 密码
-        username : 用户名
+Connect URL : ws://127.0.0.1:8081/game-socket
+header 参数 :
+    access-token : {accessToken}
 </pre>
-            </td>
-        </tr>
-        </tbody>
-    </table>
+</div>
+
+<div class="navbar-form navbar-left">
+    <form ng-submit="requestConnect()">
+        <div class="form-group" style="width:200px;">
+            <input type="text" name="roomId" class="form-control" autocomplete="off"
+                   placeholder="请输入房间号" ng-model="formData.roomId">
+        </div>
+        <div class="form-group" style="width:200px;">
+            <input type="text" name="accessToken" class="form-control" autocomplete="off"
+                   placeholder="请输入 Access Token" ng-model="formData.accessToken">
+        </div>
+        <div class="form-group" style="width:130px;">
+            <button type="submit" class="btn btn-success">进入聊天室</button>
+        </div>
+    </form>
+</div>
+
+<div class="container">
+
+</div>
+
+<div class="navbar-form navbar-left">
+    <form ng-submit="chatRoomSpeak()">
+        <div class="form-group" style="width:600px;">
+            <input type="text" style="width:600px;" name="message" class="form-control" autocomplete="off" ng-model="chatData.message">
+        </div>
+        <div class="form-group" style="width:130px;">
+            <button type="submit" class="btn btn-success">发言</button>
+        </div>
+    </form>
 </div>
