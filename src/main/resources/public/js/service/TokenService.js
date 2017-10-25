@@ -34,3 +34,34 @@ TokenService.prototype.checkToken = function(successCall, errorCall) {
         }
     );
 };
+
+let WebSocketService = function(uri) {
+    this.wss = /^ws:\/\//.test(uri) ? new WebSocket(uri) : new WebSocket("ws://"+window.location.host+uri);
+};
+WebSocketService.connect = function(uri) {
+    return new WebSocketService(uri);
+};
+WebSocketService.prototype.onOpen = function(callOpen) {
+    if (typeof callOpen==="function") {
+        this.wss.onopen = callOpen;
+    }
+    return this;
+};
+WebSocketService.prototype.onClose = function(callClose) {
+    if (typeof callClose==="function") {
+        this.wss.onclose = callClose;
+    }
+    return this;
+};
+WebSocketService.prototype.onError = function(callError) {
+    if (typeof callError==="function") {
+        this.wss.onerror = callError;
+    }
+    return this;
+};
+WebSocketService.prototype.onMessage = function(callMessage) {
+    if (typeof callMessage==="function") {
+        this.wss.onmessage = callMessage;
+    }
+    return this;
+};
