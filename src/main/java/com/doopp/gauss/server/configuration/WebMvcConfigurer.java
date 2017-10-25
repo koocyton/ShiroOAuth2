@@ -1,8 +1,6 @@
 package com.doopp.gauss.server.configuration;
 
 import com.alibaba.fastjson.serializer.SerializerFeature;
-import com.alibaba.fastjson.support.config.FastJsonConfig;
-import com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter;
 import com.doopp.gauss.server.json.MappingFastJsonHttpMessageConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -12,14 +10,10 @@ import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
-import org.springframework.web.servlet.config.annotation.DefaultServletHandlerConfigurer;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
-import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.springframework.web.servlet.config.annotation.*;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,11 +29,23 @@ public class WebMvcConfigurer extends WebMvcConfigurerAdapter{
         super.addResourceHandlers(registry);
     }
 
-    @Bean("async-executor")
-    public ThreadPoolTaskExecutor asyncExecutor() {
-        return new ThreadPoolTaskExecutor();
+    // 异步
+    @Override
+    public void configureAsyncSupport(AsyncSupportConfigurer configurer) {
+        configurer.setDefaultTimeout(30*1000L); //tomcat默认10秒
+        configurer.setTaskExecutor(mvcTaskExecutor());//所借助的TaskExecutor
     }
 
+    @Bean
+    public ThreadPoolTaskExecutor mvcTaskExecutor(){
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(10);
+        executor.setQueueCapacity(100);
+        executor.setMaxPoolSize(25);
+        return executor;
+    }
+
+    // 上传文件
     @Bean
     public CommonsMultipartResolver multipartResolver() throws Exception {
         CommonsMultipartResolver commonsMultipartResolver =  new CommonsMultipartResolver();
@@ -49,6 +55,7 @@ public class WebMvcConfigurer extends WebMvcConfigurerAdapter{
         return commonsMultipartResolver;
     }
 
+    // 模版
     @Bean
     public FreeMarkerConfigurer freeMarkerConfigurer() {
         FreeMarkerConfigurer freeMarkerConfigurer = new FreeMarkerConfigurer();
@@ -66,21 +73,24 @@ public class WebMvcConfigurer extends WebMvcConfigurerAdapter{
         return freeMarkerViewResolver;
     }
 
-//    @Override
-//    public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
-//        super.configureMessageConverters(converters);
-//        converters.add(fastJsonHttpMessageConverter());
-//    }
-//
-//    private FastJsonHttpMessageConverter fastJsonHttpMessageConverter() {
-//        FastJsonHttpMessageConverter fastConverter = new FastJsonHttpMessageConverter();
-//        FastJsonConfig fastJsonConfig = new FastJsonConfig();
-//        fastJsonConfig.setSerializerFeatures(
-//            SerializerFeature.PrettyFormat
-//        );
-//        fastConverter.setFastJsonConfig(fastJsonConfig);
-//        return fastConverter;
-//    }
+    @Override
+    public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
+        converters.add(this.fastJsonHttpMessageConverter());
+    }
+
+    private MappingFastJsonHttpMessageConverter fastJsonHttpMessageConverter() {
+        List<MediaType> mediaTypes = new ArrayList<MediaType>(){{
+           add(MediaType.APPLICATION_JSON_UTF8);
+        }};
+        SerializerFeature[] serializerFeatures = {
+            SerializerFeature.WriteMapNullValue,
+            SerializerFeature.QuoteFieldNames
+        };
+        MappingFastJsonHttpMessageConverter jsonConverter = new MappingFastJsonHttpMessageConverter();
+        jsonConverter.setSupportedMediaTypes(mediaTypes);
+        jsonConverter.setSerializerFeature(serializerFeatures);
+        return jsonConverter;
+    }
 
     @Override
     public void configureDefaultServletHandling(DefaultServletHandlerConfigurer configurer){
