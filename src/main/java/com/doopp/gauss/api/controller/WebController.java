@@ -61,4 +61,12 @@ public class WebController {
     public String showApi() {
         return "demo/api_doc";
     }
+
+    /*
+     * API 列表
+     */
+    @RequestMapping(value = "/help/api")
+    public String apiPortal() {
+        return "help/portal";
+    }
 }

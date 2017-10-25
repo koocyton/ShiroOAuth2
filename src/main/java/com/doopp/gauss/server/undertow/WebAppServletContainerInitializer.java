@@ -1,12 +1,13 @@
 package com.doopp.gauss.server.undertow;
 
+import com.doopp.gauss.server.configuration.ApplicationConfiguration;
+import com.doopp.gauss.server.configuration.WebMvcConfigurer;
 import com.doopp.gauss.server.filter.SessionFilter;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
-import org.springframework.web.context.support.XmlWebApplicationContext;
 import org.springframework.web.filter.CharacterEncodingFilter;
 import org.springframework.web.servlet.DispatcherServlet;
 
@@ -27,7 +28,9 @@ public class WebAppServletContainerInitializer implements ServletContainerInitia
 
         // root web application context
         AnnotationConfigWebApplicationContext rootWebAppContext = new AnnotationConfigWebApplicationContext();
-        rootWebAppContext.scan("com.doopp.gauss.server.configuration");
+        rootWebAppContext.register(ApplicationConfiguration.class);
+        rootWebAppContext.register(WebMvcConfigurer.class);
+        // rootWebAppContext.scan("com.doopp.gauss.server.configuration");
         ctx.addListener(new ContextLoaderListener(rootWebAppContext));
 
         // set encode
@@ -38,6 +41,7 @@ public class WebAppServletContainerInitializer implements ServletContainerInitia
 
         // set spring mvc servlet
         DispatcherServlet dispatcherServlet = new DispatcherServlet();
+        // dispatcherServlet.setContextClass(WebApplicationContext.class);
         dispatcherServlet.setContextConfigLocation("classpath:config/spring-mvc/mvc-dispatcher-servlet.xml");
         ServletRegistration.Dynamic dispatcher = ctx.addServlet("mvc-dispatcher", dispatcherServlet);//DispatcherServlet.class);
         dispatcher.setLoadOnStartup(1);
