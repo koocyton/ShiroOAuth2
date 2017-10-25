@@ -5,6 +5,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.web.context.ContextLoaderListener;
+import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.context.support.XmlWebApplicationContext;
 import org.springframework.web.filter.CharacterEncodingFilter;
 import org.springframework.web.servlet.DispatcherServlet;
@@ -24,10 +25,9 @@ public class WebAppServletContainerInitializer implements ServletContainerInitia
         FilterRegistration.Dynamic sessionFilter = ctx.addFilter("sessionFilter", SessionFilter.class);
         sessionFilter.addMappingForUrlPatterns(EnumSet.allOf(DispatcherType.class), false, "/*");
 
-        // load applicationContext
-        XmlWebApplicationContext rootWebAppContext = new XmlWebApplicationContext();
-        rootWebAppContext.setConfigLocation("classpath:config/spring/applicationContext.xml");
-        rootWebAppContext.setParent(applicationContext);
+        // root web application context
+        AnnotationConfigWebApplicationContext rootWebAppContext = new AnnotationConfigWebApplicationContext();
+        rootWebAppContext.scan("com.doopp.gauss.server.configuration");
         ctx.addListener(new ContextLoaderListener(rootWebAppContext));
 
         // set encode

@@ -10,40 +10,23 @@
 
     <context:annotation-config/>
 
-    <context:component-scan base-package="com.doopp.gauss.api.controller, com.doopp.gauss.api.controllerr">
+    <!-- <context:component-scan base-package="com.doopp.gauss.api.controller, com.doopp.gauss.api.controllerr">
         <context:include-filter type="annotation"
                                 expression="org.springframework.stereotype.Controller"/>
         <context:include-filter type="annotation"
                                 expression="org.springframework.web.bind.annotation.ControllerAdvice"/>
-    </context:component-scan>
+    </context:component-scan> -->
 
     <!-- 开启注解 -->
     <mvc:annotation-driven>
         <mvc:async-support default-timeout="30000" task-executor="async-executor"/>
     </mvc:annotation-driven>
 
-    <bean class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor" id="async-executor"/>
-
     <!-- 静态资源(js、image等)的访问-->
     <!-- webjar -->
-    <mvc:resources mapping="/webjars/**" location="classpath:/META-INF/resources/webjars/" />
+    <!-- <mvc:resources mapping="/webjars/**" location="classpath:/META-INF/resources/webjars/" />
     <mvc:default-servlet-handler />
-    <mvc:resources mapping="/**" location="classpath:/public/" />
-
-    <!-- freemarker 模版 -->
-    <!-- 配置freeMarker的模板路径 -->
-    <bean class="org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer">
-        <property name="templateLoaderPath" value="classpath:/template/pages/" />
-        <property name="defaultEncoding" value="UTF-8" />
-    </bean>
-
-    <!-- freemarker视图解析器 -->
-    <bean class="org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver">
-        <property name="suffix" value=".html" />
-        <property name="contentType" value="text/html;charset=UTF-8" />
-        <!-- 此变量值为pageContext.request, 页面使用方法：rc.contextPath -->
-        <property name="requestContextAttribute" value="rc" />
-    </bean>
+    <mvc:resources mapping="/**" location="classpath:/public/" /> -->
 
     <mvc:annotation-driven>
         <mvc:message-converters register-defaults="true">
@@ -67,12 +50,5 @@
     <!--
     <aop:config proxy-target-class="true"></aop:config>
     //-->
-
-    <!-- 支持上传文件 -->
-    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
-        <property name="defaultEncoding" value="UTF-8" />
-        <property name="maxUploadSize" value="5400000" />
-        <property name="uploadTempDir" value="file:/tmp" />
-    </bean>
 
 </beans>

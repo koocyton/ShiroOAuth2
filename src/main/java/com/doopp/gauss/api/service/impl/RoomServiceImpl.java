@@ -1,6 +1,7 @@
 package com.doopp.gauss.api.service.impl;
 
 import com.doopp.gauss.api.Exception.EmptyException;
+import com.doopp.gauss.api.dao.RoomDao;
 import com.doopp.gauss.api.dao.impl.RoomDaoImpl;
 import com.doopp.gauss.api.entity.RoomAbstractEntity;
 import com.doopp.gauss.api.entity.RoomEntity;
@@ -22,7 +23,7 @@ public class RoomServiceImpl implements RoomService {
     private Map<String, RoomAbstractEntity> roomList = new HashMap<>();
 
     @Autowired
-    private RoomDaoImpl roomDao;
+    private RoomDao roomDao;
 
     @Override
     public RoomEntity createRoom(UserEntity user, String roomName) throws Exception {
