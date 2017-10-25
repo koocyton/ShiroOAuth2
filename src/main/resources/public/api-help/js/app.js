@@ -28,11 +28,11 @@ angular.module('ngRouteChatApp', ['ngRoute', 'ngCookies'])
         {
             $locationProvider.hashPrefix('');
             $routeProvider
-                .when('/login', {templateUrl: 'page/login', controller:"loginCtrl"})
-                .when('/register', {templateUrl: 'page/register', controller:"registerCtrl"})
-                .when('/hall', {templateUrl: 'page/hall', controller:"hallCtrl"})
-                .when('/room', {templateUrl: 'page/room', controller:"roomCtrl"})
-                .when('/create-room', {templateUrl: 'page/create-room', controller:"createRoomCtrl"})
+                .when('/login', {templateUrl: 'page/login.html', controller:"loginCtrl"})
+                .when('/register', {templateUrl: 'page/register.html', controller:"registerCtrl"})
+                .when('/hall', {templateUrl: 'page/hall.html', controller:"hallCtrl"})
+                .when('/room', {templateUrl: 'page/room.html', controller:"roomCtrl"})
+                .when('/create-room', {templateUrl: 'page/create-room.html', controller:"createRoomCtrl"})
                 .otherwise({redirectTo: '/login'});
         }
     ]
