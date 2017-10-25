@@ -19,7 +19,7 @@ import java.util.List;
 
 @Configuration
 @EnableWebMvc
-@ComponentScan("com.doopp.gauss")
+@ComponentScan("com.doopp.gauss.api.controller")
 public class WebMvcConfigurer extends WebMvcConfigurerAdapter{
 
     @Override

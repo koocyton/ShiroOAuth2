@@ -1,18 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:context="http://www.springframework.org/schema/context"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
-                           http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd">
-
-    <!-- import properties -->
-    <context:property-placeholder location="classpath:config/application.properties" />
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
 
     <bean id="undertowServer" class="com.doopp.gauss.server.undertow.UndertowServer">
-        <property name="host" value="${undertow.host}" />
-        <property name="port" value="${undertow.port}" />
-        <property name="webAppName" value="${undertow.webAppName}" />
-        <property name="webAppRoot" value="${undertow.webAppRoot}" />
+        <property name="host" value="127.0.0.1" />
+        <property name="port" value="8081" />
+        <property name="webAppName" value="chat-server" />
+        <property name="webAppRoot" value="/" />
         <property name="servletContainerInitializer">
             <bean class="com.doopp.gauss.server.undertow.WebAppServletContainerInitializer" />
         </property>

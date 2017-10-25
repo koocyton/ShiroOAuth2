@@ -91,23 +91,45 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }
 
-apply plugin: 'idea'
-// apply plugin: 'eclipse'
-apply plugin: 'spring-boot'
+//    apply plugin: 'idea'
+//    apply plugin: 'spring-boot'
+//    buildscript {
+//        repositories {
+//            mavenLocal()
+//            jcenter()
+//            mavenCentral()
+//
+//            maven { url "http://repo.spring.io/release" }
+//            maven { url "http://repo.spring.io/milestone" }
+//        }
+//        dependencies {
+//            classpath "org.springframework.boot:spring-boot-gradle-plugin:1.5.7.RELEASE"
+//        }
+//    }
 
-buildscript {
 
-    repositories {
-        mavenLocal()
-        jcenter()
-        mavenCentral()
-
-        maven { url "http://repo.spring.io/release" }
-        maven { url "http://repo.spring.io/milestone" }
-        // maven { url "http://repo.spring.io/snapshot" }
+jar {
+    manifest {
+        attributes(
+                "Manifest-Version": 1.0,
+                "Main-Class": "com.doopp.gauss.server.KTApplication",
+                "Class-Path": "./"
+        )
     }
-
-    dependencies {
-        classpath "org.springframework.boot:spring-boot-gradle-plugin:1.5.7.RELEASE"
+    from {
+        configurations.compile.collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
     }
+}
+task clearPj(type:Delete){
+    delete 'build','target'
+}
+task copyJar(type:Copy){
+    // from configurations.runtime
+    // into ('build/libs')
+}
+task release(type: Copy,dependsOn: [clearPj, copyJar, jar]) {
+    // from  'webapp/WEB-INF'
+    // into ('WEB-INF') // 目标位置
 }
