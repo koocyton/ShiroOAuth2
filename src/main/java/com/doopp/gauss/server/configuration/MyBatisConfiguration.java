@@ -49,7 +49,6 @@ public class MyBatisConfiguration {
 
     @Bean
     public SqlSessionFactoryBean sqlSessionFactoryBean(DruidDataSource druidDataSource) throws Exception {
-
         SqlSessionFactoryBean sqlSessionFactoryBean = new SqlSessionFactoryBean();
         sqlSessionFactoryBean.setDataSource(druidDataSource);
         PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();

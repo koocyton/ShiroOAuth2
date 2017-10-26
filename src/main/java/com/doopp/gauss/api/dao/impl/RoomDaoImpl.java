@@ -3,7 +3,6 @@
 //import com.doopp.gauss.api.dao.RoomDao;
 //import com.doopp.gauss.api.entity.RoomAbstractEntity;
 //import com.doopp.gauss.api.entity.RoomEntity;
-//import com.doopp.gauss.api.entity.UserEntity;
 //import com.doopp.gauss.server.redis.CustomShadedJedis;
 //import org.slf4j.Logger;
 //import org.slf4j.LoggerFactory;
@@ -11,9 +10,8 @@
 //import org.springframework.stereotype.Repository;
 //
 //import java.util.List;
-//import java.util.Map;
 //
-//@Repository
+//@Repository("roomDao")
 //public class RoomDaoImpl implements RoomDao {
 //
 //    private final Logger logger = LoggerFactory.getLogger(RoomDaoImpl.class);
