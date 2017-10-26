@@ -35,6 +35,9 @@ TokenService.prototype.checkToken = function(successCall, errorCall) {
     );
 };
 
+/*
+ * 长链接
+ */
 let WebSocketService = function(uri) {
     this.wss = /^ws:\/\//.test(uri)
         ? new WebSocket(uri)
@@ -67,3 +70,40 @@ WebSocketService.prototype.onMessage = function(callMessage) {
     }
     return this;
 };
+
+/*
+ * http request
+ */
+let formPost = function($http, url, queryData, successCallback, errorCallback)
+{
+    let queryString = "";
+    if (typeof queryData==="object") {
+        for(let idx in queryData) {
+            queryString = (queryString==="") ? "" : "&";
+            let key = "" + idx;
+            queryString = key + "=" + queryData[key];
+        }
+    }
+    else {
+        queryString = "" + queryData;
+    }
+    $http({
+        method : 'POST',
+        url : url,
+        data : queryString,
+        headers : {'Content-Type': 'application/x-www-form-urlencoded'}
+    }).then(
+        function successCallback(res) {
+            console.log("successCallback : \n      >>> " + res);
+            if (typeof successCallback === "function") {
+                successCallback(res);
+            }
+        },
+        function errorCallback(res) {
+            console.log("errorCallback : \n      >>> " + res);
+            if (typeof errorCallback === "function") {
+                errorCallback(res);
+            }
+        }
+    );
+}

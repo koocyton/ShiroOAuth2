@@ -1,29 +1,34 @@
 "use strict";
 
 let RegisterController = function($scope, $http, $location, $cookieStore) {
+    $scope.registerData = [];
+    $scope.requestRegister = function() {
+        formPost($http, '/api/v1/register', $scope.registerData, null, null);
+    };
 };
 
 let LoginController = function($scope, $http, $location, $cookieStore) {
+    $scope.loginData = [];
+    $scope.requestLogin = function() {
+        formPost($http, '/api/v1/login', $scope.loginData, null, null);
+    };
 };
 
 let CreateRoomController = function($scope, $http, $location, $cookieStore) {
+    $scope.createRoomData = [];
+    $scope.requestCreateRoom = function() {
+        formPost($http, '/api/v1/room/create', $scope.createRoomData, null, null);
+    };
 };
 
 let HallController = function($scope, $http, $location, $cookieStore) {
-};
 
-let RoomController = function($scope, $http, $location, $cookieStore) {
-
-    $scope.formData = [];
-
-    $scope.chatData = [];
-
-    $scope.requestConnect = function() {
+    $scope.requestLogin = function() {
         $http({
-            method: 'POST',
-            url: '/api/v1/room/join',
-            data    : "roomId=" + $scope.formData.roomId,
-            headers: {'access-token': $scope.formData.accessToken, 'Content-Type': 'application/x-www-form-urlencoded'}
+            method: 'GET',
+            url: '/api/v1/room/list',
+            data    : "roomName=" + $scope.formData.roomName,
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'}
         }).then(
             function successCallback(res) {
                 console.log(res);
@@ -33,9 +38,12 @@ let RoomController = function($scope, $http, $location, $cookieStore) {
             }
         );
     };
+};
 
-    $scope.chatRoomSpeak = function () {
-
+let RoomController = function($scope, $http, $location, $cookieStore) {
+    $scope.joinRoomData = [];
+    $scope.requestJoinRoom = function() {
+        formPost($http, '/api/v1/room/join', $scope.joinRoomData, null, null);
     };
 };
 
