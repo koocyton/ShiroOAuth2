@@ -1,65 +1,197 @@
 <!DOCTYPE html>
 <html lang="zh-cn">
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title> API Doc </title>
-    <link href="/webjars/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
-    <link href="css/KTAnchor.css" rel="stylesheet">
-    <script src="/webjars/angular/1.6.6/angular.min.js"></script>
-    <script src="/webjars/angular-route/1.6.6/angular-route.min.js"></script>
-    <script src="/webjars/angular-cookies/1.6.6/angular-cookies.min.js"></script>
-    <script src="js/app.js"></script>
-</head>
-<body ng-app="ngRouteChatApp">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title> API Doc </title>
+        <link href="/webjars/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+        <link href="css/KTAnchor.css" rel="stylesheet">
+        <script src="/webjars/angular/1.6.6/angular.min.js"></script>
+    </head>
+<body>
 
 <div class="body-background" style="top:0;left:0;width:100%;height:100%;overflow:hidden;">
     <div class="body-background blur-10"></div>
 </div>
 
 <div class="body-content">
-    <div class="body-content-left scroll-container opacity-80">
-        <div style="top:0px;position:relative;padding:0 0;" id="main-menu">
-            <div class="treemenu-container">
-                <a href="javascript:;" class="tree-menu tree-menu-0">
-                    <div>API</div>
-                </a>
-                <div style="display: block;">
-                    <a href="#/register" class="tree-menu tree-menu-1">
-                        <div>注册　</div>
-                    </a>
-                    <a href="#/login" class="tree-menu tree-menu-1">
-                        <div>登录　</div>
-                    </a>
-                    <a href="#/create-room" class="tree-menu tree-menu-1">
-                        <div>创建房间　</div>
-                    </a>
-                    <a href="#/hall" class="tree-menu tree-menu-1">
-                        <div>列出房间　</div>
-                    </a>
-                    <a href="#/room" class="tree-menu tree-menu-1">
-                        <div>长连　</div>
-                    </a>
-                </div>
-            </div>
+    <div class="body-content-right scroll-container opacity-92" style="width:100%;padding:20px 0 40px 0;">
+
+        <div class="container">
+            <table class="table table-bordered">
+                <thead>
+                <tr class="active">
+                    <th colspan="2">
+                        # 登录 #
+                    </th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr>
+                    <td>
+                        <b>API URL</b> : <code>[POST] http://domain.com/api/v1/login</code>
+                        <br><b>POST 参数</b> :
+                        <br><b style="padding-left:20px;">account</b> : <code>#account</code>
+                        <br><b style="padding-left:20px;">password</b> : <code>#password</code>
+                        <br><b>返回</b> :
+                        <br><b style="padding-left:20px;">json</b> : <code>{#accesstoken}</code>
+                        <br><b>测试返回</b> :
+                        <br><b style="padding-left:20px;">json</b> : <code>#右侧测试结果显示在这#</code>
+                    </td>
+                    <td>
+                        <form ng-submit="mLogin()">
+                            <div class="form-group" style="width:200px;">
+                                <input type="text" name="account" class="form-control" autocomplete="off"
+                                       placeholder="Enter Account" ng-model="loginData.account">
+                            </div>
+                            <div class="form-group" style="width:200px;">
+                                <input type="text" name="password" class="form-control" autocomplete="off"
+                                       placeholder="Enter Password" ng-model="loginData.password">
+                            </div>
+                            <div class="form-group" style="width:200px;">
+                                登录的数据会保存，其他需要 access token 的接口，会直接用最近一次登录的 access token
+                            </div>
+                            <div class="form-group" style="width:130px;">
+                                <button type="submit" class="btn btn-success">登录</button>
+                            </div>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
         </div>
-    </div>
-    <div class="body-content-right scroll-container opacity-92" ng-view="">
+
+
+        <div class="container">
+            <table class="table table-bordered">
+                <thead>
+                <tr class="active">
+                    <th colspan="2">
+                        # 新用户注册 #
+                    </th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr>
+                    <td>
+                        <b>API URL</b> : <code>[POST] http://domain.com/api/v1/register</code>
+                        <br><b>POST 参数</b> :
+                        <br><b style="padding-left:20px;">account</b> : <code>#account</code>
+                        <br><b style="padding-left:20px;">password</b> : <code>#password</code>
+                        <br><b style="padding-left:20px;">nickName</b> : <code>#nickName</code>
+                        <br><b>返回</b> :
+                        <br><b style="padding-left:20px;">json</b> : <code>{#accesstoken}</code>
+                        <br><b>测试返回</b> :
+                        <br><b style="padding-left:20px;">json</b> : <code>#右侧测试结果显示在这#</code>
+                    </td>
+                    <td>
+                        <form ng-submit="mRegister()">
+                            <div class="form-group" style="width:200px;">
+                                <input type="text" name="account" class="form-control" autocomplete="off"
+                                       placeholder="Enter Account" ng-model="registerData.account">
+                            </div>
+                            <div class="form-group" style="width:200px;">
+                                <input type="text" name="password" class="form-control" autocomplete="off"
+                                       placeholder="Enter Password" ng-model="registerData.password">
+                            </div>
+                            <div class="form-group" style="width:200px;">
+                                <input type="text" name="nickName" class="form-control" autocomplete="off"
+                                       placeholder="Enter Nick name" ng-model="registerData.nickName">
+                            </div>
+                            <div class="form-group" style="width:130px;">
+                                <button type="submit" class="btn btn-success">注册</button>
+                            </div>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+
+        <div class="container">
+            <table class="table table-bordered">
+                <thead>
+                <tr class="active">
+                    <th colspan="2">
+                        # 创建新房间 #
+                    </th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr>
+                    <td>
+                        <b>API URL</b> : <code>[POST] http://domain.com/api/v1/room/create</code>
+                        <br><b>POST 参数</b> :
+                        <br><b style="padding-left:20px;">nickName</b> : <code>#roomName</code>
+                        <br><b>返回</b> :
+                        <br><b style="padding-left:20px;">json</b> : <code>{#accesstoken}</code>
+                        <br><b>测试返回</b> :
+                        <br><b style="padding-left:20px;">json</b> : <code>#右侧测试结果显示在这#</code>
+                    </td>
+                    <td>
+                        <form ng-submit="mCreateRoom()">
+                            <div class="form-group" style="width:200px;">
+                                <input type="text" name="roomName" class="form-control" autocomplete="off"
+                                       placeholder="Enter Room name" ng-model="createRoomData.roomName">
+                            </div>
+                            <div class="form-group" style="width:130px;">
+                                <button type="submit" class="btn btn-success">创建房间</button>
+                            </div>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+
+        <div class="container">
+            <table class="table table-bordered">
+                <thead>
+                <tr class="active">
+                    <th colspan="2">
+                        # 列出所有房间 #
+                    </th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr>
+                    <td>
+                        <b>API URL</b> : <code>[GET] http://domain.com/api/v1/room/list</code>
+                        <br><b>返回</b> :
+                        <br><b style="padding-left:20px;">json</b> : <code>{#accesstoken}</code>
+                        <br><b>测试返回</b> :
+                        <br><b style="padding-left:20px;">json</b> : <code>#右侧测试结果显示在这#</code>
+                    </td>
+                    <td>
+                        <form ng-submit="mCreateRoom()">
+                            <div class="form-group" style="width:200px;">
+                                <input type="text" name="roomName" class="form-control" autocomplete="off"
+                                       placeholder="Enter Room name" ng-model="createRoomData.roomName">
+                            </div>
+                            <div class="form-group" style="width:130px;">
+                                <button type="submit" class="btn btn-success">创建房间</button>
+                            </div>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
     </div>
 </div>
 
 <nav class="navbar navbar-inverse" role="navigation" style="background-color:rgba(0,0,0,0.68);">
     <div class="container">
         <div class="navbar-header">
-            <a href="javascript:void(0);" class="navbar-brand"> &nbsp; API Doc</a>
-        </div>
-        <div id="navbar" class="collapse navbar-collapse">
-            <ul class="nav navbar-nav navbar-right">
-                <li>
-                    <a href="javascript:void(0);"> Hello </a>
-                </li>
-            </ul>
+            <a class="navbar-brand"> &nbsp; API Doc</a>
         </div>
     </div>
 </nav>
