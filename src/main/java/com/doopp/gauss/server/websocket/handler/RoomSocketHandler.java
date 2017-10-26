@@ -3,7 +3,6 @@ package com.doopp.gauss.server.websocket.handler;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
-import com.doopp.gauss.api.entity.RoomEntity;
 import com.doopp.gauss.api.entity.UserEntity;
 import com.doopp.gauss.api.service.AccountService;
 import org.slf4j.Logger;
@@ -22,14 +21,12 @@ import java.util.Map;
  * Created by henry on 2017/7/20.
  */
 @Component
-public class GameSocketHandler implements WebSocketHandler {
+public class RoomSocketHandler implements WebSocketHandler {
 
     @Autowired
     AccountService accountService;
 
-    private static final Logger logger = LoggerFactory.getLogger(GameSocketHandler.class);
-
-    // private public final ArrayList<WebSocketSession> users = new ArrayList<WebSocketSession>();
+    private static final Logger logger = LoggerFactory.getLogger(RoomSocketHandler.class);
 
     private static final Map<String, WebSocketSession> socketSessions = new HashMap<>();
 

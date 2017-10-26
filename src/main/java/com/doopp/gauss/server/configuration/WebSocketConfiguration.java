@@ -1,7 +1,7 @@
 package com.doopp.gauss.server.configuration;
 
 import com.doopp.gauss.server.websocket.WebSocketHandshakeInterceptor;
-import com.doopp.gauss.server.websocket.handler.GameSocketHandler;
+import com.doopp.gauss.server.websocket.handler.RoomSocketHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
@@ -22,18 +22,18 @@ public class WebSocketConfiguration extends WebMvcConfigurerAdapter implements W
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
 
-        registry.addHandler(systemWebSocketHandler(),"/game-socket")
+        registry.addHandler(roomSocketHandler(),"/room-socket")
                 .addInterceptors(new WebSocketHandshakeInterceptor())
                 .setAllowedOrigins("*");
 
-        registry.addHandler(systemWebSocketHandler(),"/game-socket/sockjs")
-                .addInterceptors(new WebSocketHandshakeInterceptor())
-                .setAllowedOrigins("*")
-                .withSockJS();
+        // registry.addHandler(roomSocketHandler(),"/game-socket/sockjs")
+        //        .addInterceptors(new WebSocketHandshakeInterceptor())
+        //        .setAllowedOrigins("*")
+        //        .withSockJS();
     }
 
     @Bean
-    public WebSocketHandler systemWebSocketHandler(){
-        return new GameSocketHandler();
+    public WebSocketHandler roomSocketHandler(){
+        return new RoomSocketHandler();
     }
 }

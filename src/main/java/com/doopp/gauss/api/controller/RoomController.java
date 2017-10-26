@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -64,13 +63,25 @@ public class RoomController {
     }
 
     /**
+     * 离开房间
+     *
+     * @param currentUser 当前用户
+     * @return 加入的房间信息
+     */
+    @ResponseBody
+    @RequestMapping(value = "/room/leave", method = RequestMethod.POST)
+    public void leaveRoom(@RequestAttribute("currentUser") UserEntity currentUser) throws EmptyException {
+        roomService.leaveRoom(currentUser);
+    }
+
+    /**
      * 目前所在房间
      *
      * @param currentUser 当前用户
      * @return 加入的房间信息
      */
     @ResponseBody
-    @RequestMapping(value = "/user/current-room", method = RequestMethod.GET)
+    @RequestMapping(value = "/room/me", method = RequestMethod.GET)
     public RoomDTO currentRoom(@RequestAttribute("currentUser") UserEntity currentUser) {
         RoomEntity room = roomService.userCurrentRoom(currentUser);
         return (room==null) ? null : CommonUtils.modelMap(room, RoomDTO.class);
@@ -82,7 +93,7 @@ public class RoomController {
      * @return List
      */
     @ResponseBody
-    @RequestMapping(value = "/room/{rule}-list", method = RequestMethod.GET)
+    @RequestMapping(value = "/{rule}-room/list", method = RequestMethod.GET)
     public Map<String, RoomAbstractEntity> roomList(@PathVariable("rule") String rule) {
         return roomService.roomList(rule, 0 );
         // return CommonUtils.modelMap(rooms, List.class, RoomDTO.class.getTypeName());

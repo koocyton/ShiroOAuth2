@@ -32,6 +32,9 @@ public class RoomServiceImpl implements RoomService {
         room.setOwner(user);
         roomDao.setUserIndex(user.getId(), room.getId());
 
+
+        logger.info(" >>> create room id " + room.getId());
+
         // 应该用面向切面，稍后改
         // 房间摘要信息
         RoomAbstractEntity roomAbstract = roomDao.getRoomAbstract(room);
@@ -88,6 +91,7 @@ public class RoomServiceImpl implements RoomService {
                     // 应该用面向切面，稍后改
                     // change user number
                     RoomAbstractEntity roomAbstract = roomList.get(String.valueOf(roomId));
+                    logger.info(" >>> " + roomAbstract + " " + String.valueOf(roomId));
                     int userNumber = roomAbstract.getUserNumber();
                     roomAbstract.setUserNumber(userNumber-1);
                     roomList.put(String.valueOf(roomId), roomAbstract);
