@@ -22,6 +22,13 @@ public class WebAppServletContainerInitializer implements ServletContainerInitia
     @Override
     public void onStartup(Set<Class<?>> c, ServletContext ctx) throws ServletException {
 
+        // set encode
+        FilterRegistration.Dynamic encodingFilter = ctx.addFilter("encoding-filter", CharacterEncodingFilter.class);
+        encodingFilter.setInitParameter("encoding", "UTF-8");
+        encodingFilter.setInitParameter("forceEncoding", "true");
+        // encodingFilter.addMappingForServletNames(EnumSet.allOf(DispatcherType.class), false, "/*");
+        encodingFilter.addMappingForUrlPatterns(EnumSet.allOf(DispatcherType.class), false, "/*");
+
         // session filter
         FilterRegistration.Dynamic sessionFilter = ctx.addFilter("sessionFilter", SessionFilter.class);
         sessionFilter.addMappingForUrlPatterns(EnumSet.allOf(DispatcherType.class), false, "/*");
@@ -32,12 +39,6 @@ public class WebAppServletContainerInitializer implements ServletContainerInitia
         rootWebAppContext.register(WebMvcConfigurer.class);
         // rootWebAppContext.scan("com.doopp.gauss.server.configuration");
         ctx.addListener(new ContextLoaderListener(rootWebAppContext));
-
-        // set encode
-        FilterRegistration.Dynamic encodingFilter = ctx.addFilter("encoding-filter", CharacterEncodingFilter.class);
-        encodingFilter.setInitParameter("encoding", "UTF-8");
-        encodingFilter.setInitParameter("forceEncoding", "true");
-        encodingFilter.addMappingForServletNames(EnumSet.allOf(DispatcherType.class), false, "/*");
 
         // set spring mvc servlet
         DispatcherServlet dispatcherServlet = new DispatcherServlet();

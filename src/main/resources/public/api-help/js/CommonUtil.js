@@ -74,24 +74,55 @@ WebSocketService.prototype.onMessage = function(callMessage) {
 /*
  * http request
  */
-let formPost = function($http, url, queryData, successCall, errorCall)
+let httpGet = function($http, url, successCall, errorCall, headers)
+{
+    if (typeof headers!=="object") {
+        headers = {};
+    }
+    $http({
+        method : 'GET',
+        url : url,
+        headers : headers
+    }).then(
+        function successCallback(res) {
+            console.log("successCall : \n      >>> " + res);
+            if (typeof successCall === "function") {
+                successCall(res);
+            }
+        },
+        function errorCallback(res) {
+            console.log("errorCall : \n      >>> " + res);
+            if (typeof errorCall === "function") {
+                errorCall(res);
+            }
+        }
+    );
+};
+
+let formPost = function($http, url, queryData, successCall, errorCall, headers)
 {
     let queryString = "";
     if (typeof queryData==="object") {
         for(let idx in queryData) {
             queryString += (queryString==="") ? "" : "&";
             let key = "" + idx;
-            queryString += key + "=" + queryData[key];
+            queryString += encodeURIComponent(key) + "=" + encodeURIComponent(queryData[key]);
         }
     }
     else {
         queryString = "" + queryData;
     }
+    if (typeof headers==="object") {
+        headers["Content-Type"] = "application/x-www-form-urlencoded";
+    }
+    else {
+        headers = {"Content-Type" : "application/x-www-form-urlencoded"}
+    }
     $http({
         method : 'POST',
         url : url,
         data : queryString,
-        headers : {'Content-Type': 'application/x-www-form-urlencoded'}
+        headers : headers
     }).then(
         function successCallback(res) {
             console.log("successCall : \n      >>> " + res);

@@ -61,7 +61,7 @@ public class AccountServiceImpl implements AccountService {
      * @throws Exception 注册异常，账号或密码不合格
      */
     @Override
-    public UserEntity registerThenGetUser(String account, String password) throws Exception
+    public UserEntity registerThenGetUser(String account, String password, String nickName) throws Exception
     {
         // 当前时间
         int currentTime = (int)(System.currentTimeMillis() / 1000);
@@ -74,7 +74,7 @@ public class AccountServiceImpl implements AccountService {
         user.setSalt(salt);
         user.setPassword(this.hashPassword(user, password));
         user.setCreated_at(currentTime);
-        user.setNickname("");
+        user.setNickname(nickName);
         user.setPortrait("");
         user.setFriends("");
         // 保存用户
