@@ -1,10 +1,9 @@
 package com.doopp.gauss.server.configuration;
 
+import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
 import org.springframework.cache.annotation.EnableCaching;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.FilterType;
-import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.*;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 @Configuration
@@ -22,4 +21,12 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 })
 
 public class ApplicationConfiguration {
+
+//    @Bean
+//    public PropertyPlaceholderConfigurer propertyConfigurer() {
+//        PropertyPlaceholderConfigurer propertyConfigurer = new PropertyPlaceholderConfigurer();
+//        propertyConfigurer.setLocation(new ClassPathResource("config/application.properties"));
+//        return propertyConfigurer;
+//    }
+
 }
