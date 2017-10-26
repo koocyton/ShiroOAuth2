@@ -38,7 +38,7 @@
                         <br><b>返回</b> :
                         <br><b style="padding-left:20px;">json</b> : <code>{#accesstoken}</code>
                         <br><b>测试返回</b> :
-                        <br><b style="padding-left:20px;">json</b> : <code>#右侧测试结果显示在这#</code>
+                        <br><b style="padding-left:20px;">json</b> : <code ng-bind="testResponse">#右侧测试结果显示在这#</code>
                     </td>
                     <td>
                         <form ng-submit="mLogin()">
@@ -47,7 +47,7 @@
                                        placeholder="Enter Account" ng-model="loginData.account">
                             </div>
                             <div class="form-group" style="width:200px;">
-                                <input type="text" name="password" class="form-control" autocomplete="off"
+                                <input type="password" name="password" class="form-control" autocomplete="off"
                                        placeholder="Enter Password" ng-model="loginData.password">
                             </div>
                             <div class="form-group" style="width:200px;">
@@ -85,7 +85,7 @@
                         <br><b>返回</b> :
                         <br><b style="padding-left:20px;">json</b> : <code>{#accesstoken}</code>
                         <br><b>测试返回</b> :
-                        <br><b style="padding-left:20px;">json</b> : <code>#右侧测试结果显示在这#</code>
+                        <br><b style="padding-left:20px;">json</b> : <code ng-bind="testResponse">#右侧测试结果显示在这#</code>
                     </td>
                     <td>
                         <form ng-submit="mRegister()">
@@ -127,14 +127,18 @@
                     <td>
                         <b>API URL</b> : <code>[POST] http://domain.com/api/v1/room/create</code>
                         <br><b>POST 参数</b> :
-                        <br><b style="padding-left:20px;">nickName</b> : <code>#roomName</code>
+                        <br><b style="padding-left:20px;">roomName</b> : <code>#roomName</code>
                         <br><b>返回</b> :
                         <br><b style="padding-left:20px;">json</b> : <code>{#accesstoken}</code>
                         <br><b>测试返回</b> :
-                        <br><b style="padding-left:20px;">json</b> : <code>#右侧测试结果显示在这#</code>
+                        <br><b style="padding-left:20px;">json</b> : <code ng-bind="testResponse">#右侧测试结果显示在这#</code>
                     </td>
                     <td>
                         <form ng-submit="mCreateRoom()">
+                            <div class="form-group" style="width:200px;">
+                                <input type="text" class="form-control" autocomplete="off"
+                                       placeholder="Enter Access Token" ng-model="accessToken">
+                            </div>
                             <div class="form-group" style="width:200px;">
                                 <input type="text" name="roomName" class="form-control" autocomplete="off"
                                        placeholder="Enter Room name" ng-model="createRoomData.roomName">
@@ -167,11 +171,17 @@
                         <br><b>返回</b> :
                         <br><b style="padding-left:20px;">json</b> : <code>{#accesstoken}</code>
                         <br><b>测试返回</b> :
-                        <br><b style="padding-left:20px;">json</b> : <code>#右侧测试结果显示在这#</code>
+                        <br><b style="padding-left:20px;">json</b> : <code ng-bind="testResponse">#右侧测试结果显示在这#</code>
                     </td>
                     <td>
                         <div class="form-group" ng-click="mRoomList()" style="width:130px;">
-                            <button type="submit" class="btn btn-success">创建房间</button>
+                            <div class="form-group" style="width:200px;">
+                                <input type="text" class="form-control" autocomplete="off"
+                                       placeholder="Enter Access Token" ng-model="accessToken">
+                            </div>
+                            <div class="form-group" style="width:130px;">
+                                <button type="submit" class="btn btn-success">列出房间</button>
+                            </div>
                         </div>
                     </td>
                 </tr>
@@ -197,11 +207,15 @@
                         <br><b>返回</b> :
                         <br><b style="padding-left:20px;">json</b> : <code>{#accesstoken}</code>
                         <br><b>测试返回</b> :
-                        <br><b style="padding-left:20px;">json</b> : <code>#右侧测试结果显示在这#</code>
+                        <br><b style="padding-left:20px;">json</b> : <code ng-bind="testResponse">#右侧测试结果显示在这#</code>
                     </td>
                     <td>
                         <form ng-submit="mJoinRoom()">
                             <div class="form-group" style="width:200px;">
+                                <div class="form-group" style="width:200px;">
+                                    <input type="text" class="form-control" autocomplete="off"
+                                           placeholder="Enter Access Token" ng-model="accessToken">
+                                </div>
                                 <input type="text" name="roomName" class="form-control" autocomplete="off"
                                        placeholder="Enter Room name" ng-model="createRoomData.roomName">
                             </div>

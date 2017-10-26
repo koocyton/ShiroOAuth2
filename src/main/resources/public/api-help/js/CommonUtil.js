@@ -74,14 +74,14 @@ WebSocketService.prototype.onMessage = function(callMessage) {
 /*
  * http request
  */
-let formPost = function($http, url, queryData, successCallback, errorCallback)
+let formPost = function($http, url, queryData, successCall, errorCall)
 {
     let queryString = "";
     if (typeof queryData==="object") {
         for(let idx in queryData) {
-            queryString = (queryString==="") ? "" : "&";
+            queryString += (queryString==="") ? "" : "&";
             let key = "" + idx;
-            queryString = key + "=" + queryData[key];
+            queryString += key + "=" + queryData[key];
         }
     }
     else {
@@ -94,16 +94,16 @@ let formPost = function($http, url, queryData, successCallback, errorCallback)
         headers : {'Content-Type': 'application/x-www-form-urlencoded'}
     }).then(
         function successCallback(res) {
-            console.log("successCallback : \n      >>> " + res);
-            if (typeof successCallback === "function") {
-                successCallback(res);
+            console.log("successCall : \n      >>> " + res);
+            if (typeof successCall === "function") {
+                successCall(res);
             }
         },
         function errorCallback(res) {
-            console.log("errorCallback : \n      >>> " + res);
-            if (typeof errorCallback === "function") {
-                errorCallback(res);
+            console.log("errorCall : \n      >>> " + res);
+            if (typeof errorCall === "function") {
+                errorCall(res);
             }
         }
     );
-}
+};
