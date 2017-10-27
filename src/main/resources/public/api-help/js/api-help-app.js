@@ -81,30 +81,15 @@ let LeaveRoomController = function($scope, $http) {
 
 };
 
-let crOnOpen = function(e) {
-    console.log("WebSocket crOnOpen !");
-};
-
-let crOnMessage = function(e) {
-    console.log("WebSocket onMessage !");
-};
-
 let ChatRoomController = function($scope) {
     $scope.accessToken = "-";
     $scope.mListRoom = function() {
         // websocket connect
-        WebSocketService
-            .connect("/room-socket?access-token=" + $scope.accessToken)
-            .onOpen(crOnOpen)
-            .onMessage(crOnMessage);
+        let ws = WebSocketService
+            .connect("/live-socket?access-token=" + $scope.accessToken)
+            .onOpen(function(e){})
+            .onMessage(function(e){});
 
-        /*
-        httpGet($http, '/api/v1/room/list', $scope.registerData,
-            function(res) {
-                $scope.testResponse = res.data;
-            },
-            null,
-            {"access-token": $scope.accessToken});
-        */
+        ws.send(JSON.encode())
     };
 };

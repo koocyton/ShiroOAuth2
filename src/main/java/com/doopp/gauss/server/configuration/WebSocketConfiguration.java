@@ -1,11 +1,10 @@
 package com.doopp.gauss.server.configuration;
 
 import com.doopp.gauss.server.websocket.WebSocketHandshakeInterceptor;
-import com.doopp.gauss.server.websocket.handler.RoomSocketHandler;
+import com.doopp.gauss.server.websocket.handler.LiveSocketHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
-import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
@@ -22,18 +21,18 @@ public class WebSocketConfiguration extends WebMvcConfigurerAdapter implements W
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
 
-        registry.addHandler(roomSocketHandler(),"/room-socket")
+        registry.addHandler(webSocketHandler(),"/live-socket")
                 .addInterceptors(new WebSocketHandshakeInterceptor())
                 .setAllowedOrigins("*");
 
-        // registry.addHandler(roomSocketHandler(),"/game-socket/sockjs")
+        // registry.addHandler(roomSocketHandler(),"/live-socket/sockjs")
         //        .addInterceptors(new WebSocketHandshakeInterceptor())
         //        .setAllowedOrigins("*")
         //        .withSockJS();
     }
 
     @Bean
-    public WebSocketHandler roomSocketHandler(){
-        return new RoomSocketHandler();
+    public org.springframework.web.socket.WebSocketHandler webSocketHandler(){
+        return new LiveSocketHandler();
     }
 }

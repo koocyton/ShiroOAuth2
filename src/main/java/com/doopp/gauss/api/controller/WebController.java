@@ -1,7 +1,8 @@
 package com.doopp.gauss.api.controller;
 
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
 @Controller
 public class WebController {
@@ -50,7 +51,7 @@ public class WebController {
      * 进入房间
      */
     @RequestMapping(value = "/demo/room/{roomId}")
-    public String joinRoom(@PathVariable("roomId") int ruroomIdle) {
+    public String joinRoom(@PathVariable("roomId") int roomId) {
         return "demo/room";
     }
 
