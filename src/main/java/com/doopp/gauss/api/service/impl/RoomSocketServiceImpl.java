@@ -8,48 +8,100 @@ import com.doopp.gauss.api.service.RoomSocketService;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
+import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.WebSocketSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 @Service("roomSocketService")
 public class RoomSocketServiceImpl implements RoomSocketService {
 
+    // log
     private final Logger logger = LoggerFactory.getLogger(RoomServiceImpl.class);
 
+    // room's session
     private static final Map<Integer, RoomEntity> roomSessions = new HashMap<>();
 
+    // socket's session
     private static final Map<Long, WebSocketSession> socketSessions = new HashMap<>();
+
+    // last created room id
+    private static int lastRoomId = 54612;
 
     /*
      * 当建立连接时
      */
     @Override
-    public void afterConnectionEstablished(UserEntity currentUser, WebSocketSession socketSession) {
+    public void afterConnectionEstablished(UserEntity currentUser, WebSocketSession socketSession) throws IOException {
+        Long sessionId = currentUser.getId();
+        WebSocketSession oldSession = socketSessions.get(currentUser.getId());
+        if (oldSession!=null && oldSession.isOpen()) {
+            oldSession.close();
+            socketSessions.remove(sessionId);
+        }
         // add session map
-        socketSessions.put(currentUser.getId(), socketSession);
+        socketSessions.put(sessionId, socketSession);
     }
 
     /*
-     * is join room
+     * check is join room
      */
     private boolean isJoinRoom(WebSocketSession socketSession) {
-        Object isJoinRoom = socketSession.getAttributes().get("isJoinRoom");
+        Object isJoinRoom = socketSession.getAttributes().get("roomId");
         return isJoinRoom==null;
     }
 
     /*
-     * join room filter
+     * 新建一个房间的对象
+     */
+    private RoomEntity newRoomSession(UserEntity currentUser, JSONObject messageObject) {
+        JSONObject actionData = messageObject.getObject("data", JSONObject.class);
+        String roomName = actionData.getString("roomName");
+        RoomEntity roomSession = new RoomEntity();
+        synchronized ("createChatRoom") {
+            roomSession.setId(++lastRoomId);
+        }
+        roomSession.setName(roomName);
+        roomSession.setOwner(currentUser);
+        return roomSession;
+    }
+
+    /*
+     * 创建新房间
+     */
+    private boolean createRoom(UserEntity currentUser, JSONObject messageObject, WebSocketSession socketSession) {
+        RoomEntity roomSession = this.newRoomSession(currentUser, messageObject);
+        int roomId = roomSession.getId();
+        socketSession.getAttributes().put("roomId", roomId);
+        roomSessions.put(roomId, roomSession);
+        return true;
+    }
+
+    /*
+     * 进入已经建立的房间
      */
     private boolean joinRoom(UserEntity currentUser, JSONObject messageObject, WebSocketSession socketSession) {
-
-        socketSession.getAttributes().put("isJoinRoom", "isJoinRoom");
-        socketSession.getAttributes().put("roomId", "isJoinRoom");
+        JSONObject actionData = messageObject.getObject("data", JSONObject.class);
+        int roomId = actionData.getInteger("roomId");
+        socketSession.getAttributes().put("roomId", roomId);
+        roomSessions.get(roomId).joinWatch(currentUser);
         return true;
+    }
+
+    /*
+     * 离开房间
+     */
+    private void leaveRoom(UserEntity currentUser, WebSocketSession socketSession) {
+        if (isJoinRoom(socketSession)) {
+            logger.info(" >>> " + socketSession);
+            int roomId = (int) socketSession.getAttributes().remove("roomId");
+            roomSessions.get(roomId).userLeave(currentUser);
+        }
     }
 
     private JSONObject getJsonObject(TextMessage message) {
@@ -73,19 +125,27 @@ public class RoomSocketServiceImpl implements RoomSocketService {
             JSONObject messageObject = this.getJsonObject(message);
             // 获取 action ( createRoom | joinRoom )
             String action = messageObject.getString("action");
-            // join room
-            if (action.equals("joinRoom")) {
-                if(this.joinRoom(currentUser, messageObject, socketSession))
-                {
-
-                }
-            }
-            else {
-                this.closeConnection(socketSession);
+            // 根据 action 执行
+            switch(action) {
+                // 创建房间
+                case "createRoom":
+                    if (!this.createRoom(currentUser, messageObject, socketSession)) {
+                        this.closeConnection(socketSession);
+                    }
+                    break;
+                // 加入房间
+                case "joinRoom":
+                    if (!this.joinRoom(currentUser, messageObject, socketSession)) {
+                        this.closeConnection(socketSession);
+                    }
+                    break;
+                // 默认
+                default:
+                    this.closeConnection(socketSession);
+                    break;
             }
             return;
         }
-        logger.info(" >>> " + message);
     }
 
     /*
@@ -95,20 +155,21 @@ public class RoomSocketServiceImpl implements RoomSocketService {
     public void afterConnectionClosed(UserEntity currentUser, WebSocketSession socketSession, CloseStatus status) {
         // remove session from map
         socketSessions.remove(currentUser.getId());
+        // leave room
+        this.leaveRoom(currentUser, socketSession);
     }
 
     /**
      * 关闭某个连接
      *
-     * @param socketSession
+     * @param socketSession 要手动关闭的 socket 连接
      */
     private void closeConnection (WebSocketSession socketSession) {
         if (socketSession!=null && socketSession.isOpen()) {
             try {
                 socketSession.close();
             }
-            catch(Exception e)
-            {
+            catch(Exception e) {
             }
         }
     }

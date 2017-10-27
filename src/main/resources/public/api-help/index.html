@@ -8,6 +8,8 @@
         <link href="/webjars/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
         <link href="css/KTAnchor.css" rel="stylesheet">
         <script src="/webjars/angular/1.6.6/angular.min.js"></script>
+        <script src="js/CommonUtil.js"></script>
+        <script src="js/api-help-app.js"></script>
     </head>
 <body ng-app="ngApiHelpApp">
 
@@ -360,8 +362,18 @@
     </div>
 </nav>
 
-<script src="js/CommonUtil.js"></script>
-<script src="js/api-help-app.js"></script>
 
+<script>
+let apiHelpApp = angular.module('ngApiHelpApp',[]);
+
+apiHelpApp.controller('LoginController', LoginController);
+apiHelpApp.controller('RegisterController', RegisterController);
+apiHelpApp.controller('UserInfoController', UserInfoController);
+apiHelpApp.controller('CreateRoomController', CreateRoomController);
+apiHelpApp.controller('RoomListController', RoomListController);
+apiHelpApp.controller('JoinRoomController', JoinRoomController);
+apiHelpApp.controller('CurrentRoomController', CurrentRoomController);
+apiHelpApp.controller('LeaveRoomController', LeaveRoomController);
+</script>
 </body>
 </html>

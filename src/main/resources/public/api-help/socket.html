@@ -8,8 +8,10 @@
     <link href="/webjars/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
     <link href="css/KTAnchor.css" rel="stylesheet">
     <script src="/webjars/angular/1.6.6/angular.min.js"></script>
+    <script src="js/CommonUtil.js"></script>
+    <script src="js/api-help-app.js"></script>
 </head>
-<body ng-app="ngSocketApp">
+<body ng-app="ngApiHelpApp">
 
 <div class="body-background" style="top:0;left:0;width:100%;height:100%;overflow:hidden;">
     <div class="body-background blur-10"></div>
@@ -55,6 +57,99 @@
             </table>
         </div>
 
+        <div class="container" ng-controller="LoginController">
+            <table class="table table-bordered">
+                <thead>
+                <tr class="active">
+                    <th colspan="2">
+                        # 登录 #
+                    </th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr>
+                    <td>
+                        <b>API URL</b> : <code>[POST] http://domain.com/api/v1/login</code>
+                        <br><b>POST 参数</b> :
+                        <br><b style="padding-left:20px;">account</b> : <code>#account</code>
+                        <br><b style="padding-left:20px;">password</b> : <code>#password</code>
+                        <br><b>返回</b> :
+                        <br><b style="padding-left:20px;">json</b> : <code>{#accesstoken}</code>
+                        <br><b>测试返回</b> :
+                        <br><b style="padding-left:20px;">json</b> : <code ng-bind="testResponse">#右侧测试结果显示在这#</code>
+                    </td>
+                    <td>
+                        <form ng-submit="mLogin()">
+                            <div class="form-group" style="width:200px;">
+                                <input type="text" name="account" class="form-control" autocomplete="off"
+                                       placeholder="Enter Account" ng-model="loginData.account">
+                            </div>
+                            <div class="form-group" style="width:200px;">
+                                <input type="password" name="password" class="form-control" autocomplete="off"
+                                       placeholder="Enter Password" ng-model="loginData.password">
+                            </div>
+                            <div class="form-group" style="width:200px;">
+                                登录的数据会保存，其他需要 access token 的接口，会直接用最近一次登录的 access token
+                            </div>
+                            <div class="form-group" style="width:130px;">
+                                <button type="submit" class="btn btn-success">登录</button>
+                            </div>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+
+        <div class="container" ng-controller="RegisterController">
+            <table class="table table-bordered">
+                <thead>
+                <tr class="active">
+                    <th colspan="2">
+                        # 新用户注册 #
+                    </th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr>
+                    <td>
+                        <b>API URL</b> : <code>[POST] http://domain.com/api/v1/register</code>
+                        <br><b>POST 参数</b> :
+                        <br><b style="padding-left:20px;">account</b> : <code>#account</code>
+                        <br><b style="padding-left:20px;">password</b> : <code>#password</code>
+                        <br><b style="padding-left:20px;">nickName</b> : <code>#nickName</code>
+                        <br><b>返回</b> :
+                        <br><b style="padding-left:20px;">json</b> : <code>{#accesstoken}</code>
+                        <br><b>测试返回</b> :
+                        <br><b style="padding-left:20px;">json</b> : <code ng-bind="testResponse">#右侧测试结果显示在这#</code>
+                    </td>
+                    <td>
+                        <form ng-submit="mRegister()">
+                            <div class="form-group" style="width:200px;">
+                                <input type="text" name="account" class="form-control" autocomplete="off"
+                                       placeholder="Enter Account" ng-model="registerData.account">
+                            </div>
+                            <div class="form-group" style="width:200px;">
+                                <input type="text" name="password" class="form-control" autocomplete="off"
+                                       placeholder="Enter Password" ng-model="registerData.password">
+                            </div>
+                            <div class="form-group" style="width:200px;">
+                                <input type="text" name="nickName" class="form-control" autocomplete="off"
+                                       placeholder="Enter Nick name" ng-model="registerData.nickName">
+                            </div>
+                            <div class="form-group" style="width:130px;">
+                                <button type="submit" class="btn btn-success">注册</button>
+                            </div>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
     </div>
 </div>
 
@@ -73,8 +168,12 @@
     </div>
 </nav>
 
-<script src="js/CommonUtil.js"></script>
-<script src="js/socket-app.js"></script>
+<script>
+let apiHelpApp = angular.module('ngApiHelpApp',[]);
+apiHelpApp.controller('LoginController', LoginController);
+apiHelpApp.controller('RegisterController', RegisterController);
+apiHelpApp.controller('ChatRoomController', ChatRoomController);
+</script>
 
 </body>
 </html>

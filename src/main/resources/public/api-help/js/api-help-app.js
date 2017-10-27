@@ -73,11 +73,38 @@ let JoinRoomController = function($scope, $http) {
     };
 };
 
-let apiHelpApp = angular.module('ngApiHelpApp',[]);
+let CurrentRoomController = function($scope, $http) {
 
-apiHelpApp.controller('LoginController', LoginController);
-apiHelpApp.controller('RegisterController', RegisterController);
-apiHelpApp.controller('UserInfoController', UserInfoController);
-apiHelpApp.controller('CreateRoomController', CreateRoomController);
-apiHelpApp.controller('RoomListController', RoomListController);
-apiHelpApp.controller('JoinRoomController', JoinRoomController);
+};
+
+let LeaveRoomController = function($scope, $http) {
+
+};
+
+let crOnOpen = function(e) {
+    console.log("WebSocket crOnOpen !");
+};
+
+let crOnMessage = function(e) {
+    console.log("WebSocket onMessage !");
+};
+
+let ChatRoomController = function($scope) {
+    $scope.accessToken = "-";
+    $scope.mListRoom = function() {
+        // websocket connect
+        WebSocketService
+            .connect("/room-socket?access-token=" + $scope.accessToken)
+            .onOpen(crOnOpen)
+            .onMessage(crOnMessage);
+
+        /*
+        httpGet($http, '/api/v1/room/list', $scope.registerData,
+            function(res) {
+                $scope.testResponse = res.data;
+            },
+            null,
+            {"access-token": $scope.accessToken});
+        */
+    };
+};
