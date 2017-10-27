@@ -24,9 +24,6 @@ public class WebSocketHandshakeInterceptor extends HttpSessionHandshakeIntercept
 
         // 将用户信息带入到 socket 里面
         ServletServerHttpRequest serverRequest = (ServletServerHttpRequest) request;
-        //HttpSession httpSession = serverRequest.getServletRequest().getSession(isCreateSession());
-        //attributes.put("currentUser", httpSession.getAttribute("currentUser"));
-
         UserEntity user = (UserEntity) serverRequest.getServletRequest().getAttribute("currentUser");
         attributes.put("currentUser", user);
 
