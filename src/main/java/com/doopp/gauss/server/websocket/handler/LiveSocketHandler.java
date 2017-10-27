@@ -5,7 +5,6 @@ import com.alibaba.fastjson.JSONObject;
 import com.doopp.gauss.api.entity.RoomEntity;
 import com.doopp.gauss.api.entity.UserEntity;
 import com.google.common.base.Objects;
-import com.google.common.util.concurrent.Monitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.socket.*;
@@ -155,6 +154,10 @@ public class LiveSocketHandler implements org.springframework.web.socket.WebSock
     private boolean joinRoom(UserEntity user, JSONObject messageObject, WebSocketSession socketSession) {
         JSONObject actionData = messageObject.getObject("data", JSONObject.class);
         int roomId = actionData.getInteger("roomId");
+        RoomEntity roomSession = roomSessions.get(roomId);
+        if (Objects.equal(roomSession, null)) {
+            return false;
+        }
         socketSession.getAttributes().put("roomId", roomId);
         roomSessions.get(roomId).joinWatch(user);
         return true;
@@ -174,7 +177,11 @@ public class LiveSocketHandler implements org.springframework.web.socket.WebSock
     private void leaveRoom(UserEntity user, WebSocketSession socketSession) {
         if (isJoinRoom(socketSession)) {
             int roomId = (int) socketSession.getAttributes().remove("roomId");
-            roomSessions.get(roomId).userLeave(user);
+            RoomEntity roomSession =  roomSessions.get(roomId);
+            if (!Objects.equal(roomSession, null)) {
+                roomSessions.get(roomId).userLeave(user);
+                // 暂未加入删除房间的逻辑，离开后，房间为空，应该将房间删除
+            }
         }
     }
 
