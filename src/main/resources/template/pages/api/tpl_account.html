@@ -1,3 +1,40 @@
+
+<div class="container" ng-controller="RoomListController">
+    <table class="table table-bordered">
+        <thead>
+        <tr class="active">
+            <th colspan="2">
+                <span class="label label-info"># 查看自己 #</span>
+            </th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr>
+            <td>
+                <b>API URL</b> : <code>[GET] http://domain.com/api/v1/user/me</code>
+                <br><b>GET 参数</b> :
+                <br><b>返回</b> :
+                <br><b style="padding-left:20px;">json</b> : <code>{UserDTO}</code>
+                <br><b>测试返回</b> :
+                <br><b style="padding-left:20px;">json</b> : <code ng-bind="testResponse">#右侧测试结果显示在这#</code>
+            </td>
+            <td>
+                <form ng-submit="listRoom()">
+                    <div class="form-group" style="width:200px;">
+                        <input type="text" class="form-control" autocomplete="off"
+                               placeholder="Enter Access Token" ng-model="accessToken">
+                    </div>
+                    <div class="form-group" style="width:130px;">
+                        <button type="submit" class="btn btn-success">列出聊天室</button>
+                    </div>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
 <div class="container" ng-controller="LoginController">
     <table class="table table-bordered">
         <thead>
@@ -91,13 +128,12 @@
     </table>
 </div>
 
-
-<div class="container" ng-controller="UserInfoController">
+<div class="container" ng-controller="MeInfoController">
     <table class="table table-bordered">
         <thead>
         <tr class="active">
             <th colspan="2">
-                <span class="label label-info"># 查看用户 #</span>
+                <span class="label label-info"># 查看自己 #</span>
             </th>
         </tr>
         </thead>

@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Chat Room</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8"/>
+    <meta content="yes" name="apple-mobile-web-app-capable"/>
+    <meta content="yes" name="apple-touch-fullscreen"/>
+    <meta content="telephone=no" name="format-detection"/>
+    <meta content="black" name="apple-mobile-web-app-status-bar-style">
+    <meta content="#ffffff" name="msapplication-TileColor"/>
+    <meta http-equiv="Expires" content="-1">
+    <meta http-equiv="Cache-Control" content="no-store">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
+    <link href="/webjars/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <script src="/webjars/angular/1.6.6/angular.min.js"></script>
+    <script src="/webjars/angular-route/1.6.6/angular-route.min.js"></script>
+    <script src="/webjars/angular-cookies/1.6.6/angular-cookies.min.js"></script>
+    <script>
+        "use strict";
+
+        /*
+ * Room Controller
+ */
+        let RoomController = function($scope, $http, $location, $cookieStore) {
+
+            let tokenService = new TokenService($cookieStore);
+            let accessToken = tokenService.getToken();
+
+            WebSocketService
+                .connect("/game-socket?access-token=" + accessToken)
+                .onMessage(function(e){
+                    console.log(e);
+                })
+                .onClose(function(e){
+                    console.log(e);
+                });
+        };
+
+        /*
+         * Hall Controller
+         */
+        let HallController = function($scope, $http, $location, $cookieStore) {
+
+            $scope.roomList = [];
+
+            $scope.openHall = function(accessToken) {
+                $http({
+                    method: 'GET',
+                    url: '/api/v1/room/hot-list',
+                    headers: {'access-token': accessToken}
+                }).then(
+                    function successCallback(res) {
+                        let roomList = [];
+                        for (let key in res.data) {
+                            roomList[rooms.length] = res.data[key];
+                        }
+                        $scope.roomList = roomList;
+                    },
+                    function errorCallback(res) {
+                        console.log(res);
+                    }
+                );
+            };
+
+            let tokenService = new TokenService($cookieStore);
+            let accessToken = tokenService.getToken();
+            tokenService.checkToken(
+                function successCallback(res){
+                    $scope.openHall(accessToken);
+                },
+                function errorCallback(res){
+                    $location.path("/login");
+                }
+            );
+        };
+
+        /*
+         * Create Room Controller
+         */
+        let CreateRoomController = function($scope, $http, $location, $cookieStore) {
+            let tokenService = new TokenService($cookieStore);
+            tokenService.checkToken(
+                function successCallback(res){
+                },
+                function errorCallback(res){
+                    $location.path("/login");
+                }
+            );
+        };
+
+        angular.module('ngRouteChatApp', ['ngRoute', 'ngCookies'])
+            .controller("loginCtrl", LoginController)
+            .controller("hallCtrl", HallController)
+            .controller("registerCtrl", RegisterController)
+            .controller("roomCtrl", RoomController)
+            .controller("createRoomCtrl", CreateRoomController)
+            .controller("apiDocCtrl", ApiDocController)
+            .config([
+                    '$routeProvider',
+                    '$locationProvider',
+                    function ($routeProvider, $locationProvider)
+                    {
+                        $locationProvider.hashPrefix('');
+                        $routeProvider
+                            .when('/login', {templateUrl: '/demo/login', controller:"loginCtrl"})
+                            .when('/register', {templateUrl: '/demo/register', controller:"registerCtrl"})
+                            .when('/hall', {templateUrl: '/demo/hall', controller:"hallCtrl"})
+                            .when('/room', {templateUrl: '/demo/room', controller:"roomCtrl"})
+                            .when('/create-room', {templateUrl: '/demo/create-room', controller:"createRoomCtrl"})
+                            .when('/api-doc', {templateUrl: '/demo/api-doc', controller:"apiDocCtrl"})
+                            .otherwise({redirectTo: '/login'});
+                    }
+                ]
+            );
+    </script>
+    <style>
+    .nav-tabar{width:100%;margin:0;}
+    .nav-tabar li {width:20%;float:left;margin:0;}
+    .nav-tabar li a{text-align:center;}
+    </style>
+</head>
+
+<body ng-app="ngRouteChatApp">
+
+    <nav class="navbar navbar-default navbar-fixed-top">
+        <div class="container" style="text-align:center;line-height:44px;font-size:23px;font-weight:bold;">Chat Hall</div>
+    </nav>
+    <nav class="navbar"> </nav>
+
+    <div class="center-block" ng-view="" style="align-content:center;"></div>
+
+    <nav class="navbar navbar-default navbar-fixed-bottom">
+            <ul class="nav navbar-nav nav-tabar">
+                <li class="active" style="width:20%;">
+                    <a href="#/login">登录</a>
+                </li>
+                <li style="width:20%;">
+                    <a href="#/register">注册</a>
+                </li>
+                <li style="width:20%;">
+                    <a href="#/hall">大厅</a>
+                </li>
+                <li style="width:20%;">
+                    <a href="#/create-room">创建房间</a>
+                </li>
+                <li style="width:20%;">
+                    <a href="#/api-doc">API 文档</a>
+                </li>
+            </ul>
+    </nav>
+</body>
+</html>
