@@ -54,6 +54,9 @@ public class LiveSocketHandler implements org.springframework.web.socket.WebSock
         }
         // add session map
         socketSessions.put(sessionId, socketSession);
+        //
+        TextMessage textMessage = new TextMessage("{status:0}");
+        socketSession.sendMessage(textMessage);
     }
 
     @Override

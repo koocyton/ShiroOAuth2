@@ -82,23 +82,26 @@ let LeaveRoomController = function($scope, $http) {
 };
 
 let ChatRoomController = function($scope) {
-    $scope.accessToken = "-";
-    $scope.createRoom = function() {
-        // websocket connect
-        let ws = WebSocketService
+    $scope.accessToken = "";
+    $scope.roomId = 0;
+    $scope.ws = null;
+
+    $scope.createSocket = function() {
+        $scope.ws = WebSocketService
             .connect("/live-socket?access-token=" + $scope.accessToken)
             .onOpen(function(e){})
             .onMessage(function(e){});
-        let createRoomMessage = {action:"createRoom"};
-        ws.send(angular.toJson(createRoomMessage))
     };
+
+    $scope.createRoom = function() {
+        let createRoomMessage = {action:"createRoom"};
+        console.log($scope.ws);
+        $scope.ws.send("aaaa")
+    };
+
     $scope.joinRoom = function() {
-        // websocket connect
-        let ws = WebSocketService
-            .connect("/live-socket?access-token=" + $scope.accessToken)
-            .onOpen(function(e){})
-            .onMessage(function(e){});
-        let joinRoomMessage = {action:"joinRoom", data:{}};
-        ws.send(angular.toJson(joinRoomMessage))
+        let joinRoomMessage = {action:"joinRoom", data:{roomId:$scope.roomId}};
+        console.log($scope.ws);
+        $scope.ws.send(angular.toJson(joinRoomMessage))
     };
 };

@@ -24,7 +24,7 @@
             <table class="table table-bordered">
                 <thead>
                 <tr class="active">
-                    <th colspan="2">
+                    <th colspan="4">
                         # 聊天室操作 #
                     </th>
                 </tr>
@@ -40,7 +40,7 @@
                         <br><b style="padding-left:20px;">json</b> : <code ng-bind="testResponse"># 发送接受的数据显示在这 #</code>
                     </td>
                     <td>
-                        <form ng-submit="mListRoom()">
+                        <form ng-submit="createSocket()">
                             <div class="form-group" style="width:200px;">
                                 <div class="form-group" style="width:200px;">
                                     <input type="text" class="form-control" autocomplete="off"
@@ -48,7 +48,27 @@
                                 </div>
                             </div>
                             <div class="form-group" style="width:130px;">
-                                <button type="submit" class="btn btn-success">列出聊天室</button>
+                                <button type="submit" class="btn btn-success">连接服务器</button>
+                            </div>
+                        </form>
+                    </td>
+                    <td>
+                        <form ng-submit="createRoom()">
+                            <div class="form-group" style="width:130px;">
+                                <button type="submit" class="btn btn-success">创建聊天室</button>
+                            </div>
+                        </form>
+                    </td>
+                    <td>
+                        <form ng-submit="joinRoom()">
+                            <div class="form-group" style="width:200px;">
+                                <div class="form-group" style="width:200px;">
+                                    <input type="text" class="form-control" autocomplete="off"
+                                           placeholder="Room ID" ng-model="roomId">
+                                </div>
+                            </div>
+                            <div class="form-group" style="width:130px;">
+                                <button type="submit" class="btn btn-success">进入聊天室</button>
                             </div>
                         </form>
                     </td>
