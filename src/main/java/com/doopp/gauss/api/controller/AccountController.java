@@ -2,7 +2,9 @@ package com.doopp.gauss.api.controller;
 
 import com.doopp.gauss.api.entity.UserEntity;
 import com.doopp.gauss.api.entity.dto.SessionKeyDTO;
+import com.doopp.gauss.api.entity.dto.UserMeDTO;
 import com.doopp.gauss.api.service.AccountService;
+import com.doopp.gauss.api.utils.CommonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,5 +57,18 @@ public class AccountController {
         UserEntity user = accountService.registerThenGetUser(account, password, nickName);
         String accessToken = accountService.registerSession(user);
         return new SessionKeyDTO(accessToken);
+    }
+
+    /**
+     * 查询当前用户信息
+     *
+     * @param currentUser 当前用户
+     * @return 返回用户信息
+     */
+    @ResponseBody
+    @RequestMapping(value = "me", method = RequestMethod.GET)
+    public UserMeDTO myInfo(@RequestAttribute("currentUser") UserEntity currentUser) {
+        // GET user
+        return CommonUtils.modelMap(currentUser, UserMeDTO.class);
     }
 }

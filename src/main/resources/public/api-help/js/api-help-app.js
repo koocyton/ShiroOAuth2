@@ -81,9 +81,10 @@ let LeaveRoomController = function($scope, $http) {
 
 };
 
-let ChatRoomController = function($scope) {
+let ChatRoomController = function($scope, $http) {
     $scope.accessToken = "";
     $scope.roomId = 0;
+    $scope.roomName = "美丽的小屋";
     $scope.ws = null;
 
     $scope.createSocket = function() {
@@ -94,14 +95,21 @@ let ChatRoomController = function($scope) {
     };
 
     $scope.createRoom = function() {
-        let createRoomMessage = {action:"createRoom"};
-        console.log($scope.ws);
-        $scope.ws.send("aaaa")
+        let createRoomMessage = {action:"createRoom", data:{roomName:$scope.roomName}};
+        $scope.ws.send(angular.toJson(createRoomMessage));
     };
 
     $scope.joinRoom = function() {
         let joinRoomMessage = {action:"joinRoom", data:{roomId:$scope.roomId}};
-        console.log($scope.ws);
-        $scope.ws.send(angular.toJson(joinRoomMessage))
+        $scope.ws.send(angular.toJson(joinRoomMessage));
+    };
+
+    $scope.listRoom = function() {
+        httpGet($http, '/api/v1/room/list',
+            function(res) {
+                $scope.testResponse = res.data;
+            },
+            null,
+            {"access-token": $scope.accessToken});
     };
 };

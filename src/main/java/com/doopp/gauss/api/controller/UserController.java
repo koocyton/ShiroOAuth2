@@ -15,16 +15,4 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping(value = "api/v1/")
 public class UserController {
 
-    /**
-     * 查询当前用户信息
-     *
-     * @param currentUser 当前用户
-     * @return 返回用户信息
-     */
-    @ResponseBody
-    @RequestMapping(value = "user/me", method = RequestMethod.GET)
-    public UserMeDTO myInfo(@RequestAttribute("currentUser") UserEntity currentUser) {
-        // GET user
-        return CommonUtils.modelMap(currentUser, UserMeDTO.class);
-    }
 }

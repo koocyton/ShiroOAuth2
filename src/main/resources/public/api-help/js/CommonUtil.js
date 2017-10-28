@@ -39,7 +39,7 @@ TokenService.prototype.checkToken = function(successCall, errorCall) {
  * 长链接
  */
 let WebSocketService = function(uri) {
-    this.wss = /^ws:\/\//.test(uri)
+    this.ws = /^ws:\/\//.test(uri)
         ? new WebSocket(uri)
         : new WebSocket("ws://"+window.location.host+uri);
 };
@@ -48,27 +48,30 @@ WebSocketService.connect = function(uri) {
 };
 WebSocketService.prototype.onOpen = function(callOpen) {
     if (typeof callOpen==="function") {
-        this.wss.onopen = callOpen;
+        this.ws.onopen = callOpen;
     }
     return this;
 };
 WebSocketService.prototype.onClose = function(callClose) {
     if (typeof callClose==="function") {
-        this.wss.onclose = callClose;
+        this.ws.onclose = callClose;
     }
     return this;
 };
 WebSocketService.prototype.onError = function(callError) {
     if (typeof callError==="function") {
-        this.wss.onerror = callError;
+        this.ws.onerror = callError;
     }
     return this;
 };
 WebSocketService.prototype.onMessage = function(callMessage) {
     if (typeof callMessage==="function") {
-        this.wss.onmessage = callMessage;
+        this.ws.onmessage = callMessage;
     }
     return this;
+};
+WebSocketService.prototype.send = function(message) {
+    this.ws.send(message);
 };
 
 /*

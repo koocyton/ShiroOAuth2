@@ -131,6 +131,15 @@ public class LiveSocketHandler implements org.springframework.web.socket.WebSock
         return false;
     }
 
+    /**
+     * 取得正在运行的房间
+     *
+     * @return RoomList
+     */
+    public Map<Integer, RoomEntity> getRoomList() {
+        return roomSessions;
+    }
+
     public void pushMessage(UserEntity toUser, String message) {
         Long userId = toUser.getId();
         WebSocketSession socketSession = socketSessions.get(userId);
@@ -251,8 +260,11 @@ public class LiveSocketHandler implements org.springframework.web.socket.WebSock
             int roomId = (int) socketSession.getAttributes().remove("roomId");
             RoomEntity roomSession =  roomSessions.get(roomId);
             if (!Objects.equal(roomSession, null)) {
-                roomSessions.get(roomId).userLeave(user);
-                // 暂未加入删除房间的逻辑，离开后，房间为空，应该将房间删除
+                roomSession.userLeave(user);
+                // 删除房间
+                if (roomSession.getOwner()==null && roomSession.getFrontUsers().size()==0 && roomSession.getWatchUsers().size()==0) {
+                    roomSessions.remove(roomId);
+                }
             }
         }
     }
