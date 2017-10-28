@@ -1,7 +1,9 @@
 package com.doopp.gauss.server.configuration;
 
 import com.doopp.gauss.server.websocket.WebSocketHandshakeInterceptor;
-import com.doopp.gauss.server.websocket.handler.LiveSocketHandler;
+import com.doopp.gauss.server.websocket.LiveSocketHandler;
+import com.doopp.gauss.server.websocket.rule.ChatRoomRule;
+import com.doopp.gauss.server.websocket.rule.WereWolfRule;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
@@ -21,7 +23,7 @@ public class WebSocketConfiguration extends WebMvcConfigurerAdapter implements W
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
 
-        registry.addHandler(webSocketHandler(),"/live-socket")
+        registry.addHandler(liveSocketHandler(),"/live-socket")
                 .addInterceptors(new WebSocketHandshakeInterceptor())
                 .setAllowedOrigins("*");
 
@@ -32,7 +34,17 @@ public class WebSocketConfiguration extends WebMvcConfigurerAdapter implements W
     }
 
     @Bean
-    public org.springframework.web.socket.WebSocketHandler webSocketHandler(){
+    public LiveSocketHandler liveSocketHandler(){
         return new LiveSocketHandler();
+    }
+
+    @Bean
+    public ChatRoomRule chatRoomRule() {
+        return new ChatRoomRule();
+    }
+
+    @Bean
+    public WereWolfRule wereWolfRule() {
+        return new WereWolfRule();
     }
 }

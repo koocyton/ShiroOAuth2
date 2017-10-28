@@ -1,6 +1,6 @@
 package com.doopp.gauss.api.entity;
 
-import com.doopp.gauss.api.service.impl.AccountServiceImpl;
+import com.google.common.base.Objects;
 import lombok.Getter;
 import lombok.Setter;
 import org.slf4j.Logger;
@@ -29,32 +29,41 @@ public class RoomEntity implements Serializable {
     @Getter @Setter private String name;
 
     // 房主
-    @Getter @Setter private UserEntity owner;
+    @Getter private UserEntity owner;
 
     // 前排玩家
-    @Getter private Map<String, UserEntity> frontUsers = new HashMap<>();
+    @Getter private Map<Long, UserEntity> frontUsers = new HashMap<>();
 
     // 围观玩家
-    @Getter private Map<String, UserEntity> watchUsers = new HashMap<>();
+    @Getter private Map<Long, UserEntity> watchUsers = new HashMap<>();
+
+    // 加入到房主
+    public void setOwner(UserEntity user) {
+        if (this.getOwner()==null) {
+            this.frontUsers.remove(user.getId());
+            this.watchUsers.remove(user.getId());
+            this.owner = user;
+        }
+    }
 
     // 加入到前排
     public void joinFront(UserEntity user) {
-        this.frontUsers.put(String.valueOf(user.getId()), user);
-        this.watchUsers.remove(String.valueOf(user.getId()));
+        this.frontUsers.put(user.getId(), user);
+        this.watchUsers.remove(user.getId());
     }
 
     // 加入到围观玩家
     public void joinWatch(UserEntity user) {
-        this.frontUsers.remove(String.valueOf(user.getId()));
-        this.watchUsers.put(String.valueOf(user.getId()), user);
+        this.frontUsers.remove(user.getId());
+        this.watchUsers.put(user.getId(), user);
     }
 
     // 离开房间
     public void userLeave(UserEntity user) {
-        if (this.owner!=null && this.owner.getId().equals(user.getId())) {
+        if (this.owner!=null && Objects.equal(this.owner.getId(), user.getId())) {
             this.owner = null;
         }
-        this.frontUsers.remove(String.valueOf(user.getId()));
-        this.watchUsers.remove(String.valueOf(user.getId()), user);
+        this.frontUsers.remove(user.getId());
+        this.watchUsers.remove(user.getId());
     }
 }
