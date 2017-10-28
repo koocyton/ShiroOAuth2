@@ -3,7 +3,7 @@
     <table class="table table-bordered">
         <thead>
         <tr class="active">
-            <th colspan="3">
+            <th colspan="4">
                 <span class="label label-info"># 长连 #</span>
             </th>
         </tr>
@@ -11,82 +11,39 @@
 
         <tbody>
         <tr>
-            <td style="width:50%;">
+            <td style="width:25%;">
                 <b>Message</b> : <code>{}</code>
             </td>
-            <td>
+            <td style="width:25%;">
                 <form ng-submit="createSocket()">
-                    <div class="form-group" style="width:200px;">
+                    <div class="form-group">
                         <input type="text" class="form-control" autocomplete="off"
-                               placeholder="Enter Access Token" ng-model="accessToken">
+                               placeholder="Enter Access Token" ng-model="createSocketAccessToken">
                     </div>
-                    <div class="form-group" style="width:130px;">
+                    <div class="form-group">
                         <button type="submit" class="btn btn-success">连接游戏服</button>
+                        <span>{{ socketStatus }}</span>
                     </div>
                 </form>
             </td>
-            <td>
+            <td style="width:25%;">
                 <form ng-submit="apiCreateRoom()">
-                    <div class="form-group" style="width:200px;">
-                        <input type="text" class="form-control" autocomplete="off"
-                               placeholder="Enter Access Token" ng-model="accessToken">
-                    </div>
-                    <div class="form-group" style="width:200px;">
+                    <div class="form-group">
                         <input type="text" class="form-control" autocomplete="off"
                                placeholder="Room Name" ng-model="createRoomMessage.data.roomName">
                     </div>
-                    <div class="form-group" style="width:130px;">
+                    <div class="form-group">
                         <button type="submit" class="btn btn-success">创建房间</button>
                     </div>
                 </form>
             </td>
-        </tr>
-        </tbody>
-    </table>
-</div>
-
-<div class="container">
-    <table class="table table-bordered">
-        <thead>
-        <tr class="active">
-            <th colspan="3">
-                <span class="label label-info"># 列出聊天室 #</span>
-            </th>
-        </tr>
-        </thead>
-
-        <tbody>
-        <tr>
-            <td style="width:50%;">
-                <b>API URL</b> : <code>[GET] http://domain.com/api/v1/room/list</code>
-                <br><b>GET 参数</b> :
-                <br><b>返回</b> :
-                <br><b style="padding-left:20px;">json</b> : <code>{UserDTO}</code>
-                <br><b>测试返回</b> :
-                <br><b style="padding-left:20px;">json</b> : <code ng-bind="roomListResponse">#右侧测试结果显示在这#</code>
-            </td>
-            <td>
-                <form ng-submit="apiRoomList()">
-                    <div class="form-group" style="width:200px;">
-                        <input type="text" class="form-control" autocomplete="off"
-                               placeholder="Enter Access Token" ng-model="accessToken">
-                    </div>
-                    <div class="form-group" style="width:130px;">
-                        <button type="submit" class="btn btn-success">列出聊天室</button>
-                    </div>
-                </form>
-            </td>
-            <td>
+            <td style="width:25%;">
                 <form ng-submit="apiJoinRoom()">
-                    <div class="form-group" style="width:200px;">
-                        <input type="text" class="form-control" autocomplete="off"
-                               placeholder="Enter Access Token" ng-model="accessToken">
-                    </div>
-                    <div class="form-group" style="width:200px;">
+                    <div class="form-group">
                         <input type="text" class="form-control" autocomplete="off"
                                placeholder="Room ID" ng-model="joinRoomMessage.data.roomId">
                     </div>
-                    <div class="form-group" style="width:130px;">
+                    <div class="form-group">
                         <button type="submit" class="btn btn-success">进入房间</button>
                     </div>
                 </form>
@@ -100,7 +57,43 @@
     <table class="table table-bordered">
         <thead>
         <tr class="active">
-            <th colspan="3">
+            <th colspan="2">
+                <span class="label label-info"># 列出聊天室 #</span>
+            </th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr>
+            <td>
+                <b>API URL</b> : <code>[GET] http://domain.com/api/v1/room/list</code>
+                <br><b>GET 参数</b> :
+                <br><b>返回</b> :
+                <br><b style="padding-left:20px;">json</b> : <code>{UserDTO}</code>
+                <br><b>测试返回</b> :
+                <br><b style="padding-left:20px;">json</b> : <code ng-bind="roomListResponse">#右侧测试结果显示在这#</code>
+            </td>
+            <td style="width:25%;">
+                <form ng-submit="apiRoomList()">
+                    <div class="form-group">
+                        <input type="text" class="form-control" autocomplete="off"
+                               placeholder="Enter Access Token" ng-model="roomListAccessToken">
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-success">列出聊天室</button>
+                    </div>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="container">
+    <table class="table table-bordered">
+        <thead>
+        <tr class="active">
+            <th colspan="2">
                 <span class="label label-info"># 登录 #</span>
             </th>
         </tr>
@@ -108,7 +101,7 @@
 
         <tbody>
         <tr>
-            <td style="width:50%;">
+            <td>
                 <b>API URL</b> : <code>[POST] http://domain.com/api/v1/login</code>
                 <br><b>POST 参数</b> :
                 <br><b style="padding-left:20px;">account</b> : <code>#account</code>
@@ -118,20 +111,20 @@
                 <br><b>测试返回</b> :
                 <br><b style="padding-left:20px;">json</b> : <code ng-bind="loginResponse">#右侧测试结果显示在这#</code>
             </td>
-            <td colspan="2">
+            <td style="width:25%;">
                 <form ng-submit="apiLogin()">
-                    <div class="form-group" style="width:200px;">
+                    <div class="form-group">
                         <input type="text" name="account" class="form-control" autocomplete="off"
                                placeholder="Enter Account" ng-model="loginData.account">
                     </div>
-                    <div class="form-group" style="width:200px;">
+                    <div class="form-group">
                         <input type="password" name="password" class="form-control" autocomplete="off"
                                placeholder="Enter Password" ng-model="loginData.password">
                     </div>
-                    <div class="form-group" style="width:200px;">
+                    <div class="form-group">
                         登录的数据会保存，其他需要 access token 的接口，会直接用最近一次登录的 access token
                     </div>
-                    <div class="form-group" style="width:130px;">
+                    <div class="form-group">
                         <button type="submit" class="btn btn-success">登录</button>
                     </div>
                 </form>
@@ -146,7 +139,7 @@
     <table class="table table-bordered">
         <thead>
         <tr class="active">
-            <th colspan="3">
+            <th colspan="2">
                 <span class="label label-info"># 新用户注册 #</span>
             </th>
         </tr>
@@ -154,7 +147,7 @@
 
         <tbody>
         <tr>
-            <td style="width:50%;">
+            <td>
                 <b>API URL</b> : <code>[POST] http://domain.com/api/v1/register</code>
                 <br><b>POST 参数</b> :
                 <br><b style="padding-left:20px;">account</b> : <code>#account</code>
@@ -165,21 +158,21 @@
                 <br><b>测试返回</b> :
                 <br><b style="padding-left:20px;">json</b> : <code ng-bind="registerResponse">#右侧测试结果显示在这#</code>
             </td>
-            <td colspan="2">
+            <td style="width:25%;">
                 <form ng-submit="apiRegister()">
-                    <div class="form-group" style="width:200px;">
+                    <div class="form-group">
                         <input type="text" name="account" class="form-control" autocomplete="off"
                                placeholder="Enter Account" ng-model="registerData.account">
                     </div>
-                    <div class="form-group" style="width:200px;">
+                    <div class="form-group">
                         <input type="text" name="password" class="form-control" autocomplete="off"
                                placeholder="Enter Password" ng-model="registerData.password">
                     </div>
-                    <div class="form-group" style="width:200px;">
+                    <div class="form-group">
                         <input type="text" name="nickName" class="form-control" autocomplete="off"
                                placeholder="Enter Nick name" ng-model="registerData.nickName">
                     </div>
-                    <div class="form-group" style="width:130px;">
+                    <div class="form-group">
                         <button type="submit" class="btn btn-success">注册</button>
                     </div>
                 </form>
@@ -193,7 +186,7 @@
     <table class="table table-bordered">
         <thead>
         <tr class="active">
-            <th colspan="3">
+            <th colspan="2">
                 <span class="label label-info"># 查看自己 #</span>
             </th>
         </tr>
@@ -201,7 +194,7 @@
 
         <tbody>
         <tr>
-            <td style="width:50%;">
+            <td>
                 <b>API URL</b> : <code>[GET] http://domain.com/api/v1/user/me</code>
                 <br><b>GET 参数</b> :
                 <br><b>返回</b> :
@@ -209,13 +202,13 @@
                 <br><b>测试返回</b> :
                 <br><b style="padding-left:20px;">json</b> : <code ng-bind="meInfoResponse">#右侧测试结果显示在这#</code>
             </td>
-            <td colspan="2">
+            <td style="width:25%;">
                 <form ng-submit="apiMeInfo()">
-                    <div class="form-group" style="width:200px;">
+                    <div class="form-group">
                         <input type="text" class="form-control" autocomplete="off"
-                               placeholder="Enter Access Token" ng-model="accessToken">
+                               placeholder="Enter Access Token" ng-model="meInfoAccessToken">
                     </div>
-                    <div class="form-group" style="width:130px;">
+                    <div class="form-group">
                         <button type="submit" class="btn btn-success">查看用户信息</button>
                     </div>
                 </form>

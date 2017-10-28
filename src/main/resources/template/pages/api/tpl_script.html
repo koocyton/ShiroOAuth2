@@ -150,9 +150,10 @@ let ApiTestController = function($scope, $http) {
     $scope.loginData = {account:"k0001@doopp.com", password:"123456"};
 
     $scope.createRoomMessage = {action:"createRoom", data:{roomName:"美丽的小屋"}};
-    $scope.joinRoomMessage = {action:"joinRoom", data:{roomId:"10086"}};
+    $scope.joinRoomMessage = {action:"joinRoom", data:{roomId:"54612"}};
 
     $scope.accessToken = "";
+    $scope.socketStatus = "未连接";
 
     $scope.registerResponse = null;
     $scope.loginResponse = null;
@@ -177,28 +178,36 @@ let ApiTestController = function($scope, $http) {
             null);
     };
 
+    $scope.meInfoAccessToken = "";
     $scope.apiMeInfo = function() {
         httpGet($http, '/api/v1/user/me',
             function(res) {
                 $scope.meInfoResponse = res.data;
             },
             null,
-            {"access-token": $scope.accessToken});
+            {"access-token": $scope.meInfoAccessToken});
     };
 
+    $scope.roomListAccessToken = "";
     $scope.apiRoomList = function() {
         httpGet($http, '/api/v1/room/list',
             function(res) {
                 $scope.roomListResponse = res.data;
             },
             null,
-            {"access-token": $scope.accessToken});
+            {"access-token": $scope.roomListAccessToken});
     };
 
+    $scope.createSocketAccessToken = "";
     $scope.createSocket = function() {
         $scope.ws = WebSocketService
-            .connect("/live-socket?access-token=" + $scope.accessToken)
-            .onOpen(function(e){})
+            .connect("/live-socket?access-token=" + $scope.createSocketAccessToken)
+            .onOpen(function(e){
+                $scope.socketStatus = "连接";
+            })
+            .onClose(function(e){
+                $scope.socketStatus = "断开";
+            })
             .onMessage(function(e){});
     };
 

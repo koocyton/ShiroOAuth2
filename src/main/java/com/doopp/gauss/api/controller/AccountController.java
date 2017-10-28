@@ -67,7 +67,20 @@ public class AccountController {
      */
     @ResponseBody
     @RequestMapping(value = "/user/me", method = RequestMethod.GET)
-    public UserMeDTO myInfo(@RequestAttribute("currentUser") UserEntity currentUser) {
+    public UserMeDTO getMe(@RequestAttribute("currentUser") UserEntity currentUser) {
+        // GET user
+        return CommonUtils.modelMap(currentUser, UserMeDTO.class);
+    }
+
+    /**
+     * 更新当前用户信息
+     *
+     * @param currentUser 当前用户
+     * @return 返回用户信息
+     */
+    @ResponseBody
+    @RequestMapping(value = "/user/me", method = RequestMethod.PUT)
+    public UserMeDTO updateMe(@RequestAttribute("currentUser") UserEntity currentUser) {
         // GET user
         return CommonUtils.modelMap(currentUser, UserMeDTO.class);
     }
