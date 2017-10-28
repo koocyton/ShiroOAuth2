@@ -153,14 +153,18 @@ let ApiTestController = function($scope, $http) {
     $scope.joinRoomMessage = {action:"joinRoom", data:{roomId:"10086"}};
 
     $scope.accessToken = "";
-    $scope.testResponse = null;
+
+    $scope.registerResponse = null;
+    $scope.loginResponse = null;
+    $scope.meInfoResponse = null;
+    $scope.roomListResponse = null;
 
     $scope.ws = null;
 
     $scope.apiRegister = function() {
         formPost($http, '/api/v1/register', $scope.registerData,
             function(res) {
-                $scope.testResponse = res.data;
+                $scope.registerResponse = res.data;
             },
             null);
     };
@@ -168,7 +172,7 @@ let ApiTestController = function($scope, $http) {
     $scope.apiLogin = function() {
         formPost($http, '/api/v1/login', $scope.loginData,
             function(res) {
-                $scope.testResponse = res.data;
+                $scope.loginResponse = res.data;
             },
             null);
     };
@@ -176,7 +180,7 @@ let ApiTestController = function($scope, $http) {
     $scope.apiMeInfo = function() {
         httpGet($http, '/api/v1/user/me',
             function(res) {
-                $scope.testResponse = res.data;
+                $scope.meInfoResponse = res.data;
             },
             null,
             {"access-token": $scope.accessToken});
@@ -185,7 +189,7 @@ let ApiTestController = function($scope, $http) {
     $scope.apiRoomList = function() {
         httpGet($http, '/api/v1/room/list',
             function(res) {
-                $scope.testResponse = res.data;
+                $scope.roomListResponse = res.data;
             },
             null,
             {"access-token": $scope.accessToken});

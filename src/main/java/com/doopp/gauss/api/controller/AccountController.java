@@ -66,7 +66,7 @@ public class AccountController {
      * @return 返回用户信息
      */
     @ResponseBody
-    @RequestMapping(value = "me", method = RequestMethod.GET)
+    @RequestMapping(value = "/user/me", method = RequestMethod.GET)
     public UserMeDTO myInfo(@RequestAttribute("currentUser") UserEntity currentUser) {
         // GET user
         return CommonUtils.modelMap(currentUser, UserMeDTO.class);
