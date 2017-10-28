@@ -144,44 +144,36 @@ let formPost = function($http, url, queryData, successCall, errorCall, headers)
     );
 };
 
-let RegisterController = function($scope, $http) {
-    $scope.registerData = [];
+let ApiTestController = function($scope, $http) {
+
+    $scope.registerData = {account:"k0001@doopp.com", password:"123456", nickName:"helloBoy"};
+    $scope.loginData = {account:"k0001@doopp.com", password:"123456"};
+
+    $scope.createRoomMessage = {action:"createRoom", data:{roomName:"美丽的小屋"}};
+    $scope.joinRoomMessage = {action:"joinRoom", data:{roomId:"10086"}};
+
+    $scope.accessToken = "";
     $scope.testResponse = null;
-    $scope.mRegister = function() {
+
+    $scope.ws = null;
+
+    $scope.apiRegister = function() {
         formPost($http, '/api/v1/register', $scope.registerData,
             function(res) {
                 $scope.testResponse = res.data;
             },
             null);
     };
-};
 
-let LoginController = function($scope, $http) {
-    $scope.loginData = [];
-    $scope.mLogin = function() {
+    $scope.apiLogin = function() {
         formPost($http, '/api/v1/login', $scope.loginData,
             function(res) {
                 $scope.testResponse = res.data;
             },
             null);
     };
-};
 
-let RoomListController = function($scope, $http) {
-    $scope.accessToken = "";
-    $scope.mRoomList = function() {
-        httpGet($http, '/api/v1/room/list',
-            function(res) {
-                $scope.testResponse = res.data;
-            },
-            null,
-            {"access-token": $scope.accessToken});
-    };
-};
-
-let MeInfoController = function($scope, $http) {
-    $scope.accessToken = "";
-    $scope.mUserInfo = function() {
+    $scope.apiMeInfo = function() {
         httpGet($http, '/api/v1/user/me',
             function(res) {
                 $scope.testResponse = res.data;
@@ -189,12 +181,8 @@ let MeInfoController = function($scope, $http) {
             null,
             {"access-token": $scope.accessToken});
     };
-};
 
-let RoomListController = function($scope, $http) {
-    $scope.accessToken = "";
-
-    $scope.listRoom = function() {
+    $scope.apiRoomList = function() {
         httpGet($http, '/api/v1/room/list',
             function(res) {
                 $scope.testResponse = res.data;
@@ -202,13 +190,6 @@ let RoomListController = function($scope, $http) {
             null,
             {"access-token": $scope.accessToken});
     };
-};
-
-let ChatRoomController = function($scope, $http) {
-    $scope.accessToken = "";
-    $scope.roomId = 0;
-    $scope.roomName = "美丽的小屋";
-    $scope.ws = null;
 
     $scope.createSocket = function() {
         $scope.ws = WebSocketService
@@ -217,30 +198,15 @@ let ChatRoomController = function($scope, $http) {
             .onMessage(function(e){});
     };
 
-    $scope.createRoom = function() {
-        let createRoomMessage = {action:"createRoom", data:{roomName:$scope.roomName}};
-        $scope.ws.send(angular.toJson(createRoomMessage));
+    $scope.apiCreateRoom = function() {
+        $scope.ws.send(angular.toJson($scope.createRoomMessage));
     };
 
-    $scope.joinRoom = function() {
-        let joinRoomMessage = {action:"joinRoom", data:{roomId:$scope.roomId}};
-        $scope.ws.send(angular.toJson(joinRoomMessage));
-    };
-
-    $scope.listRoom = function() {
-        httpGet($http, '/api/v1/room/list',
-            function(res) {
-                $scope.testResponse = res.data;
-            },
-            null,
-            {"access-token": $scope.accessToken});
+    $scope.apiJoinRoom = function() {
+        $scope.ws.send(angular.toJson($scope.joinRoomMessage));
     };
 };
 
 let apiHelpApp = angular.module('ngApiHelpApp',[]);
-apiHelpApp.controller('LoginController', LoginController);
-apiHelpApp.controller('RegisterController', RegisterController);
-apiHelpApp.controller('MeInfoController', MeInfoController);
-apiHelpApp.controller('RoomListController', RoomListController);
-apiHelpApp.controller('ChatRoomController', ChatRoomController);
+apiHelpApp.controller('ApiTestController', ApiTestController);
 </script>
