@@ -6,7 +6,6 @@ import com.doopp.gauss.api.entity.UserEntity;
 import com.doopp.gauss.server.websocket.LiveSocketHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.awt.font.TextMeasurer;
 import java.util.Map;
 
 public class ChatRoomRule {

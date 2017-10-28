@@ -1,0 +1,129 @@
+<div class="container" ng-controller="LoginController">
+    <table class="table table-bordered">
+        <thead>
+        <tr class="active">
+            <th colspan="2">
+                <span class="label label-info"># 登录 #</span>
+            </th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr>
+            <td>
+                <b>API URL</b> : <code>[POST] http://domain.com/api/v1/login</code>
+                <br><b>POST 参数</b> :
+                <br><b style="padding-left:20px;">account</b> : <code>#account</code>
+                <br><b style="padding-left:20px;">password</b> : <code>#password</code>
+                <br><b>返回</b> :
+                <br><b style="padding-left:20px;">json</b> : <code>{#accesstoken}</code>
+                <br><b>测试返回</b> :
+                <br><b style="padding-left:20px;">json</b> : <code ng-bind="testResponse">#右侧测试结果显示在这#</code>
+            </td>
+            <td>
+                <form ng-submit="mLogin()">
+                    <div class="form-group" style="width:200px;">
+                        <input type="text" name="account" class="form-control" autocomplete="off"
+                               placeholder="Enter Account" ng-model="loginData.account">
+                    </div>
+                    <div class="form-group" style="width:200px;">
+                        <input type="password" name="password" class="form-control" autocomplete="off"
+                               placeholder="Enter Password" ng-model="loginData.password">
+                    </div>
+                    <div class="form-group" style="width:200px;">
+                        登录的数据会保存，其他需要 access token 的接口，会直接用最近一次登录的 access token
+                    </div>
+                    <div class="form-group" style="width:130px;">
+                        <button type="submit" class="btn btn-success">登录</button>
+                    </div>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+
+<div class="container" ng-controller="RegisterController">
+    <table class="table table-bordered">
+        <thead>
+        <tr class="active">
+            <th colspan="2">
+                <span class="label label-info"># 新用户注册 #</span>
+            </th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr>
+            <td>
+                <b>API URL</b> : <code>[POST] http://domain.com/api/v1/register</code>
+                <br><b>POST 参数</b> :
+                <br><b style="padding-left:20px;">account</b> : <code>#account</code>
+                <br><b style="padding-left:20px;">password</b> : <code>#password</code>
+                <br><b style="padding-left:20px;">nickName</b> : <code>#nickName</code>
+                <br><b>返回</b> :
+                <br><b style="padding-left:20px;">json</b> : <code>{#accesstoken}</code>
+                <br><b>测试返回</b> :
+                <br><b style="padding-left:20px;">json</b> : <code ng-bind="testResponse">#右侧测试结果显示在这#</code>
+            </td>
+            <td>
+                <form ng-submit="mRegister()">
+                    <div class="form-group" style="width:200px;">
+                        <input type="text" name="account" class="form-control" autocomplete="off"
+                               placeholder="Enter Account" ng-model="registerData.account">
+                    </div>
+                    <div class="form-group" style="width:200px;">
+                        <input type="text" name="password" class="form-control" autocomplete="off"
+                               placeholder="Enter Password" ng-model="registerData.password">
+                    </div>
+                    <div class="form-group" style="width:200px;">
+                        <input type="text" name="nickName" class="form-control" autocomplete="off"
+                               placeholder="Enter Nick name" ng-model="registerData.nickName">
+                    </div>
+                    <div class="form-group" style="width:130px;">
+                        <button type="submit" class="btn btn-success">注册</button>
+                    </div>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+
+<div class="container" ng-controller="UserInfoController">
+    <table class="table table-bordered">
+        <thead>
+        <tr class="active">
+            <th colspan="2">
+                <span class="label label-info"># 查看用户 #</span>
+            </th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr>
+            <td>
+                <b>API URL</b> : <code>[GET] http://domain.com/api/v1/user/me</code>
+                <br><b>GET 参数</b> :
+                <br><b>返回</b> :
+                <br><b style="padding-left:20px;">json</b> : <code>{UserDTO}</code>
+                <br><b>测试返回</b> :
+                <br><b style="padding-left:20px;">json</b> : <code ng-bind="testResponse">#右侧测试结果显示在这#</code>
+            </td>
+            <td>
+                <form ng-submit="mUserInfo()">
+                    <div class="form-group" style="width:200px;">
+                        <input type="text" class="form-control" autocomplete="off"
+                               placeholder="Enter Access Token" ng-model="accessToken">
+                    </div>
+                    <div class="form-group" style="width:130px;">
+                        <button type="submit" class="btn btn-success">查看用户信息</button>
+                    </div>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
