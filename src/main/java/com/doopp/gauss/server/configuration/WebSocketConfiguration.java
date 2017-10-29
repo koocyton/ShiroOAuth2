@@ -2,8 +2,8 @@ package com.doopp.gauss.server.configuration;
 
 import com.doopp.gauss.server.websocket.WebSocketHandshakeInterceptor;
 import com.doopp.gauss.server.websocket.LiveSocketHandler;
-import com.doopp.gauss.server.websocket.rule.ChatRoomRule;
-import com.doopp.gauss.server.websocket.rule.WereWolfRule;
+import com.doopp.gauss.server.websocket.realm.ChatRoomRealm;
+import com.doopp.gauss.server.websocket.realm.WereWolfRealm;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
@@ -39,12 +39,12 @@ public class WebSocketConfiguration extends WebMvcConfigurerAdapter implements W
     }
 
     @Bean
-    public ChatRoomRule chatRoomRule() {
-        return new ChatRoomRule();
+    public ChatRoomRealm chatRoomRule() {
+        return new ChatRoomRealm();
     }
 
     @Bean
-    public WereWolfRule wereWolfRule() {
-        return new WereWolfRule();
+    public WereWolfRealm wereWolfRule() {
+        return new WereWolfRealm();
     }
 }

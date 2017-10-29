@@ -1,4 +1,4 @@
-package com.doopp.gauss.server.websocket.rule;
+package com.doopp.gauss.server.websocket.realm;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -9,16 +9,18 @@ import com.google.common.base.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class ChatRoomRule {
+@Component
+public class ChatRoomRealm {
 
     // log
-    private final Logger logger = LoggerFactory.getLogger(ChatRoomRule.class);
+    private final Logger logger = LoggerFactory.getLogger(ChatRoomRealm.class);
 
     // room's session
     private static final Map<Integer, RoomEntity> roomSessions = new HashMap<>();
@@ -31,8 +33,55 @@ public class ChatRoomRule {
 
     public void handleTextMessage(UserEntity sendUser, RoomEntity roomSession, JSONObject message) {
         // 插入发送人
-        message.put("sendUser", sendUser.getId());
+        message.put("sendUserId", sendUser.getId());
         message.put("sendUserName", sendUser.getNickname());
+        // 获取 action
+        String messageAction = message.getString("action");
+        switch(messageAction) {
+            // 房间内聊天
+            case "public-talk" :
+                this.publicTalk(sendUser, roomSession, message);
+                break;
+
+            // 举行活动
+            case "hold-activity" :
+                break;
+
+            // 参加活动
+            case "join-activities" :
+                this.joinActivities(sendUser, roomSession, message);
+                break;
+
+            // 活动开始
+            case "start-activities" :
+                break;
+
+            // 房主踢人
+            case "kick-out" :
+                break;
+        }
+    }
+
+    /*
+     * 加入活动
+     */
+    private void joinActivities(UserEntity sendUser, RoomEntity roomSession, JSONObject message) {
+        // 反馈，加入成功还是失败
+        if (true) {
+            liveSocketHandler.pushMessage(sendUser, message.toJSONString());
+            // 加满人员后，自动开始活动，并给活动人员，标注新的 realm flag
+            // todo ... 补充逻辑在此
+        }
+        //
+        else {
+            liveSocketHandler.pushMessage(sendUser, message.toJSONString());
+        }
+    }
+
+    /*
+     * 房间内聊天
+     */
+    private void publicTalk(UserEntity sendUser, RoomEntity roomSession, JSONObject message) {
         // 发送给前排
         Map<Long, UserEntity> frontUsers = roomSession.getFrontUsers();
         for (UserEntity frontUser : frontUsers.values()) {
@@ -105,7 +154,7 @@ public class ChatRoomRule {
         // 标注加入了房间
         socketSession.getAttributes().put("roomId", roomId);
         // 标注状态是加入房间聊天
-        socketSession.getAttributes().put("socketRule", LiveSocketHandler.CHAT_ROOM_SOCKET_RULE);
+        socketSession.getAttributes().put("socketRule", LiveSocketHandler.CHAT_ROOM_SOCKET_REALM);
         // 创建 room
         roomSessions.put(roomId, roomSession);
         return true;
@@ -133,7 +182,7 @@ public class ChatRoomRule {
         // 标注加入了房间
         socketSession.getAttributes().put("roomId", roomId);
         // 标注状态是加入房间聊天
-        socketSession.getAttributes().put("socketRule", LiveSocketHandler.CHAT_ROOM_SOCKET_RULE);
+        socketSession.getAttributes().put("socketRule", LiveSocketHandler.CHAT_ROOM_SOCKET_REALM);
         // 加入到房间
         roomSessions.get(roomId).joinWatch(user);
         return true;

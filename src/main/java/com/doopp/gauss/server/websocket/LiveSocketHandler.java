@@ -1,11 +1,10 @@
 package com.doopp.gauss.server.websocket;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.doopp.gauss.api.entity.RoomEntity;
 import com.doopp.gauss.api.entity.UserEntity;
-import com.doopp.gauss.server.websocket.rule.ChatRoomRule;
-import com.doopp.gauss.server.websocket.rule.WereWolfRule;
+import com.doopp.gauss.server.websocket.realm.ChatRoomRealm;
+import com.doopp.gauss.server.websocket.realm.WereWolfRealm;
 import com.google.common.base.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,16 +34,17 @@ public class LiveSocketHandler implements org.springframework.web.socket.WebSock
     // last created room id
     // private static int lastRoomId = 54612;
 
-    public static final String WERE_WOLF_SOCKET_RULE = "WERE_WOLF_SOCKET_RULE";
-    public static final String CHAT_ROOM_SOCKET_RULE = "CHAT_ROOM_SOCKET_RULE";
+    // 域标记
+    public static final String WERE_WOLF_SOCKET_REALM = "WERE_WOLF_SOCKET_REALM";
+    public static final String CHAT_ROOM_SOCKET_REALM = "CHAT_ROOM_SOCKET_REALM";
 
-    // chat room rule
+    // chat room realm
     @Autowired
-    private ChatRoomRule chatRoomRule;
+    private ChatRoomRealm chatRoomRule;
 
-    // were wolf rule
+    // were wolf realm
     @Autowired
-    private WereWolfRule wereWolfRule;
+    private WereWolfRealm wereWolfRule;
 
     @Override
     public void afterConnectionEstablished(WebSocketSession socketSession) throws Exception {
@@ -92,20 +92,20 @@ public class LiveSocketHandler implements org.springframework.web.socket.WebSock
         String socketRule = (String) socketSession.getAttributes().get("socketRule");
         // 当前用户
         UserEntity currentUser = (UserEntity) socketSession.getAttributes().get("currentUser");
+        // 房间 ID
+        int roomId = (int) socketSession.getAttributes().get("roomId");
+        // 房间
+        RoomEntity roomSession = chatRoomRule.getRoomSession(roomId);
         // 规则转发
         switch (socketRule) {
             // 在聊天室
-            case CHAT_ROOM_SOCKET_RULE :
-                // 房间 ID
-                int roomId = (int) socketSession.getAttributes().get("roomId");
-                // 房间
-                RoomEntity roomSession = chatRoomRule.getRoomSession(roomId);
+            case CHAT_ROOM_SOCKET_REALM :
                 // delegate
                 chatRoomRule.handleTextMessage(currentUser, roomSession, messageObject);
                 break;
             // 玩狼人杀
-            case WERE_WOLF_SOCKET_RULE :
-                wereWolfRule.handleTextMessage(currentUser, socketSession, messageObject);
+            case WERE_WOLF_SOCKET_REALM :
+                wereWolfRule.handleTextMessage(currentUser, roomSession, messageObject);
                 break;
         }
     }
