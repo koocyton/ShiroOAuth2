@@ -193,39 +193,98 @@ let ApiTestController = function($scope, $http) {
     $scope.meInfoResponse = null;
     $scope.roomListResponse = null;
 
+    $scope.apiRequestMessage = [];
+
+    $scope.scrollWindow=function(){
+        let _el = document.getElementById('request_history');
+        _el.scrollTop = _el.scrollHeight;
+    };
+
     $scope.apiRegister = function() {
+        let ii = $scope.apiRequestMessage.length;
+        $scope.apiRequestMessage[ii] = {
+            requestUrl : '[POST] /api/v1/register',
+            request : $scope.registerData,
+            response : null,
+            errorResponse : null
+        };
         formPost($http, '/api/v1/register', $scope.registerData,
             function(res) {
+                $scope.apiRequestMessage[ii].response = res.data;
                 $scope.registerResponse = res.data;
+                $scope.scrollWindow();
             },
-            null);
+            function(res) {
+                $scope.apiRequestMessage[ii].errorResponse = res.data;
+                $scope.registerResponse = res.data;
+                $scope.scrollWindow();
+            });
     };
 
     $scope.apiLogin = function() {
+        let ii = $scope.apiRequestMessage.length;
+        $scope.apiRequestMessage[ii] = {
+            requestUrl : '[POST] /api/v1/login',
+            request : $scope.registerData,
+            response : null,
+            errorResponse : null
+        };
         formPost($http, '/api/v1/login', $scope.loginData,
             function(res) {
+                $scope.apiRequestMessage[ii].response = res.data;
                 $scope.loginResponse = res.data;
+                $scope.scrollWindow();
             },
-            null);
+            function(res) {
+                $scope.apiRequestMessage[ii].errorResponse = res.data;
+                $scope.loginResponse = res.data;
+                $scope.scrollWindow();
+            });
     };
 
     $scope.meInfoAccessToken = "";
     $scope.apiMeInfo = function() {
+        let ii = $scope.apiRequestMessage.length;
+        $scope.apiRequestMessage[ii] = {
+            requestUrl : '[GET] /api/v1/user/me',
+            request : null,
+            response : null,
+            errorResponse : null
+        };
         httpGet($http, '/api/v1/user/me',
             function(res) {
+                $scope.apiRequestMessage[ii].response = res.data;
                 $scope.meInfoResponse = res.data;
+                $scope.scrollWindow();
             },
-            null,
+            function(res) {
+                $scope.apiRequestMessage[ii].response = res.data;
+                $scope.meInfoResponse = res.data;
+                $scope.scrollWindow();
+            },
             {"access-token": $scope.meInfoAccessToken});
     };
 
     $scope.roomListAccessToken = "";
     $scope.apiRoomList = function() {
+        let ii = $scope.apiRequestMessage.length;
+        $scope.apiRequestMessage[ii] = {
+            requestUrl : '[GET] /api/v1/room/list',
+            request : null,
+            response : null,
+            errorResponse : null
+        };
         httpGet($http, '/api/v1/room/list',
             function(res) {
+                $scope.apiRequestMessage[ii].response = res.data;
                 $scope.roomListResponse = res.data;
+                $scope.scrollWindow();
             },
-            null,
+            function(res) {
+                $scope.apiRequestMessage[ii].response = res.data;
+                $scope.roomListResponse = res.data;
+                $scope.scrollWindow();
+            },
             {"access-token": $scope.roomListAccessToken});
     };
 
@@ -246,8 +305,17 @@ let ApiTestController = function($scope, $http) {
                 .onClose(function (e) {
                     scopeRoom.socketStatus = "断开";
                     console.log("Disconnected: " + e.reason);
+                    $scope.scrollWindow();
                 })
                 .onMessage(function (e) {
+                    let ii = $scope.apiRequestMessage.length;
+                    $scope.apiRequestMessage[ii] = {
+                        requestUrl : '[GET] websocket',
+                        request : e.message,
+                        response : null,
+                        errorResponse : null
+                    };
+                    $scope.scrollWindow();
                 });
             //
             if (scopeRoom.action==="createRoom") {
