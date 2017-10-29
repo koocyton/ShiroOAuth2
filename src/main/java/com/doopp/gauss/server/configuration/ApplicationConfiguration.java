@@ -8,7 +8,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 @EnableCaching
 
 @Import({
-    ApplicationPropertiesConfiguration.class,
+    PropertiesUtil.class,
     EhcacheConfiguration.class,
     RedisConfiguration.class,
     MyBatisConfiguration.class,

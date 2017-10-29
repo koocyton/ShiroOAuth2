@@ -6,7 +6,7 @@ import org.springframework.core.io.ClassPathResource;
 import java.io.IOException;
 import java.util.Properties;
 
-public class ApplicationPropertiesConfiguration {
+public class PropertiesUtil {
 
     @Bean
     public Properties applicationProperties() {
