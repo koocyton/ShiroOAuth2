@@ -15,8 +15,8 @@ public class WerewolfGame {
     @Autowired
     AccountService accountService;
 
-    @Autowired
-    CustomShadedJedis roomRedis;
+    //@Autowired
+    //CustomShadedJedis roomRedis;
 
     private class GameTask implements Runnable {
 
@@ -29,7 +29,7 @@ public class WerewolfGame {
                 }
                 // UserEntity user = accountService.getUserByToken();
                 logger.info(" >>> Run GameTask - AccountService : " + accountService);
-                roomRedis.test();
+                //roomRedis.test();
                 try {
                     Thread.sleep(1000);
                 }

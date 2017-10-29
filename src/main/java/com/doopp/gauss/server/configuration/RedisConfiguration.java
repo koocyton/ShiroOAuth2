@@ -9,64 +9,84 @@ import redis.clients.jedis.ShardedJedisPool;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 public class RedisConfiguration {
 
+    //    @Bean
+    //    public CustomShadedJedis roomRedis(JedisPoolConfig jedisPoolConfig, Properties applicationProperties)
+    //    {
+    //        String s1 = applicationProperties.getProperty("redis.server.room.1");
+    //        String s2 = applicationProperties.getProperty("redis.server.room.2");
+    //        // shard redis
+    //        ShardedJedisPool shardedJedisPool = this.shardedJedisPool(jedisPoolConfig, s1, s2);
+    //        CustomShadedJedis customShadedJedis = new CustomShadedJedis();
+    //        customShadedJedis.setShardedJedisPool(shardedJedisPool);
+    //        return customShadedJedis;
+    //    }
+    //
+    //    @Bean
+    //    public CustomShadedJedis roomIndexRedis(JedisPoolConfig jedisPoolConfig, Properties applicationProperties)
+    //    {
+    //        String s1 = applicationProperties.getProperty("redis.server.roomIndex.1");
+    //        String s2 = applicationProperties.getProperty("redis.server.roomIndex.2");
+    //        // shard redis
+    //        ShardedJedisPool shardedJedisPool = this.shardedJedisPool(jedisPoolConfig, s1, s2);
+    //        CustomShadedJedis customShadedJedis = new CustomShadedJedis();
+    //        customShadedJedis.setShardedJedisPool(shardedJedisPool);
+    //        return customShadedJedis;
+    //    }
+
     @Bean
-    public CustomShadedJedis roomRedis(@Qualifier("jedisPoolConfig") JedisPoolConfig jedisPoolConfig)
+    public CustomShadedJedis sessionRedis(@Qualifier("jedisPoolConfig") JedisPoolConfig jedisPoolConfig, @Qualifier("applicationProperties") Properties applicationProperties)
     {
+        String s1 = applicationProperties.getProperty("redis.server.session.1");
+        String s2 = applicationProperties.getProperty("redis.server.session.2");
+        //System.out.print(" >>>>>>>>>>>>>>> " + s1 + " \n >>>>>>>>>>>>>>> " + s2 + "\n");
         // shard redis
-        ShardedJedisPool shardedJedisPool = this.shardedJedisPool(jedisPoolConfig, "redis://127.0.0.1:6379/1", "redis://127.0.0.1:6379/2");
+        ShardedJedisPool shardedJedisPool = this.shardedJedisPool(jedisPoolConfig, s1, s2);
         CustomShadedJedis customShadedJedis = new CustomShadedJedis();
         customShadedJedis.setShardedJedisPool(shardedJedisPool);
         return customShadedJedis;
     }
 
     @Bean
-    public CustomShadedJedis roomIndexRedis(@Qualifier("jedisPoolConfig") JedisPoolConfig jedisPoolConfig)
+    public CustomShadedJedis userRedis(@Qualifier("jedisPoolConfig") JedisPoolConfig jedisPoolConfig, @Qualifier("applicationProperties") Properties applicationProperties)
     {
+        String s1 = applicationProperties.getProperty("redis.server.user.1");
+        String s2 = applicationProperties.getProperty("redis.server.user.2");
+        //System.out.print(" >>>>>>>>>>>>>>> " + s1 + " \n >>>>>>>>>>>>>>> " + s2 + "\n");
         // shard redis
-        ShardedJedisPool shardedJedisPool = this.shardedJedisPool(jedisPoolConfig, "redis://127.0.0.1:6379/3", "redis://127.0.0.1:6379/4");
+        ShardedJedisPool shardedJedisPool = this.shardedJedisPool(jedisPoolConfig, s1, s2);
         CustomShadedJedis customShadedJedis = new CustomShadedJedis();
         customShadedJedis.setShardedJedisPool(shardedJedisPool);
         return customShadedJedis;
     }
 
     @Bean
-    public CustomShadedJedis sessionRedis(@Qualifier("jedisPoolConfig") JedisPoolConfig jedisPoolConfig)
+    public JedisPoolConfig jedisPoolConfig (Properties applicationProperties)
     {
-        ShardedJedisPool shardedJedisPool = this.shardedJedisPool(jedisPoolConfig, "redis://127.0.0.1:6379/5", "redis://127.0.0.1:6379/6");
-        CustomShadedJedis customShadedJedis = new CustomShadedJedis();
-        customShadedJedis.setShardedJedisPool(shardedJedisPool);
-        return customShadedJedis;
-    }
+        int maxTotal = Integer.parseInt(applicationProperties.getProperty("redis.pool.maxTotal"));
+        int maxIdle = Integer.parseInt(applicationProperties.getProperty("redis.pool.maxIdle"));
+        int minIdle = Integer.parseInt(applicationProperties.getProperty("redis.pool.minIdle"));
+        boolean lifo = Boolean.getBoolean(applicationProperties.getProperty("redis.pool.lifo"));
+        int maxWaitMillis = Integer.parseInt(applicationProperties.getProperty("redis.pool.maxWaitMillis"));
+        boolean testOnBorrow = Boolean.getBoolean(applicationProperties.getProperty("redis.pool.testOnBorrow"));
 
-    @Bean
-    public CustomShadedJedis userRedis(@Qualifier("jedisPoolConfig") JedisPoolConfig jedisPoolConfig)
-    {
-        ShardedJedisPool shardedJedisPool = this.shardedJedisPool(jedisPoolConfig, "redis://127.0.0.1:6379/7", "redis://127.0.0.1:6379/8");
-        CustomShadedJedis customShadedJedis = new CustomShadedJedis();
-        customShadedJedis.setShardedJedisPool(shardedJedisPool);
-        return customShadedJedis;
-    }
-
-    @Bean
-    public JedisPoolConfig jedisPoolConfig ()
-    {
         // Jedis池配置
         JedisPoolConfig config = new JedisPoolConfig();
         // 最大分配的对象数
-        config.setMaxTotal(10);
+        config.setMaxTotal(maxTotal);
         // 最大能够保持idel状态的对象数
-        config.setMaxIdle(10);
+        config.setMaxIdle(maxIdle);
         // 最小空闲的对象数。2.5.1以上版本有效
-        config.setMinIdle(8);
+        config.setMinIdle(minIdle);
         // 当池内没有返回对象时，最大等待时间
-        config.setMaxWaitMillis(1000);
+        config.setMaxWaitMillis(maxWaitMillis);
         // 是否启用Lifo。如果不设置，默认为true。2.5.1以上版本有效
-        config.setLifo(false);
+        config.setLifo(lifo);
         // 当调用borrow Object方法时，是否进行有效性检查
-        config.setTestOnBorrow(true);
+        config.setTestOnBorrow(testOnBorrow);
         // return
         return config;
     }
@@ -102,6 +122,7 @@ public class RedisConfiguration {
         List<JedisShardInfo> jedisInfoList =new ArrayList<>(hosts.length);
         // loop
         for (String host : hosts) {
+            // System.out.print(" >>>>>>>>>>>>>>> " + host + "\n");
             JedisShardInfo jedisShardInfo = new JedisShardInfo(host);
             jedisShardInfo.setConnectionTimeout(2000);
             jedisShardInfo.setSoTimeout(2000);
