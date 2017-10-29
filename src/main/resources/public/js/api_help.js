@@ -1,5 +1,3 @@
-<script>
-
 "use strict";
 
 /*
@@ -75,6 +73,14 @@ WebSocketService.prototype.onMessage = function(callMessage) {
 WebSocketService.prototype.send = function(message) {
     this.ws.send(message);
 };
+WebSocketService.prototype.close = function() {
+    try {
+        this.ws.close();
+    }
+    catch(e) {
+
+    }
+};
 
 /*
  * http request
@@ -149,18 +155,43 @@ let ApiTestController = function($scope, $http) {
     $scope.registerData = {account:"k0001@doopp.com", password:"123456", nickName:"helloBoy"};
     $scope.loginData = {account:"k0001@doopp.com", password:"123456"};
 
-    $scope.createRoomMessage = {action:"createRoom", data:{roomName:"美丽的小屋"}};
-    $scope.joinRoomMessage = {action:"joinRoom", data:{roomId:"54612"}};
+    $scope.room1 = {
+        action : "createRoom",
+        accessToken : "",
+        createMessage : {action:"createRoom", data:{roomName:"美丽的小屋1"}},
+        joinMessage : {action:"joinRoom", data:{roomId:"54613"}},
+        ws : null,
+        socketStatus : "未连接",
+        sendMessage : "",
+        receivedMessage : ""
+    };
 
-    $scope.accessToken = "";
-    $scope.socketStatus = "未连接";
+    $scope.room2 = {
+        action : "joinRoom",
+        accessToken : "",
+        createMessage : {action:"createRoom", data:{roomName:"美丽的小屋2"}},
+        joinMessage : {action:"joinRoom", data:{roomId:"54614"}},
+        ws : null,
+        socketStatus : "未连接",
+        sendMessage : "",
+        receivedMessage : ""
+    };
+
+    $scope.room3 = {
+        action : "joinRoom",
+        accessToken : "",
+        createMessage : {action:"createRoom", data:{roomName:"美丽的小屋3"}},
+        joinMessage : {action:"joinRoom", data:{roomId:"54615"}},
+        ws : null,
+        socketStatus : "未连接",
+        sendMessage : "",
+        receivedMessage : ""
+    };
 
     $scope.registerResponse = null;
     $scope.loginResponse = null;
     $scope.meInfoResponse = null;
     $scope.roomListResponse = null;
-
-    $scope.ws = null;
 
     $scope.apiRegister = function() {
         formPost($http, '/api/v1/register', $scope.registerData,
@@ -198,28 +229,42 @@ let ApiTestController = function($scope, $http) {
             {"access-token": $scope.roomListAccessToken});
     };
 
-    $scope.createSocketAccessToken = "";
-    $scope.createSocket = function() {
-        $scope.ws = WebSocketService
-            .connect("/live-socket?access-token=" + $scope.createSocketAccessToken)
-            .onOpen(function(e){
-                $scope.socketStatus = "连接";
-            })
-            .onClose(function(e){
-                $scope.socketStatus = "断开";
-            })
-            .onMessage(function(e){});
+    $scope.disconnectRoom = function(ii) {
+        let scopeRoom = eval("$scope.room" + ii);
+        if (scopeRoom.ws!==null) {
+            scopeRoom.ws.close();
+            scopeRoom.ws = null;
+        }
     };
 
-    $scope.apiCreateRoom = function() {
-        $scope.ws.send(angular.toJson($scope.createRoomMessage));
-    };
-
-    $scope.apiJoinRoom = function() {
-        $scope.ws.send(angular.toJson($scope.joinRoomMessage));
+    $scope.connectRoom = function(ii) {
+        let scopeRoom = eval("$scope.room" + ii);
+        if (scopeRoom.ws===null) {
+            //
+            scopeRoom.ws = WebSocketService
+                .connect("/live-socket?access-token=" + scopeRoom.accessToken)
+                .onClose(function (e) {
+                    scopeRoom.socketStatus = "断开";
+                    console.log("Disconnected: " + e.reason);
+                })
+                .onMessage(function (e) {
+                });
+            //
+            if (scopeRoom.action==="createRoom") {
+                scopeRoom.ws.onOpen(function (e) {
+                    scopeRoom.socketStatus = "连接";
+                    scopeRoom.ws.send(angular.toJson(scopeRoom.createMessage));
+                })
+            }
+            else if (scopeRoom.action==="joinRoom") {
+                scopeRoom.ws.onOpen(function (e) {
+                    scopeRoom.socketStatus = "连接";
+                    scopeRoom.ws.send(angular.toJson(scopeRoom.joinMessage));
+                })
+            }
+        }
     };
 };
 
 let apiHelpApp = angular.module('ngApiHelpApp',[]);
 apiHelpApp.controller('ApiTestController', ApiTestController);
-</script>

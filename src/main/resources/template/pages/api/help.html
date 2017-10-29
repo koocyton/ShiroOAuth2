@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>API Helper</title>
+    <link href="/webjars/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/api_help.css" rel="stylesheet">
+    <script src="/webjars/angular/1.6.6/angular.min.js"></script>
+    <script src="/js/api_help.js"></script>
+</head>
+
+<body ng-app="ngApiHelpApp">
+
+<div class="body-background" style="top:0;left:0;width:100%;height:100%;overflow:hidden;">
+    <div class="body-background blur-10" style="background-image:url(/css/portal_bg.jpg)"></div>
+</div>
+
+<div class="body-content" ng-controller="ApiTestController">
+    <div class="body-content-left scroll-container opacity-92">
+        <#include "/api/tpl_account.html" />
+        <#include "/api/tpl_room.html" />
+    </div>
+    <div class="body-content-right scroll-container opacity-92">
+    </div>
+</div>
+
+<nav class="navbar navbar-inverse" role="navigation" style="background-color:rgba(0,0,0,0.78);">
+    <div class="container">
+        <div class="navbar-header">
+            <a href="javascript:void(0);" class="navbar-brand"> &nbsp; API Helper</a>
+        </div>
+        <div id="navbar" class="collapse navbar-collapse">
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a href="javascript:void(0);">ip 127.0.0.1</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+</body>
+</html>

@@ -12,6 +12,6 @@ public class WebController {
      */
     @RequestMapping(value = "/api")
     public String demoMain() {
-        return "api/helper";
+        return "api/help";
     }
 }

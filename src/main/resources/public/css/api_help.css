@@ -1,0 +1,27 @@
+body{overflow:hidden;}
+label{font-weight:normal;}
+input,button,button:focus,button:active,button:visited,a:focus,a:active{outline:none;}
+
+body .container{width:100%;}
+.blur-10 {-webkit-filter:blur(10px); -moz-filter:blur(10px); -ms-filter:blur(10px); filter:blur(10px);}
+
+/* 背景图 */
+.body-background {height:120%;width:120%;top:-10%;left:-10%;position:absolute; background:rgba(0,0,0,0) url(/css/portal_bg.jpg) no-repeat scroll 0 0 / cover; z-index:-1;}
+.opacity-92 {opacity:0.92;-moz-opacity:0.92;}
+
+/* 导航的菜单 */
+.navbar>.container{width:100%;}
+.navbar {min-height:40px;}
+body>.navbar {border-radius:0;}
+.navbar-brand {height: 40px;line-height: 10px;}
+.navbar-nav>li>a {padding-top:10px;padding-bottom:10px;}
+.container>.navbar-default{border-color:#cccccc;}
+.navbar-form>form>.form-group{width:200px;}
+.navbar-form>form>.form-group>input{width:200px;}
+
+/* 正文部分 和 左右内容 */
+.body-content {position:absolute;width:100%;height:100%;top:40px;left:0;}
+.body-content-left, .body-content-right {height:calc(100% - 40px);padding:20px 0 0 0;float:left;display:inline-block;background:#ffffff no-repeat scroll 0 0 / cover;}
+.body-content-left {width:62%;}
+.body-content-right {width:38%;}
+.body-content>.scroll-container{overflow-x:hidden;overflow-y:scroll;}

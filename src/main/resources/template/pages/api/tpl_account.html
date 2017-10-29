@@ -3,7 +3,7 @@
     <table class="table table-bordered">
         <thead>
         <tr class="active">
-            <th colspan="4">
+            <th colspan="3">
                 <span class="label label-info"># 长连 #</span>
             </th>
         </tr>
@@ -11,43 +11,90 @@
 
         <tbody>
         <tr>
-            <td style="width:25%;">
-                <b>Message</b> : <code>{}</code>
-            </td>
-            <td style="width:25%;">
-                <form ng-submit="createSocket()">
+            <td style="width:33%;">
+                <div>
+                    <b>socket url : </b> <code>ws://domain.com/live-socket?access-token=xxx</code>
+                    <br>
+                    <b>send json : </b> <code>{action:"createRoom", data:{roomName:#roomName}}</code>
+                </div>
+                <form ng-submit="connectRoom(1)">
                     <div class="form-group">
                         <input type="text" class="form-control" autocomplete="off"
-                               placeholder="Enter Access Token" ng-model="createSocketAccessToken">
+                               placeholder="Enter Access Token" ng-model="room1.accessToken">
                     </div>
                     <div class="form-group">
-                        <button type="submit" class="btn btn-success">连接游戏服</button>
+                        <input type="text" class="form-control" autocomplete="off"
+                               placeholder="Room Name" ng-model="room1.createMessage.data.roomName">
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-success">创建房间 socket 1</button>
+                    </div>
+                </form>
+
+                <form ng-submit="disconnectRoom(1)">
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-success">退出房间</button>
                         <span>{{ socketStatus }}</span>
                     </div>
                 </form>
             </td>
-            <td style="width:25%;">
-                <form ng-submit="apiCreateRoom()">
+
+            <td style="width:33%;">
+                <div>
+                    <b>socket url : </b> <code>ws://domain.com/live-socket?access-token=xxx</code>
+                    <br>
+                    <b>send json : </b> <code>{action:"joinRoom", data:{roomId:#roomId}}</code>
+                </div>
+                <form ng-submit="connectRoom(2)">
                     <div class="form-group">
                         <input type="text" class="form-control" autocomplete="off"
-                               placeholder="Room Name" ng-model="createRoomMessage.data.roomName">
+                               placeholder="Enter Access Token" ng-model="room2.accessToken">
                     </div>
                     <div class="form-group">
-                        <button type="submit" class="btn btn-success">创建房间</button>
+                        <input type="text" class="form-control" autocomplete="off"
+                               placeholder="Room ID" ng-model="room2.joinMessage.data.roomId">
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-success">进入房间 socket 2</button>
+                    </div>
+                </form>
+
+                <form ng-submit="disconnectRoom(2)">
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-success">退出房间</button>
+                        <span>{{ socketStatus }}</span>
                     </div>
                 </form>
             </td>
-            <td style="width:25%;">
-                <form ng-submit="apiJoinRoom()">
+
+            <td style="width:33%;">
+                <div>
+                    <b>socket url : </b> <code>ws://domain.com/live-socket?access-token=xxx</code>
+                    <br>
+                    <b>send json : </b> <code>{action:"joinRoom", data:{roomId:#roomId}}</code>
+                </div>
+                <form ng-submit="connectRoom(3)">
                     <div class="form-group">
                         <input type="text" class="form-control" autocomplete="off"
-                               placeholder="Room ID" ng-model="joinRoomMessage.data.roomId">
+                               placeholder="Enter Access Token" ng-model="room3.accessToken">
                     </div>
                     <div class="form-group">
-                        <button type="submit" class="btn btn-success">进入房间</button>
+                        <input type="text" class="form-control" autocomplete="off"
+                               placeholder="Room ID" ng-model="room3.joinMessage.data.roomId">
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-success">进入房间 socket 3</button>
+                    </div>
+                </form>
+
+                <form ng-submit="disconnectRoom(3)">
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-success">退出房间</button>
+                        <span>{{ socketStatus }}</span>
                     </div>
                 </form>
             </td>
+
         </tr>
         </tbody>
     </table>
@@ -73,7 +120,7 @@
                 <br><b>测试返回</b> :
                 <br><b style="padding-left:20px;">json</b> : <code ng-bind="roomListResponse">#右侧测试结果显示在这#</code>
             </td>
-            <td style="width:25%;">
+            <td style="width:38%;">
                 <form ng-submit="apiRoomList()">
                     <div class="form-group">
                         <input type="text" class="form-control" autocomplete="off"
@@ -111,7 +158,7 @@
                 <br><b>测试返回</b> :
                 <br><b style="padding-left:20px;">json</b> : <code ng-bind="loginResponse">#右侧测试结果显示在这#</code>
             </td>
-            <td style="width:25%;">
+            <td style="width:38%;">
                 <form ng-submit="apiLogin()">
                     <div class="form-group">
                         <input type="text" name="account" class="form-control" autocomplete="off"
@@ -158,7 +205,7 @@
                 <br><b>测试返回</b> :
                 <br><b style="padding-left:20px;">json</b> : <code ng-bind="registerResponse">#右侧测试结果显示在这#</code>
             </td>
-            <td style="width:25%;">
+            <td style="width:38%;">
                 <form ng-submit="apiRegister()">
                     <div class="form-group">
                         <input type="text" name="account" class="form-control" autocomplete="off"
@@ -202,7 +249,7 @@
                 <br><b>测试返回</b> :
                 <br><b style="padding-left:20px;">json</b> : <code ng-bind="meInfoResponse">#右侧测试结果显示在这#</code>
             </td>
-            <td style="width:25%;">
+            <td style="width:38%;">
                 <form ng-submit="apiMeInfo()">
                     <div class="form-group">
                         <input type="text" class="form-control" autocomplete="off"
