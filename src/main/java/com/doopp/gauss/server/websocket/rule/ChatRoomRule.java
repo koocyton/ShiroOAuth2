@@ -105,7 +105,7 @@ public class ChatRoomRule {
         // 标注加入了房间
         socketSession.getAttributes().put("roomId", roomId);
         // 标注状态是加入房间聊天
-        socketSession.getAttributes().put("socketRule", "chatRoom");
+        socketSession.getAttributes().put("socketRule", LiveSocketHandler.CHAT_ROOM_SOCKET_RULE);
         // 创建 room
         roomSessions.put(roomId, roomSession);
         return true;
@@ -133,7 +133,7 @@ public class ChatRoomRule {
         // 标注加入了房间
         socketSession.getAttributes().put("roomId", roomId);
         // 标注状态是加入房间聊天
-        socketSession.getAttributes().put("socketRule", "chatRoom");
+        socketSession.getAttributes().put("socketRule", LiveSocketHandler.CHAT_ROOM_SOCKET_RULE);
         // 加入到房间
         roomSessions.get(roomId).joinWatch(user);
         return true;

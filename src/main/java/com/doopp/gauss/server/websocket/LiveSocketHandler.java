@@ -35,6 +35,9 @@ public class LiveSocketHandler implements org.springframework.web.socket.WebSock
     // last created room id
     // private static int lastRoomId = 54612;
 
+    public static final String WERE_WOLF_SOCKET_RULE = "WERE_WOLF_SOCKET_RULE";
+    public static final String CHAT_ROOM_SOCKET_RULE = "CHAT_ROOM_SOCKET_RULE";
+
     // chat room rule
     @Autowired
     private ChatRoomRule chatRoomRule;
@@ -92,7 +95,7 @@ public class LiveSocketHandler implements org.springframework.web.socket.WebSock
         // 规则转发
         switch (socketRule) {
             // 在聊天室
-            case "chatRoom" :
+            case CHAT_ROOM_SOCKET_RULE :
                 // 房间 ID
                 int roomId = (int) socketSession.getAttributes().get("roomId");
                 // 房间
@@ -101,7 +104,7 @@ public class LiveSocketHandler implements org.springframework.web.socket.WebSock
                 chatRoomRule.handleTextMessage(currentUser, roomSession, messageObject);
                 break;
             // 玩狼人杀
-            case "wereWolf" :
+            case WERE_WOLF_SOCKET_RULE :
                 wereWolfRule.handleTextMessage(currentUser, socketSession, messageObject);
                 break;
         }
