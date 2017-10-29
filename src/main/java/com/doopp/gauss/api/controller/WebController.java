@@ -11,7 +11,15 @@ public class WebController {
      * API 说明
      */
     @RequestMapping(value = "/api")
-    public String demoMain() {
+    public String apiHelp() {
         return "api/help";
+    }
+
+    /*
+     * API 文档
+     */
+    @RequestMapping(value = "/api-doc")
+    public String apiDoc() {
+        return "api/doc";
     }
 }

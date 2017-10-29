@@ -75,7 +75,7 @@ public class SessionFilter extends OncePerRequestFilter {
 
         // 如果uri中包含不过滤的uri，则不进行过滤
         for (String notFilter : notFilters) {
-            if (uri.contains(notFilter) || uri.equals("/api")) {
+            if (uri.contains(notFilter) || uri.equals("/api") || uri.equals("/api-doc")) {
                 doFilter = false;
                 break;
             }
