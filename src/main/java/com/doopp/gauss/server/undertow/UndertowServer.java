@@ -61,13 +61,13 @@ public class UndertowServer implements InitializingBean, DisposableBean {
         //pathHandler.addPrefixPath("/", httpHandler);
 
         server = Undertow.builder()
-            .addHttpListener(port, "localhost")
+            .addHttpListener(port, host)
             .setHandler(httpHandler)
             .build();
 
         server.start();
 
-        logger.info("Undertow web server started; web application available at http://localhost:{}", port);
+        logger.info("Undertow web server started; web application available at http://{}:{}", host, port);
     }
 
     @Override
