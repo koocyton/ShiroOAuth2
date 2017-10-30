@@ -1,13 +1,15 @@
 package com.doopp.gauss.server.websocket;
 
+import com.alibaba.druid.pool.vendor.NullExceptionSorter;
 import com.alibaba.fastjson.JSONObject;
-import com.doopp.gauss.api.entity.RoomSession;
+import com.doopp.gauss.api.entity.RoomEntity;
 import com.doopp.gauss.api.entity.UserEntity;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.AbstractWebSocketHandler;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -18,44 +20,87 @@ public class RoomSocketHandler extends AbstractWebSocketHandler {
     private static final Map<Long, WebSocketSession> sockets = new HashMap<>();
 
     // room`s session
-    private static final Map<Integer, RoomSession> rooms = new HashMap<>();
+    private static final Map<Integer, RoomEntity> rooms = new HashMap<>();
 
     // room id
     private static int lastRoomId = 54612;
 
+    /*
+     * 获取房间列表
+     */
+    public Map<Integer, RoomEntity> getRooms() {
+        return rooms;
+    }
+
+    /*
+     * 房间里说话
+     */
+    public void publicTalk(UserEntity sendUser, RoomEntity roomSession, TextMessage message) throws IOException {
+
+        JSONObject objMessage = JSONObject.parseObject(message.getPayload());
+        objMessage.put("sendUserId", sendUser.getId());
+        objMessage.put("sendUserName", sendUser.getNickname());
+        TextMessage sendMessage = new TextMessage(JSONObject.toJSONString(objMessage));
+
+        Map<Long, UserEntity> frontUsers = roomSession.getFrontUsers();
+        for(UserEntity frontUser : frontUsers.values()) {
+            if (!Objects.equals(sendUser.getId(), frontUser.getId())) {
+                sockets.get(frontUser.getId()).sendMessage(sendMessage);
+            }
+        }
+        Map<Long, UserEntity> watchUsers = roomSession.getWatchUsers();
+        for(UserEntity watchUser : watchUsers.values()) {
+            if (!Objects.equals(sendUser.getId(), watchUser.getId())) {
+                sockets.get(watchUser.getId()).sendMessage(sendMessage);
+            }
+        }
+        UserEntity owner = roomSession.getOwner();
+        if (!Objects.equals(sendUser.getId(), owner.getId())) {
+            sockets.get(owner.getId()).sendMessage(sendMessage);
+        }
+    }
+
     // text message
     @Override
     protected void handleTextMessage(WebSocketSession socketSession, TextMessage message) throws Exception {
-        this.roomFilter(socketSession, message);
+        RoomEntity sessionRoom = this.getSessionRoom(socketSession);
+        UserEntity sessionUser = this.getSessionUser(socketSession);
+        if (sessionRoom==null) {
+            this.openRoom(socketSession, message);
+        }
+        else {
+           this.publicTalk(sessionUser, sessionRoom, message);
+        }
     }
 
     @Override
     public void afterConnectionClosed(WebSocketSession socketSession, CloseStatus status) throws Exception {
-        // get room id
-        Object objRoomId = socketSession.getAttributes().get("roomId");
-        if (objRoomId!=null) {
-            int roomId = (int) objRoomId;
-            UserEntity currentUser = (UserEntity) socketSession.getAttributes().get("currentUser");
-            // remove from rooms , sockets, socketSession.roomId
-            socketSession.getAttributes().remove("roomId");
-            rooms.remove(roomId);
-            sockets.remove(currentUser.getId());
-        }
+        // 关闭连接时，离开房间
+        this.leaveRoom(socketSession);
     }
 
     /*
-     * 获取房间列表
+     * 获取房间
      */
-    public Map<Integer, RoomSession> getRooms() {
-        return rooms;
+    private RoomEntity getSessionRoom(WebSocketSession socketSession) {
+        Object roomId = socketSession.getAttributes().get("roomId");
+        if (socketSession.getAttributes().get("roomId")==null) {
+            return null;
+        }
+        return rooms.get(roomId);
     }
 
-    private void roomFilter(WebSocketSession socketSession, TextMessage message) throws Exception {
-        // 房间 ID
-        Object roomId = socketSession.getAttributes().get("roomId");
-        if (Objects.isNull(roomId)) {
-            return;
-        }
+    /*
+     * 获取用户
+     */
+    private UserEntity getSessionUser(WebSocketSession socketSession) {
+        return (UserEntity) socketSession.getAttributes().get("currentUser");
+    }
+
+    /*
+     * 开房
+     */
+    private void openRoom(WebSocketSession socketSession, TextMessage message) throws Exception {
         // 校验消息
         JSONObject ObjMessage = JSONObject.parseObject(message.getPayload());
         // get action
@@ -65,14 +110,14 @@ public class RoomSocketHandler extends AbstractWebSocketHandler {
         // user
         UserEntity sendUser = (UserEntity) socketSession.getAttributes().get("currentUser");
         // 创建房间
-        if (messageAction.equals("join-room")) {
+        if (messageAction.equals("createRoom")) {
             // 房间名
             String roomName = messageData.getString("roomName");
             this.createRoom(sendUser, roomName, socketSession);
             return;
         }
         // 加入到房间
-        else if (messageAction.equals("create-room")) {
+        else if (messageAction.equals("joinRoom")) {
             int joinRoomId = messageData.getInteger("roomId");
             this.joinRoom(sendUser, joinRoomId, socketSession);
             return;
@@ -81,10 +126,25 @@ public class RoomSocketHandler extends AbstractWebSocketHandler {
     }
 
     /*
+     * 离开房间
+     */
+    private void leaveRoom(WebSocketSession socketSession) {
+        RoomEntity sessionRoom = this.getSessionRoom(socketSession);
+        UserEntity sessionUser = this.getSessionUser(socketSession);
+        if (sessionRoom!=null) {
+            sessionRoom.userLeave(sessionUser);
+            if (sessionRoom.getWatchUsers().size()==0 && sessionRoom.getFrontUsers().size()==0 && sessionRoom.getOwner()==null) {
+                rooms.remove(sessionRoom.getId());
+            }
+        }
+        sockets.remove(sessionUser.getId());
+    }
+
+    /*
      * 房主创建房间
      */
     private void createRoom(UserEntity owner, String roomName, WebSocketSession socketSession) {
-        RoomSession roomSession = new RoomSession();
+        RoomEntity roomSession = new RoomEntity();
         synchronized ("createChatRoom") {
             roomSession.setId(++lastRoomId);
         }
@@ -102,7 +162,7 @@ public class RoomSocketHandler extends AbstractWebSocketHandler {
      * 用户加入房间，普通状态
      */
     private void joinRoom(UserEntity watchUser, int roomId, WebSocketSession socketSession) {
-        RoomSession roomSession = rooms.get(roomId);
+        RoomEntity roomSession = rooms.get(roomId);
         roomSession.joinWatch(watchUser);
         // cache 在 socket 列表
         sockets.put(watchUser.getId(), socketSession);

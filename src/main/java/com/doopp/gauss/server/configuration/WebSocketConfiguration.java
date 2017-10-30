@@ -2,9 +2,6 @@ package com.doopp.gauss.server.configuration;
 
 import com.doopp.gauss.server.websocket.RoomSocketHandler;
 import com.doopp.gauss.server.websocket.WebSocketHandshakeInterceptor;
-import com.doopp.gauss.server.websocket.LiveSocketHandler;
-import com.doopp.gauss.server.websocket.realm.ChatRoomRealm;
-import com.doopp.gauss.server.websocket.realm.WereWolfRealm;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
@@ -24,10 +21,6 @@ public class WebSocketConfiguration extends WebMvcConfigurerAdapter implements W
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
 
-        registry.addHandler(liveSocketHandler(),"/live-socket")
-            .addInterceptors(new WebSocketHandshakeInterceptor())
-            .setAllowedOrigins("*");
-
         registry.addHandler(roomSocketHandler(),"/room-socket")
             .addInterceptors(new WebSocketHandshakeInterceptor())
             .setAllowedOrigins("*");
@@ -39,22 +32,8 @@ public class WebSocketConfiguration extends WebMvcConfigurerAdapter implements W
     }
 
     @Bean
-    public LiveSocketHandler liveSocketHandler(){
-        return new LiveSocketHandler();
-    }
-
-    @Bean
     public RoomSocketHandler roomSocketHandler(){
         return new RoomSocketHandler();
     }
 
-    @Bean
-    public ChatRoomRealm chatRoomRule() {
-        return new ChatRoomRealm();
-    }
-
-    @Bean
-    public WereWolfRealm wereWolfRule() {
-        return new WereWolfRealm();
-    }
 }

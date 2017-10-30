@@ -22,15 +22,15 @@
         <#include "/api/tpl_account.html" />
         <#include "/api/tpl_room.html" />
     </div>
-    <div class="body-content-right1 scroll-container opacity-92">
-    </div>
-    <div class="body-content-right2 scroll-container opacity-92" id="request_history" style="padding:20px;">
+    <div class="body-content-right scroll-container opacity-92" id="request_history" style="padding:20px;">
         <div class="alert alert-success" ng-repeat="p in apiRequestMessage track by $index">
+            <b>url</b> : <code>{{ p.url }}</code>
+            <br>
             <b>request</b> : <code>{{ p.request }}</code>
             <br>
             <b>response</b> : <code>{{ p.response }}</code>
             <br>
-            <b>error-response</b> : <code>{{ p.errorResponse }}</code>
+            <b>error-response</b> : <code>{{ p.error }}</code>
             <br>
         </div>
     </div>

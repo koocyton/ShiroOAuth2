@@ -1,6 +1,6 @@
 package com.doopp.gauss.api.controller;
 
-import com.doopp.gauss.api.entity.RoomSession;
+import com.doopp.gauss.api.entity.RoomEntity;
 import com.doopp.gauss.api.entity.dto.RoomDTO;
 import com.doopp.gauss.api.utils.CommonUtils;
 import com.doopp.gauss.server.websocket.RoomSocketHandler;
@@ -30,9 +30,9 @@ public class RoomController {
     @ResponseBody
     @RequestMapping(value = "/room/list")
     public List<RoomDTO> demoMain() {
-        Map<Integer, RoomSession> roomMap = roomSocketHandler.getRooms();
+        Map<Integer, RoomEntity> roomMap = roomSocketHandler.getRooms();
         return new ArrayList<RoomDTO>() {{
-            for(RoomSession room : roomMap.values()) {
+            for(RoomEntity room : roomMap.values()) {
                 add(CommonUtils.modelMap(room, RoomDTO.class));
             }
         }};

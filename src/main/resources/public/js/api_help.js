@@ -96,13 +96,11 @@ let httpGet = function($http, url, successCall, errorCall, headers)
         headers : headers
     }).then(
         function successCallback(res) {
-            console.log("successCall : \n      >>> " + res);
             if (typeof successCall === "function") {
                 successCall(res);
             }
         },
         function errorCallback(res) {
-            console.log("errorCall : \n      >>> " + res);
             if (typeof errorCall === "function") {
                 errorCall(res);
             }
@@ -188,11 +186,6 @@ let ApiTestController = function($scope, $http) {
         receivedMessage : ""
     };
 
-    $scope.registerResponse = null;
-    $scope.loginResponse = null;
-    $scope.meInfoResponse = null;
-    $scope.roomListResponse = null;
-
     $scope.apiRequestMessage = [];
 
     $scope.scrollWindow=function(){
@@ -200,92 +193,64 @@ let ApiTestController = function($scope, $http) {
         _el.scrollTop = _el.scrollHeight;
     };
 
-    $scope.apiRegister = function() {
+    let onSuccess = function(res) {
         let ii = $scope.apiRequestMessage.length;
         $scope.apiRequestMessage[ii] = {
-            requestUrl : '[POST] /api/v1/register',
-            request : $scope.registerData,
+            url : '[' + res.config.method+ '] ' + res.config.url,
+            request : res.config.data,
+            response : res.data,
+            error : null
+        };
+        $scope.scrollWindow();
+    };
+
+    let onError = function(res) {
+        let ii = $scope.apiRequestMessage.length;
+        $scope.apiRequestMessage[ii] = {
+            url : '',
+            request : "",
+            response : '',
+            error : decodeURI(res)
+        };
+        $scope.scrollWindow();
+    };
+
+    let onSocketSuccess = function(e) {
+        let ii = $scope.apiRequestMessage.length;
+        $scope.apiRequestMessage[ii] = {
+            requestUrl : '[GET] websocket',
+            request : e.message,
             response : null,
             errorResponse : null
         };
-        formPost($http, '/api/v1/register', $scope.registerData,
-            function(res) {
-                $scope.apiRequestMessage[ii].response = res.data;
-                $scope.registerResponse = res.data;
-                $scope.scrollWindow();
-            },
-            function(res) {
-                $scope.apiRequestMessage[ii].errorResponse = res.data;
-                $scope.registerResponse = res.data;
-                $scope.scrollWindow();
-            });
+        $scope.scrollWindow();
+    };
+
+    let onSocketError = function(e) {
+        let ii = $scope.apiRequestMessage.length;
+        $scope.apiRequestMessage[ii] = {
+            url : '',
+            request : "",
+            response : '',
+            error : decodeURI(res)
+        };
+        $scope.scrollWindow();
+    };
+
+    $scope.apiRegister = function() {
+        formPost($http, '/api/v1/register', $scope.registerData, onSuccess, onError);
     };
 
     $scope.apiLogin = function() {
-        let ii = $scope.apiRequestMessage.length;
-        $scope.apiRequestMessage[ii] = {
-            requestUrl : '[POST] /api/v1/login',
-            request : $scope.registerData,
-            response : null,
-            errorResponse : null
-        };
-        formPost($http, '/api/v1/login', $scope.loginData,
-            function(res) {
-                $scope.apiRequestMessage[ii].response = res.data;
-                $scope.loginResponse = res.data;
-                $scope.scrollWindow();
-            },
-            function(res) {
-                $scope.apiRequestMessage[ii].errorResponse = res.data;
-                $scope.loginResponse = res.data;
-                $scope.scrollWindow();
-            });
+        formPost($http, '/api/v1/login', $scope.loginData, onSuccess, onError);
     };
 
-    $scope.meInfoAccessToken = "";
     $scope.apiMeInfo = function() {
-        let ii = $scope.apiRequestMessage.length;
-        $scope.apiRequestMessage[ii] = {
-            requestUrl : '[GET] /api/v1/user/me',
-            request : null,
-            response : null,
-            errorResponse : null
-        };
-        httpGet($http, '/api/v1/user/me',
-            function(res) {
-                $scope.apiRequestMessage[ii].response = res.data;
-                $scope.meInfoResponse = res.data;
-                $scope.scrollWindow();
-            },
-            function(res) {
-                $scope.apiRequestMessage[ii].response = res.data;
-                $scope.meInfoResponse = res.data;
-                $scope.scrollWindow();
-            },
-            {"access-token": $scope.meInfoAccessToken});
+        httpGet($http, '/api/v1/user/me', onSuccess, onError, {"access-token": $scope.meInfoAccessToken});
     };
 
-    $scope.roomListAccessToken = "";
     $scope.apiRoomList = function() {
-        let ii = $scope.apiRequestMessage.length;
-        $scope.apiRequestMessage[ii] = {
-            requestUrl : '[GET] /api/v1/room/list',
-            request : null,
-            response : null,
-            errorResponse : null
-        };
-        httpGet($http, '/api/v1/room/list',
-            function(res) {
-                $scope.apiRequestMessage[ii].response = res.data;
-                $scope.roomListResponse = res.data;
-                $scope.scrollWindow();
-            },
-            function(res) {
-                $scope.apiRequestMessage[ii].response = res.data;
-                $scope.roomListResponse = res.data;
-                $scope.scrollWindow();
-            },
-            {"access-token": $scope.roomListAccessToken});
+        httpGet($http, '/api/v1/room/list', onSuccess, onError, {"access-token": $scope.roomListAccessToken});
     };
 
     $scope.disconnectRoom = function(ii) {
@@ -301,22 +266,13 @@ let ApiTestController = function($scope, $http) {
         if (scopeRoom.ws===null) {
             //
             scopeRoom.ws = WebSocketService
-                .connect("/live-socket?access-token=" + scopeRoom.accessToken)
+                .connect("/room-socket?access-token=" + scopeRoom.accessToken)
                 .onClose(function (e) {
                     scopeRoom.socketStatus = "断开";
                     console.log("Disconnected: " + e.reason);
                     $scope.scrollWindow();
                 })
-                .onMessage(function (e) {
-                    let ii = $scope.apiRequestMessage.length;
-                    $scope.apiRequestMessage[ii] = {
-                        requestUrl : '[GET] websocket',
-                        request : e.message,
-                        response : null,
-                        errorResponse : null
-                    };
-                    $scope.scrollWindow();
-                });
+                .onMessage(onSocketSuccess);
             //
             if (scopeRoom.action==="createRoom") {
                 scopeRoom.ws.onOpen(function (e) {

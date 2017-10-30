@@ -12,7 +12,7 @@ import java.util.Map;
  *
  * Created by Henry on 2017/10/26.
  */
-public class RoomSession {
+public class RoomEntity {
 
     /**
      * 活动状态
@@ -47,7 +47,7 @@ public class RoomSession {
     @Getter private Map<Long, UserEntity> activityUsers = new HashMap<>();
 
     // 活动状态
-    @Getter private RoomSession.ActivityStatus activityStatus = RoomSession.ActivityStatus.Non;
+    @Getter private RoomEntity.ActivityStatus activityStatus = RoomEntity.ActivityStatus.Non;
 
     // 活动类型
     @Getter private String activityType = "";
@@ -95,19 +95,19 @@ public class RoomSession {
     // 重置
     public void resetActivity() {
         this.activityUsers = new HashMap<>();
-        this.activityStatus = RoomSession.ActivityStatus.Non;
+        this.activityStatus = RoomEntity.ActivityStatus.Non;
         this.activityType = "";
     }
 
     // 检查活动状态
-    public boolean checkActivityStatus(RoomSession.ActivityStatus activityStatus) {
-        if (activityStatus.equals(RoomSession.ActivityStatus.Non)) {
+    public boolean checkActivityStatus(RoomEntity.ActivityStatus activityStatus) {
+        if (activityStatus.equals(RoomEntity.ActivityStatus.Non)) {
             return true;
         }
-        else if (activityStatus.equals(RoomSession.ActivityStatus.Ready)) {
+        else if (activityStatus.equals(RoomEntity.ActivityStatus.Ready)) {
             return true;
         }
-        else if (activityStatus.equals(RoomSession.ActivityStatus.InActivity)) {
+        else if (activityStatus.equals(RoomEntity.ActivityStatus.InActivity)) {
             return true;
         }
         return false;
