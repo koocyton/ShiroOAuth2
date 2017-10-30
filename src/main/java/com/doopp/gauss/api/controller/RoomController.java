@@ -1,9 +1,9 @@
 package com.doopp.gauss.api.controller;
 
-import com.doopp.gauss.api.entity.RoomEntity;
+import com.doopp.gauss.api.entity.RoomSession;
 import com.doopp.gauss.api.entity.dto.RoomDTO;
 import com.doopp.gauss.api.utils.CommonUtils;
-import com.doopp.gauss.server.websocket.realm.ChatRoomRealm;
+import com.doopp.gauss.server.websocket.RoomSocketHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -22,7 +22,7 @@ import java.util.Map;
 public class RoomController {
 
     @Autowired
-    ChatRoomRealm chatRoomRule;
+    RoomSocketHandler roomSocketHandler;
 
     /*
      * 聊天 Demo 界面
@@ -30,9 +30,9 @@ public class RoomController {
     @ResponseBody
     @RequestMapping(value = "/room/list")
     public List<RoomDTO> demoMain() {
-        Map<Integer, RoomEntity> roomMap = chatRoomRule.getRoomSessions();
+        Map<Integer, RoomSession> roomMap = roomSocketHandler.getRooms();
         return new ArrayList<RoomDTO>() {{
-            for(RoomEntity room : roomMap.values()) {
+            for(RoomSession room : roomMap.values()) {
                 add(CommonUtils.modelMap(room, RoomDTO.class));
             }
         }};

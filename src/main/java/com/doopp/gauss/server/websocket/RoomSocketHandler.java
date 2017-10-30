@@ -27,14 +27,6 @@ public class RoomSocketHandler extends AbstractWebSocketHandler {
     @Override
     protected void handleTextMessage(WebSocketSession socketSession, TextMessage message) throws Exception {
         this.roomFilter(socketSession, message);
-        // 如果在房间，没参加活动
-        if () {
-
-        }
-        // 若果有参加活动
-        if () {
-
-        }
     }
 
     @Override
@@ -49,6 +41,13 @@ public class RoomSocketHandler extends AbstractWebSocketHandler {
             rooms.remove(roomId);
             sockets.remove(currentUser.getId());
         }
+    }
+
+    /*
+     * 获取房间列表
+     */
+    public Map<Integer, RoomSession> getRooms() {
+        return rooms;
     }
 
     private void roomFilter(WebSocketSession socketSession, TextMessage message) throws Exception {
