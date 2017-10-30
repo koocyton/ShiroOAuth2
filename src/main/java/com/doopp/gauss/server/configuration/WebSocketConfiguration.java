@@ -1,5 +1,6 @@
 package com.doopp.gauss.server.configuration;
 
+import com.doopp.gauss.server.websocket.RoomSocketHandler;
 import com.doopp.gauss.server.websocket.WebSocketHandshakeInterceptor;
 import com.doopp.gauss.server.websocket.LiveSocketHandler;
 import com.doopp.gauss.server.websocket.realm.ChatRoomRealm;
@@ -24,8 +25,12 @@ public class WebSocketConfiguration extends WebMvcConfigurerAdapter implements W
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
 
         registry.addHandler(liveSocketHandler(),"/live-socket")
-                .addInterceptors(new WebSocketHandshakeInterceptor())
-                .setAllowedOrigins("*");
+            .addInterceptors(new WebSocketHandshakeInterceptor())
+            .setAllowedOrigins("*");
+
+        registry.addHandler(roomSocketHandler(),"/room-socket")
+            .addInterceptors(new WebSocketHandshakeInterceptor())
+            .setAllowedOrigins("*");
 
         // registry.addHandler(roomSocketHandler(),"/live-socket/sockjs")
         //        .addInterceptors(new WebSocketHandshakeInterceptor())
@@ -36,6 +41,11 @@ public class WebSocketConfiguration extends WebMvcConfigurerAdapter implements W
     @Bean
     public LiveSocketHandler liveSocketHandler(){
         return new LiveSocketHandler();
+    }
+
+    @Bean
+    public RoomSocketHandler roomSocketHandler(){
+        return new RoomSocketHandler();
     }
 
     @Bean

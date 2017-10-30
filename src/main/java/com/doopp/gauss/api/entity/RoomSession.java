@@ -4,16 +4,15 @@ import com.google.common.base.Objects;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * 房间的实体
  *
- * Created by Henry on 2017/8/26.
+ * Created by Henry on 2017/10/26.
  */
-public class RoomEntity implements Serializable {
+public class RoomSession {
 
     /**
      * 活动状态
@@ -25,7 +24,9 @@ public class RoomEntity implements Serializable {
     }
 
     // 房间 ID
-    @Getter @Setter private int id;
+    @Getter
+    @Setter
+    private int id;
 
     // 房间有多少个座位，即最多坐多少人
     @Getter @Setter private int seatCount;
@@ -46,7 +47,7 @@ public class RoomEntity implements Serializable {
     @Getter private Map<Long, UserEntity> activityUsers = new HashMap<>();
 
     // 活动状态
-    @Getter private ActivityStatus activityStatus = ActivityStatus.Non;
+    @Getter private RoomSession.ActivityStatus activityStatus = RoomSession.ActivityStatus.Non;
 
     // 活动类型
     @Getter private String activityType = "";
@@ -94,19 +95,19 @@ public class RoomEntity implements Serializable {
     // 重置
     public void resetActivity() {
         this.activityUsers = new HashMap<>();
-        this.activityStatus = ActivityStatus.Non;
+        this.activityStatus = RoomSession.ActivityStatus.Non;
         this.activityType = "";
     }
 
     // 检查活动状态
-    public boolean checkActivityStatus(ActivityStatus activityStatus) {
-        if (activityStatus.equals(ActivityStatus.Non)) {
+    public boolean checkActivityStatus(RoomSession.ActivityStatus activityStatus) {
+        if (activityStatus.equals(RoomSession.ActivityStatus.Non)) {
             return true;
         }
-        else if (activityStatus.equals(ActivityStatus.Ready)) {
+        else if (activityStatus.equals(RoomSession.ActivityStatus.Ready)) {
             return true;
         }
-        else if (activityStatus.equals(ActivityStatus.InActivity)) {
+        else if (activityStatus.equals(RoomSession.ActivityStatus.InActivity)) {
             return true;
         }
         return false;
