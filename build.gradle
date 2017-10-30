@@ -71,7 +71,7 @@ dependencies {
     compile 'org.freemarker:freemarker:2.3.23'
 
     // Util
-    compile 'com.google.guava:guava:23.3-jre'
+    compile 'com.google.guava:guava:23.2-jre'
     compile 'org.modelmapper:modelmapper:1.1.1'
     compileOnly 'org.projectlombok:lombok:1.16.18'
 
