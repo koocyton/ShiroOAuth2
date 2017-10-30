@@ -48,8 +48,12 @@ public class LiveSocketHandler implements org.springframework.web.socket.WebSock
 
     @Override
     public void afterConnectionEstablished(WebSocketSession socketSession) throws Exception {
+        // init socket realm
+        socketSession.getAttributes().put("socketRealm", "");
+        // get current User
         UserEntity currentUser = (UserEntity) socketSession.getAttributes().get("currentUser");
         Long sessionId = currentUser.getId();
+        // close old socket session
         WebSocketSession oldSession = socketSessions.get(currentUser.getId());
         if (oldSession!=null && oldSession.isOpen()) {
             this.closeConnection(oldSession);
@@ -89,7 +93,7 @@ public class LiveSocketHandler implements org.springframework.web.socket.WebSock
             return;
         }
         // 检查当前连接的规则
-        String socketRule = (String) socketSession.getAttributes().get("socketRule");
+        String socketRealm = (String) socketSession.getAttributes().get("socketRealm");
         // 当前用户
         UserEntity currentUser = (UserEntity) socketSession.getAttributes().get("currentUser");
         // 房间 ID
@@ -97,7 +101,7 @@ public class LiveSocketHandler implements org.springframework.web.socket.WebSock
         // 房间
         RoomEntity roomSession = chatRoomRule.getRoomSession(roomId);
         // 规则转发
-        switch (socketRule) {
+        switch (socketRealm) {
             // 在聊天室
             case CHAT_ROOM_SOCKET_REALM :
                 // delegate
@@ -159,6 +163,21 @@ public class LiveSocketHandler implements org.springframework.web.socket.WebSock
                 socketSession.close();
             }
             catch(Exception e) {
+            }
+        }
+    }
+
+    /*
+     * 关闭用户连接
+     *
+     * @param socketSession 要手动关闭的 socket 连接
+     */
+    public void closeConnection (UserEntity user) {
+        Long userId = user.getId();
+        if (userId!=null) {
+            WebSocketSession socketSession = socketSessions.get(userId);
+            if (socketSession!=null) {
+                this.closeConnection(socketSession);
             }
         }
     }

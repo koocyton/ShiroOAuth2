@@ -26,8 +26,6 @@ public class WebSocketHandshakeInterceptor extends HttpSessionHandshakeIntercept
         UserEntity user = (UserEntity) serverRequest.getServletRequest().getAttribute("currentUser");
         // cache current user
         attributes.put("currentUser", user);
-        // init socket realm
-        attributes.put("socketRealm", "");
 
         return super.beforeHandshake(request, response, wsHandler, attributes);
     }

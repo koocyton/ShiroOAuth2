@@ -45,36 +45,100 @@ public class ChatRoomRealm {
 
             // 举行活动
             case "hold-activity" :
+                this.holdActivity(sendUser, roomSession, message);
                 break;
 
             // 参加活动
             case "join-activities" :
-                this.joinActivities(sendUser, roomSession, message);
+                this.joinActivity(sendUser, roomSession, message);
                 break;
 
             // 活动开始
             case "start-activities" :
+                this.startActivity(sendUser, roomSession, message);
                 break;
 
             // 房主踢人
             case "kick-out" :
+                this.kickOut(sendUser, roomSession, message);
                 break;
         }
     }
 
     /*
-     * 加入活动
+     * 举行活动
+     * 房主发起，给当前房间内所有人推送活动发起
      */
-    private void joinActivities(UserEntity sendUser, RoomEntity roomSession, JSONObject message) {
+    private void holdActivity(UserEntity sendUser, RoomEntity roomSession, JSONObject message) {
+        // 如果不是房主
+        if (!sendUser.getId().equals(roomSession.getOwner().getId())) {
+            return;
+        }
+        // 如果活动已经举行并且未结束，抛弃消息
+        if (false) {
+            return;
+        }
+        // 标记活动类型，标记活动人数
+        //  roomSession.setActivityType("werewolf");
+        // 举办活动发送到公共区域
+        this.publicTalk(sendUser, roomSession, message);
+    }
+
+    /*
+     * 加入活动
+     * 将用户标注为活动准备
+     */
+    private void joinActivity(UserEntity sendUser, RoomEntity roomSession, JSONObject message) {
+        // 如果是狼人杀
+        // todo
+        //if (activityType.eq) {
+
+        // }
         // 反馈，加入成功还是失败
         if (true) {
             liveSocketHandler.pushMessage(sendUser, message.toJSONString());
             // 加满人员后，自动开始活动，并给活动人员，标注新的 realm flag
             // todo ... 补充逻辑在此
+            // 如果加入的人员够数了，就提示开始活动
+            if () {
+                this.startActivity(sendUser, roomSession, message);
+            }
         }
         //
         else {
             liveSocketHandler.pushMessage(sendUser, message.toJSONString());
+        }
+    }
+
+    /*
+     * 活动开始
+     * 活动开始后，将参入的活动人员，标注一个 activity realm
+     */
+    private void startActivity(UserEntity sendUser, RoomEntity roomSession, JSONObject message) {
+    }
+
+
+    /*
+     * 房主踢人
+     */
+    private void kickOut(UserEntity sendUser, RoomEntity roomSession, JSONObject message) {
+        // 如果不是房主
+        if (!sendUser.getId().equals(roomSession.getOwner().getId())) {
+            return;
+        }
+        // 查询要踢谁
+        JSONObject actionData = message.getObject("data", JSONObject.class);
+        Long kickOutUserId = Long.valueOf(actionData.getString("kickOutUser"));
+        // 分别从前排或围观者中找到这个人，并踢掉
+        UserEntity kickOutUser1 = roomSession.getFrontUsers().get(kickOutUserId);
+        if (kickOutUser1!=null) {
+            liveSocketHandler.closeConnection(sendUser);
+        }
+        else {
+            UserEntity kickOutUser2 = roomSession.getWatchUsers().get(kickOutUserId);
+            if (kickOutUser2!=null) {
+                liveSocketHandler.closeConnection(sendUser);
+            }
         }
     }
 
