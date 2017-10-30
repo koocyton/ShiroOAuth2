@@ -17,6 +17,15 @@ import java.util.Map;
  */
 public class RoomEntity implements Serializable {
 
+    /**
+     * 活动类型
+     */
+    private enum ActivityStatus {
+        Non,
+        Ready,
+        InActivity
+    }
+
     private final Logger logger = LoggerFactory.getLogger(RoomEntity.class);
 
     // 房间 ID
@@ -36,6 +45,15 @@ public class RoomEntity implements Serializable {
 
     // 围观玩家
     @Getter private Map<Long, UserEntity> watchUsers = new HashMap<>();
+
+    // 报名参加活动的玩家 或 正在活动的玩家
+    @Getter private Map<Long, UserEntity> activityUsers = new HashMap<>();
+
+    // 活动状态
+    @Getter private ActivityStatus activityStatus = ActivityStatus.Non;
+
+    // 活动类型
+    @Getter private String activityType = "";
 
     // 加入到房主
     public void setOwner(UserEntity user) {
@@ -65,5 +83,25 @@ public class RoomEntity implements Serializable {
         }
         this.frontUsers.remove(user.getId());
         this.watchUsers.remove(user.getId());
+    }
+
+    // 加入活动
+    public void joinActivity(UserEntity user) {
+
+    }
+
+
+    // 检查活动状态
+    public boolean checkActivityStatus(ActivityStatus activityStatus) {
+        if (activityStatus.equals(ActivityStatus.Non)) {
+            return true;
+        }
+        else if (activityStatus.equals(ActivityStatus.Ready)) {
+            return true;
+        }
+        else if (activityStatus.equals(ActivityStatus.InActivity)) {
+            return true;
+        }
+        return false;
     }
 }
