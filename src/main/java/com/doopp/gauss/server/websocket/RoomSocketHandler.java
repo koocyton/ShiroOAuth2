@@ -1,6 +1,5 @@
 package com.doopp.gauss.server.websocket;
 
-import com.alibaba.druid.pool.vendor.NullExceptionSorter;
 import com.alibaba.fastjson.JSONObject;
 import com.doopp.gauss.api.entity.RoomEntity;
 import com.doopp.gauss.api.entity.UserEntity;
@@ -36,24 +35,18 @@ public class RoomSocketHandler extends AbstractWebSocketHandler {
     /*
      * 房间里说话
      */
-    private void publicTalk(UserEntity sendUser, RoomEntity roomSession, TextMessage message) throws IOException {
+    private void publicTalk(UserEntity sendUser, RoomEntity sessionRoom, TextMessage message) throws IOException {
 
-        Map<Long, UserEntity> frontUsers = roomSession.getFrontUsers();
+        Map<Long, UserEntity> frontUsers = sessionRoom.getFrontUsers();
         for(UserEntity frontUser : frontUsers.values()) {
-            if (!Objects.equals(sendUser.getId(), frontUser.getId())) {
-                sockets.get(frontUser.getId()).sendMessage(message);
-            }
+            sockets.get(frontUser.getId()).sendMessage(message);
         }
-        Map<Long, UserEntity> watchUsers = roomSession.getWatchUsers();
+        Map<Long, UserEntity> watchUsers = sessionRoom.getWatchUsers();
         for(UserEntity watchUser : watchUsers.values()) {
-            if (!Objects.equals(sendUser.getId(), watchUser.getId())) {
-                sockets.get(watchUser.getId()).sendMessage(message);
-            }
+            sockets.get(watchUser.getId()).sendMessage(message);
         }
-        UserEntity owner = roomSession.getOwner();
-        if (!Objects.equals(sendUser.getId(), owner.getId())) {
-            sockets.get(owner.getId()).sendMessage(message);
-        }
+        UserEntity owner = sessionRoom.getOwner();
+        sockets.get(owner.getId()).sendMessage(message);
     }
 
     // text message
@@ -61,23 +54,23 @@ public class RoomSocketHandler extends AbstractWebSocketHandler {
     protected void handleTextMessage(WebSocketSession socketSession, TextMessage message) throws Exception {
 
         // 在哪个房间
-        RoomEntity theRoom = this.getSessionRoom(socketSession);
+        RoomEntity sessionRoom = this.getSessionRoom(socketSession);
         // 是哪个用户
         UserEntity sendUser = this.getSessionUser(socketSession);
         // 参加什么活动
         RoomGame roomGame = this.getSessionGame(socketSession);
 
         // 如果没有进入房间
-        if (theRoom==null) {
+        if (sessionRoom==null) {
             this.openRoom(socketSession, message);
         }
         // 在房间内，且参加了游戏
         else if (roomGame!=null) {
-            roomGame.handleTextMessage(socketSession, theRoom, sendUser, message);
+            roomGame.handleTextMessage(socketSession, sessionRoom, sendUser, message);
         }
         // 在房间内没有参加活动
         else {
-            this.sendRoomMessage(sendUser, theRoom, message);
+            this.sendRoomMessage(sendUser, sessionRoom, message);
         }
     }
 
@@ -88,49 +81,101 @@ public class RoomSocketHandler extends AbstractWebSocketHandler {
     }
 
     // 房间内发送消息
-    private void sendRoomMessage(UserEntity sendUser, RoomEntity theRoom, TextMessage message) throws Exception {
+    private void sendRoomMessage(UserEntity sendUser, RoomEntity sessionRoom, TextMessage message) throws Exception {
 
         JSONObject objMessage = JSONObject.parseObject(message.getPayload());
         objMessage.put("sendUserId", sendUser.getId());
         objMessage.put("sendUserName", sendUser.getNickname());
 
         String action = objMessage.getString("action");
-        JSONObject data = objMessage.getJSONObject("data");
         switch(action) {
             // 召唤游戏参与者
             case "callPlay" :
-                this.callPlayer();
+                this.callPlayer(sendUser, sessionRoom, objMessage);
                 break;
             // 接受召唤参与游戏
             case "joinGame" :
-                this.joinGame();
+                this.joinGame(sendUser, sessionRoom, objMessage);
+                break;
+            // 不参加游戏
+            case "leaveGame" :
+                this.leaveGame(sendUser, sessionRoom, objMessage);
                 break;
             // 公频内说话
             default :
                 TextMessage sendMessage = new TextMessage(JSONObject.toJSONString(objMessage));
-                this.publicTalk(sendUser, theRoom, sendMessage);
+                this.publicTalk(sendUser, sessionRoom, sendMessage);
         }
     }
 
     /*
      * 房主征集游戏玩家
      */
-    private void callPlayer() {
-
+    private void callPlayer(UserEntity sendUser, RoomEntity sessionRoom, JSONObject objMessage) throws IOException {
+        // 没有游戏在进行中的房间，才能发召唤
+        RoomEntity.GameStatus gameStatus = sessionRoom.getGameStatus();
+        if (!gameStatus.equals(RoomEntity.GameStatus.Resting)) {
+            return;
+        }
+        // 房主才能征集游戏玩家
+        if (sendUser.getId().equals(sessionRoom.getOwner().getId())) {
+            sessionRoom.setGameStatus(RoomEntity.GameStatus.Calling);
+            TextMessage sendMessage = new TextMessage(JSONObject.toJSONString(objMessage));
+            this.publicTalk(sendUser, sessionRoom, sendMessage);
+        }
     }
 
     /*
      * 接受征集，成为游戏玩家
      */
-    private void joinGame() {
+    private void joinGame(UserEntity sendUser, RoomEntity sessionRoom, JSONObject objMessage) {
+        // 正在召唤的房间，才能加入
+        RoomEntity.GameStatus gameStatus = sessionRoom.getGameStatus();
+        if (!gameStatus.equals(RoomEntity.GameStatus.Calling)) {
+            return;
+        }
+        // 加入游戏
+        sessionRoom.joinGame(sendUser);
+        // 如果加入到上限，就开始游戏
+        if(sessionRoom.playerNumber()>=12) {
+            this.playGame(sessionRoom);
+        }
+    }
 
+    /*
+     * 离开游戏
+     */
+    private void leaveGame(UserEntity sendUser, RoomEntity sessionRoom, JSONObject objMessage) {
+        // 正在召唤的房间，才能操作
+        RoomEntity.GameStatus gameStatus = sessionRoom.getGameStatus();
+        if (!gameStatus.equals(RoomEntity.GameStatus.Calling)) {
+            return;
+        }
+        // 离开游戏
+        sessionRoom.leaveGame(sendUser);
     }
 
     /*
      * 玩家征集完毕，开始游戏
      */
-    private void playGame() {
+    private void playGame(RoomEntity sessionRoom) {
+        for(UserEntity gameUser : sessionRoom.getGameUsers().values()) {
+            TextMessage textMessage = new TextMessage("{action:\"playGame\", gameType:\"Werewolf\"}");
+            try {
+                sockets.get(gameUser.getId()).sendMessage(textMessage);
+            }
+            catch(IOException e) {
+                continue;
+            }
+        }
+        sessionRoom.setGameStatus(RoomEntity.GameStatus.Playing);
+    }
 
+    /*
+     * 游戏结束
+     */
+    private void gameOver(RoomEntity sessionRoom) {
+        sessionRoom.setGameStatus(RoomEntity.GameStatus.Resting);
     }
 
     /*

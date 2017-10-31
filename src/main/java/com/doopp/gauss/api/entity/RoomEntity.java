@@ -15,7 +15,7 @@ import java.util.Map;
 public class RoomEntity {
 
     // 游戏状态
-    private enum GameStatus {
+    public enum GameStatus {
         Resting,
         Calling,
         Playing
@@ -45,7 +45,7 @@ public class RoomEntity {
     @Getter private Map<Long, UserEntity> gameUsers = new HashMap<>();
 
     // 游戏状态
-    @Getter private RoomEntity.GameStatus gameStatus = GameStatus.Resting;
+    @Getter @Setter private RoomEntity.GameStatus gameStatus = GameStatus.Resting;
 
     // 游戏类型
     @Getter private String gameType = "";
@@ -88,6 +88,11 @@ public class RoomEntity {
     // 加入活动
     public void joinGame(UserEntity user) {
         this.gameUsers.put(user.getId(), user);
+    }
+
+    // 离开活动
+    public void leaveGame(UserEntity user) {
+        this.gameUsers.remove(user.getId());
     }
 
     // 重置
