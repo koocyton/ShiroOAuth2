@@ -36,28 +36,23 @@ public class RoomSocketHandler extends AbstractWebSocketHandler {
     /*
      * 房间里说话
      */
-    public void publicTalk(UserEntity sendUser, RoomEntity roomSession, TextMessage message) throws IOException {
-
-        JSONObject objMessage = JSONObject.parseObject(message.getPayload());
-        objMessage.put("sendUserId", sendUser.getId());
-        objMessage.put("sendUserName", sendUser.getNickname());
-        TextMessage sendMessage = new TextMessage(JSONObject.toJSONString(objMessage));
+    private void publicTalk(UserEntity sendUser, RoomEntity roomSession, TextMessage message) throws IOException {
 
         Map<Long, UserEntity> frontUsers = roomSession.getFrontUsers();
         for(UserEntity frontUser : frontUsers.values()) {
             if (!Objects.equals(sendUser.getId(), frontUser.getId())) {
-                sockets.get(frontUser.getId()).sendMessage(sendMessage);
+                sockets.get(frontUser.getId()).sendMessage(message);
             }
         }
         Map<Long, UserEntity> watchUsers = roomSession.getWatchUsers();
         for(UserEntity watchUser : watchUsers.values()) {
             if (!Objects.equals(sendUser.getId(), watchUser.getId())) {
-                sockets.get(watchUser.getId()).sendMessage(sendMessage);
+                sockets.get(watchUser.getId()).sendMessage(message);
             }
         }
         UserEntity owner = roomSession.getOwner();
         if (!Objects.equals(sendUser.getId(), owner.getId())) {
-            sockets.get(owner.getId()).sendMessage(sendMessage);
+            sockets.get(owner.getId()).sendMessage(message);
         }
     }
 
@@ -82,7 +77,7 @@ public class RoomSocketHandler extends AbstractWebSocketHandler {
         }
         // 在房间内没有参加活动
         else {
-           this.publicTalk(sendUser, theRoom, message);
+            this.sendRoomMessage(sendUser, theRoom, message);
         }
     }
 
@@ -90,6 +85,31 @@ public class RoomSocketHandler extends AbstractWebSocketHandler {
     public void afterConnectionClosed(WebSocketSession socketSession, CloseStatus status) throws Exception {
         // 关闭连接时，离开房间
         this.leaveRoom(socketSession);
+    }
+
+    // 房间内发送消息
+    private void sendRoomMessage(UserEntity sendUser, RoomEntity theRoom, TextMessage message) throws Exception {
+
+        JSONObject objMessage = JSONObject.parseObject(message.getPayload());
+        objMessage.put("sendUserId", sendUser.getId());
+        objMessage.put("sendUserName", sendUser.getNickname());
+
+        String action = objMessage.getString("action");
+        JSONObject data = objMessage.getJSONObject("data");
+        switch(action) {
+            // 召唤游戏参与者
+            case "callPlay" :
+                this.callPlayer();
+                break;
+            // 接受召唤参与游戏
+            case "joinGame" :
+                this.joinGame();
+                break;
+            // 公频内说话
+            default :
+                TextMessage sendMessage = new TextMessage(JSONObject.toJSONString(objMessage));
+                this.publicTalk(sendUser, theRoom, sendMessage);
+        }
     }
 
     /*
