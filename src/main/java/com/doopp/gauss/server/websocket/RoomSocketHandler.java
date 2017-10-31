@@ -21,7 +21,7 @@ import java.util.Map;
 public class RoomSocketHandler extends AbstractWebSocketHandler {
 
     // logger
-    private final Logger logger = LoggerFactory.getLogger(RoomSocketHandler.class);
+    private final static Logger logger = LoggerFactory.getLogger(RoomSocketHandler.class);
 
     // socket`s session
     private static final Map<Long, WebSocketSession> sockets = new HashMap<>();
@@ -101,12 +101,12 @@ public class RoomSocketHandler extends AbstractWebSocketHandler {
         // 如果在房间内，并且 action 正常
         else {
             // 是否有参加活动
-            UserEntity joinGameUser = sessionRoom.getGameUsers().get(sessionUser.getId());
+            UserEntity joinGameMe = sessionRoom.getGameUsers().get(sessionUser.getId());
             // 活动状态
             RoomEntity.GameStatus gameStatus = sessionRoom.getGameStatus();
 
             // 如果活动正在进行，并且用户加入了游戏
-            if (gameStatus.equals(RoomEntity.GameStatus.Playing) && joinGameUser!=null) {
+            if (gameStatus.equals(RoomEntity.GameStatus.Playing) && joinGameMe!=null) {
                 // 狼人杀
                 if (sessionRoom.getGameType().equals(RoomEntity.GameTypes.WereWolf)) {
                     werewolfGame.handleTextMessage(socketSession, sessionRoom, sessionUser, messageObject);

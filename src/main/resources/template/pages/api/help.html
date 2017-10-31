@@ -19,8 +19,8 @@
 
 <div class="body-content" ng-controller="ApiTestController">
     <div class="body-content-left scroll-container opacity-92">
-        <#include "/api/tpl_account.html" />
         <#include "/api/tpl_room.html" />
+        <#include "/api/tpl_account.html" />
     </div>
     <div class="body-content-right scroll-container opacity-92" id="request_history" style="padding:20px;">
         <div class="alert alert-success" ng-repeat="p in apiRequestMessage track by $index">

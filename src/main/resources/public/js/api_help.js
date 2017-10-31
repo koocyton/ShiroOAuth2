@@ -156,8 +156,8 @@ let ApiTestController = function($scope, $http) {
     $scope.room1 = {
         action : "createRoom",
         accessToken : "",
-        createMessage : {action:"createRoom", data:{roomName:"美丽的小屋1"}},
-        joinMessage : {action:"joinRoom", data:{roomId:"54613"}},
+        createMessage : {action:"createRoom", roomName:"美丽的小屋1"},
+        joinMessage : {action:"joinRoom", roomId:"54613"},
         ws : null,
         socketStatus : "未连接",
         sendMessage : "",
@@ -167,8 +167,8 @@ let ApiTestController = function($scope, $http) {
     $scope.room2 = {
         action : "joinRoom",
         accessToken : "",
-        createMessage : {action:"createRoom", data:{roomName:"美丽的小屋2"}},
-        joinMessage : {action:"joinRoom", data:{roomId:"54614"}},
+        createMessage : {action:"createRoom", roomName:"美丽的小屋2"},
+        joinMessage : {action:"joinRoom", roomId:"54614"},
         ws : null,
         socketStatus : "未连接",
         sendMessage : "",
@@ -178,8 +178,8 @@ let ApiTestController = function($scope, $http) {
     $scope.room3 = {
         action : "joinRoom",
         accessToken : "",
-        createMessage : {action:"createRoom", data:{roomName:"美丽的小屋3"}},
-        joinMessage : {action:"joinRoom", data:{roomId:"54615"}},
+        createMessage : {action:"createRoom", roomName:"美丽的小屋3"},
+        joinMessage : {action:"joinRoom", roomId:"54615"},
         ws : null,
         socketStatus : "未连接",
         sendMessage : "",
@@ -188,9 +188,11 @@ let ApiTestController = function($scope, $http) {
 
     $scope.apiRequestMessage = [];
 
-    $scope.scrollWindow=function(){
-        let _el = document.getElementById('request_history');
-        _el.scrollTop = _el.scrollHeight;
+    $scope.scrollWindow=function() {
+        setTimeout(function() {
+            let _el = document.getElementById('request_history');
+            _el.scrollTop = _el.scrollHeight;
+        }, 1);
     };
 
     let onSuccess = function(res) {
@@ -245,10 +247,12 @@ let ApiTestController = function($scope, $http) {
         formPost($http, '/api/v1/login', $scope.loginData, onSuccess, onError);
     };
 
+    $scope.meInfoAccessToken = "";
     $scope.apiMeInfo = function() {
         httpGet($http, '/api/v1/user/me', onSuccess, onError, {"access-token": $scope.meInfoAccessToken});
     };
 
+    $scope.roomListAccessToken = "";
     $scope.apiRoomList = function() {
         httpGet($http, '/api/v1/room/list', onSuccess, onError, {"access-token": $scope.roomListAccessToken});
     };
