@@ -14,13 +14,11 @@ import java.util.Map;
  */
 public class RoomEntity {
 
-    /**
-     * 活动状态
-     */
-    private enum ActivityStatus {
-        Non,
-        Ready,
-        InActivity
+    // 游戏状态
+    private enum GameStatus {
+        Resting,
+        Calling,
+        Playing
     }
 
     // 房间 ID
@@ -43,14 +41,14 @@ public class RoomEntity {
     // 围观玩家
     @Getter private Map<Long, UserEntity> watchUsers = new HashMap<>();
 
-    // 报名参加活动的玩家 或 正在活动的玩家
-    @Getter private Map<Long, UserEntity> activityUsers = new HashMap<>();
+    // 游戏玩家
+    @Getter private Map<Long, UserEntity> gameUsers = new HashMap<>();
 
-    // 活动状态
-    @Getter private RoomEntity.ActivityStatus activityStatus = RoomEntity.ActivityStatus.Non;
+    // 游戏状态
+    @Getter private RoomEntity.GameStatus gameStatus = GameStatus.Resting;
 
-    // 活动类型
-    @Getter private String activityType = "";
+    // 游戏类型
+    @Getter private String gameType = "";
 
     // 加入到房主
     public void setOwner(UserEntity user) {
@@ -83,33 +81,19 @@ public class RoomEntity {
     }
 
     // 参加活动的人数
-    public int getActivityNumber() {
-        return this.activityUsers.size();
+    public int playerNumber() {
+        return this.gameUsers.size();
     }
 
     // 加入活动
-    public void joinActivity(UserEntity user) {
-        this.activityUsers.put(user.getId(), user);
+    public void joinGame(UserEntity user) {
+        this.gameUsers.put(user.getId(), user);
     }
 
     // 重置
-    public void resetActivity() {
-        this.activityUsers = new HashMap<>();
-        this.activityStatus = RoomEntity.ActivityStatus.Non;
-        this.activityType = "";
-    }
-
-    // 检查活动状态
-    public boolean checkActivityStatus(RoomEntity.ActivityStatus activityStatus) {
-        if (activityStatus.equals(RoomEntity.ActivityStatus.Non)) {
-            return true;
-        }
-        else if (activityStatus.equals(RoomEntity.ActivityStatus.Ready)) {
-            return true;
-        }
-        else if (activityStatus.equals(RoomEntity.ActivityStatus.InActivity)) {
-            return true;
-        }
-        return false;
+    public void resetGame() {
+        this.gameUsers = new HashMap<>();
+        this.gameStatus = GameStatus.Resting;
+        this.gameType = "";
     }
 }

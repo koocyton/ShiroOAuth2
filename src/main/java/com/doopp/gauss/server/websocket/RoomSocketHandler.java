@@ -4,6 +4,7 @@ import com.alibaba.druid.pool.vendor.NullExceptionSorter;
 import com.alibaba.fastjson.JSONObject;
 import com.doopp.gauss.api.entity.RoomEntity;
 import com.doopp.gauss.api.entity.UserEntity;
+import com.doopp.gauss.api.game.RoomGame;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -63,13 +64,25 @@ public class RoomSocketHandler extends AbstractWebSocketHandler {
     // text message
     @Override
     protected void handleTextMessage(WebSocketSession socketSession, TextMessage message) throws Exception {
-        RoomEntity sessionRoom = this.getSessionRoom(socketSession);
-        UserEntity sessionUser = this.getSessionUser(socketSession);
-        if (sessionRoom==null) {
+
+        // 在哪个房间
+        RoomEntity theRoom = this.getSessionRoom(socketSession);
+        // 是哪个用户
+        UserEntity sendUser = this.getSessionUser(socketSession);
+        // 参加什么活动
+        RoomGame roomGame = this.getSessionGame(socketSession);
+
+        // 如果没有进入房间
+        if (theRoom==null) {
             this.openRoom(socketSession, message);
         }
+        // 在房间内，且参加了游戏
+        else if (roomGame!=null) {
+            roomGame.handleTextMessage(socketSession, theRoom, sendUser, message);
+        }
+        // 在房间内没有参加活动
         else {
-           this.publicTalk(sessionUser, sessionRoom, message);
+           this.publicTalk(sendUser, theRoom, message);
         }
     }
 
@@ -77,6 +90,27 @@ public class RoomSocketHandler extends AbstractWebSocketHandler {
     public void afterConnectionClosed(WebSocketSession socketSession, CloseStatus status) throws Exception {
         // 关闭连接时，离开房间
         this.leaveRoom(socketSession);
+    }
+
+    /*
+     * 房主征集游戏玩家
+     */
+    private void callPlayer() {
+
+    }
+
+    /*
+     * 接受征集，成为游戏玩家
+     */
+    private void joinGame() {
+
+    }
+
+    /*
+     * 玩家征集完毕，开始游戏
+     */
+    private void playGame() {
+
     }
 
     /*
@@ -95,6 +129,13 @@ public class RoomSocketHandler extends AbstractWebSocketHandler {
      */
     private UserEntity getSessionUser(WebSocketSession socketSession) {
         return (UserEntity) socketSession.getAttributes().get("currentUser");
+    }
+
+    /*
+     * 获取活动
+     */
+    private RoomGame getSessionGame(WebSocketSession socketSession) {
+        return (RoomGame) socketSession.getAttributes().get("roomGame");
     }
 
     /*
