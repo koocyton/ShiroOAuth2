@@ -17,7 +17,7 @@
                     <br>
                     <b>send json : </b> <code>{action:"createRoom", data:{roomName:#roomName}}</code>
                 </div>
-                <form ng-submit="connectRoom(1)">
+                <form ng-submit="connectRoom('room1')">
                     <div class="form-group">
                         <input type="text" class="form-control" autocomplete="off"
                                placeholder="Enter Access Token" ng-model="room1.accessToken">
@@ -31,7 +31,7 @@
                     </div>
                 </form>
 
-                <form ng-submit="disconnectRoom(1)">
+                <form ng-submit="disconnectRoom('room1')">
                     <div class="form-group">
                         <button type="submit" class="btn btn-success">退出房间</button>
                         <span>{{ socketStatus }}</span>
@@ -45,7 +45,7 @@
                     <br>
                     <b>send json : </b> <code>{action:"joinRoom", data:{roomId:#roomId}}</code>
                 </div>
-                <form ng-submit="connectRoom(2)">
+                <form ng-submit="connectRoom('room2')">
                     <div class="form-group">
                         <input type="text" class="form-control" autocomplete="off"
                                placeholder="Enter Access Token" ng-model="room2.accessToken">
@@ -59,7 +59,7 @@
                     </div>
                 </form>
 
-                <form ng-submit="disconnectRoom(2)">
+                <form ng-submit="disconnectRoom('room2')">
                     <div class="form-group">
                         <button type="submit" class="btn btn-success">退出房间</button>
                         <span>{{ socketStatus }}</span>
@@ -73,7 +73,7 @@
                     <br>
                     <b>send json : </b> <code>{action:"joinRoom", data:{roomId:#roomId}}</code>
                 </div>
-                <form ng-submit="connectRoom(3)">
+                <form ng-submit="connectRoom('room3')">
                     <div class="form-group">
                         <input type="text" class="form-control" autocomplete="off"
                                placeholder="Enter Access Token" ng-model="room3.accessToken">
@@ -87,7 +87,7 @@
                     </div>
                 </form>
 
-                <form ng-submit="disconnectRoom(3)">
+                <form ng-submit="disconnectRoom('room3')">
                     <div class="form-group">
                         <button type="submit" class="btn btn-success">退出房间</button>
                         <span>{{ socketStatus }}</span>

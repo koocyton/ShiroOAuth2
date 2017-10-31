@@ -253,16 +253,23 @@ let ApiTestController = function($scope, $http) {
         httpGet($http, '/api/v1/room/list', onSuccess, onError, {"access-token": $scope.roomListAccessToken});
     };
 
-    $scope.disconnectRoom = function(ii) {
-        let scopeRoom = eval("$scope.room" + ii);
+    $scope.disconnectRoom = function(roomName) {
+        let scopeRoom = eval("$scope." + roomName);
         if (scopeRoom.ws!==null) {
             scopeRoom.ws.close();
             scopeRoom.ws = null;
         }
     };
 
-    $scope.connectRoom = function(ii) {
-        let scopeRoom = eval("$scope.room" + ii);
+    $scope.sendMessage = function(roomName, message) {
+        let scopeRoom = eval("$scope." + roomName);
+        if (scopeRoom.ws!==null) {
+            scopeRoom.ws.send(message);
+        }
+    };
+
+    $scope.connectRoom = function(roomName) {
+        let scopeRoom = eval("$scope." + roomName);
         if (scopeRoom.ws===null) {
             //
             scopeRoom.ws = WebSocketService
