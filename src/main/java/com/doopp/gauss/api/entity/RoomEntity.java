@@ -21,6 +21,13 @@ public class RoomEntity {
         Playing
     }
 
+    // 游戏类型
+    public enum GameTypes {
+        WereWolf,
+        BattleRoyale,
+        GuessDraw
+    }
+
     // 房间 ID
     @Getter
     @Setter
@@ -48,7 +55,7 @@ public class RoomEntity {
     @Getter @Setter private RoomEntity.GameStatus gameStatus = GameStatus.Resting;
 
     // 游戏类型
-    @Getter private String gameType = "";
+    @Getter @Setter private RoomEntity.GameTypes gameType = null;
 
     // 加入到房主
     public void setOwner(UserEntity user) {
@@ -99,6 +106,6 @@ public class RoomEntity {
     public void resetGame() {
         this.gameUsers = new HashMap<>();
         this.gameStatus = GameStatus.Resting;
-        this.gameType = "";
+        this.gameType = null;
     }
 }

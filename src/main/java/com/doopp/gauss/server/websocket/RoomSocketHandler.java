@@ -4,6 +4,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.doopp.gauss.api.entity.RoomEntity;
 import com.doopp.gauss.api.entity.UserEntity;
 import com.doopp.gauss.api.game.RoomGame;
+import com.doopp.gauss.api.game.impl.WerewolfGame;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -12,7 +14,6 @@ import org.springframework.web.socket.handler.AbstractWebSocketHandler;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 public class RoomSocketHandler extends AbstractWebSocketHandler {
 
@@ -24,6 +25,10 @@ public class RoomSocketHandler extends AbstractWebSocketHandler {
 
     // room id
     private static int lastRoomId = 54612;
+
+    // Were wolf
+    @Autowired
+    private WerewolfGame werewolfGame;
 
     /*
      * 获取房间列表
@@ -57,16 +62,27 @@ public class RoomSocketHandler extends AbstractWebSocketHandler {
         RoomEntity sessionRoom = this.getSessionRoom(socketSession);
         // 是哪个用户
         UserEntity sendUser = this.getSessionUser(socketSession);
-        // 参加什么活动
-        RoomGame roomGame = this.getSessionGame(socketSession);
+        // 是否有参加活动
+        UserEntity checkGameUser = sessionRoom.getGameUsers().get(sendUser.getId());
 
         // 如果没有进入房间
         if (sessionRoom==null) {
             this.openRoom(socketSession, message);
         }
         // 在房间内，且参加了游戏
-        else if (roomGame!=null) {
-            roomGame.handleTextMessage(socketSession, sessionRoom, sendUser, message);
+        else if (checkGameUser!=null) {
+            // 狼人杀
+            if (sessionRoom.getGameType().equals(RoomEntity.GameTypes.WereWolf)) {
+                werewolfGame.handleTextMessage(socketSession, sessionRoom, sendUser, message);
+            }
+            // 大逃杀
+            else if (sessionRoom.getGameType().equals(RoomEntity.GameTypes.BattleRoyale)) {
+
+            }
+            // 你画我猜
+            else if (sessionRoom.getGameType().equals(RoomEntity.GameTypes.GuessDraw)) {
+
+            }
         }
         // 在房间内没有参加活动
         else {
@@ -120,6 +136,8 @@ public class RoomSocketHandler extends AbstractWebSocketHandler {
         // 房主才能征集游戏玩家
         if (sendUser.getId().equals(sessionRoom.getOwner().getId())) {
             sessionRoom.setGameStatus(RoomEntity.GameStatus.Calling);
+            // todo 暂时用狼人杀来做例子
+            sessionRoom.setGameType(RoomEntity.GameTypes.WereWolf);
             TextMessage sendMessage = new TextMessage(JSONObject.toJSONString(objMessage));
             this.publicTalk(sendUser, sessionRoom, sendMessage);
         }
@@ -200,7 +218,7 @@ public class RoomSocketHandler extends AbstractWebSocketHandler {
      * 获取活动
      */
     private RoomGame getSessionGame(WebSocketSession socketSession) {
-        return (RoomGame) socketSession.getAttributes().get("roomGame");
+        return (WerewolfGame) socketSession.getAttributes().get("roomGame");
     }
 
     /*
