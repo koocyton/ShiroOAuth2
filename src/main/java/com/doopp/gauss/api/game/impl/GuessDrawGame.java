@@ -7,8 +7,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
-@Service("werewolfGame")
-public class WerewolfGame implements RoomGame {
+@Service("guessDrawGame")
+public class GuessDrawGame implements RoomGame {
 
     @Override
     public void handleTextMessage(WebSocketSession socketSession, RoomEntity theRoom, UserEntity sendUser, TextMessage message) {
