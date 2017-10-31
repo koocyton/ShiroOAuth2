@@ -61,9 +61,9 @@ public class RoomSocketHandler extends AbstractWebSocketHandler {
         // 在哪个房间
         RoomEntity sessionRoom = this.getSessionRoom(socketSession);
         // 是哪个用户
-        UserEntity sendUser = this.getSessionUser(socketSession);
+        UserEntity sessionUser = this.getSessionUser(socketSession);
         // 是否有参加活动
-        UserEntity checkGameUser = sessionRoom.getGameUsers().get(sendUser.getId());
+        UserEntity checkGameUser = sessionRoom.getGameUsers().get(sessionUser.getId());
 
         // 如果没有进入房间
         if (sessionRoom==null) {
@@ -73,7 +73,7 @@ public class RoomSocketHandler extends AbstractWebSocketHandler {
         else if (checkGameUser!=null) {
             // 狼人杀
             if (sessionRoom.getGameType().equals(RoomEntity.GameTypes.WereWolf)) {
-                werewolfGame.handleTextMessage(socketSession, sessionRoom, sendUser, message);
+                werewolfGame.handleTextMessage(socketSession, sessionRoom, sessionUser, message);
             }
             // 大逃杀
             else if (sessionRoom.getGameType().equals(RoomEntity.GameTypes.BattleRoyale)) {
@@ -86,7 +86,7 @@ public class RoomSocketHandler extends AbstractWebSocketHandler {
         }
         // 在房间内没有参加活动
         else {
-            this.sendRoomMessage(sendUser, sessionRoom, message);
+            this.sendRoomMessage(sessionUser, sessionRoom, message);
         }
     }
 
@@ -201,24 +201,17 @@ public class RoomSocketHandler extends AbstractWebSocketHandler {
      */
     private RoomEntity getSessionRoom(WebSocketSession socketSession) {
         Object roomId = socketSession.getAttributes().get("roomId");
-        if (socketSession.getAttributes().get("roomId")==null) {
+        if (roomId==null) {
             return null;
         }
-        return rooms.get(roomId);
+        return rooms.get(Integer.valueOf(roomId.toString()));
     }
 
     /*
      * 获取用户
      */
     private UserEntity getSessionUser(WebSocketSession socketSession) {
-        return (UserEntity) socketSession.getAttributes().get("currentUser");
-    }
-
-    /*
-     * 获取活动
-     */
-    private RoomGame getSessionGame(WebSocketSession socketSession) {
-        return (WerewolfGame) socketSession.getAttributes().get("roomGame");
+        return (UserEntity) socketSession.getAttributes().get("sessionUser");
     }
 
     /*
@@ -232,7 +225,7 @@ public class RoomSocketHandler extends AbstractWebSocketHandler {
         // get action data
         JSONObject messageData = ObjMessage.getJSONObject("data");
         // user
-        UserEntity sendUser = (UserEntity) socketSession.getAttributes().get("currentUser");
+        UserEntity sendUser = (UserEntity) socketSession.getAttributes().get("sessionUser");
         // 创建房间
         if (messageAction.equals("createRoom")) {
             // 房间名

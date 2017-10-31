@@ -97,7 +97,7 @@ public class SessionFilter extends OncePerRequestFilter {
                     UserEntity user = accountService.getUserByToken(accessToken);
                     // 如果能找到用户
                     if (user!=null) {
-                        request.setAttribute("currentUser", user);
+                        request.setAttribute("sessionUser", user);
                         filterChain.doFilter(request, response);
                         return;
                     }

@@ -62,26 +62,26 @@ public class AccountController {
     /**
      * 查询当前用户信息
      *
-     * @param currentUser 当前用户
+     * @param sessionUser 当前用户
      * @return 返回用户信息
      */
     @ResponseBody
     @RequestMapping(value = "/user/me", method = RequestMethod.GET)
-    public UserMeDTO getMe(@RequestAttribute("currentUser") UserEntity currentUser) {
+    public UserMeDTO getMe(@RequestAttribute("sessionUser") UserEntity sessionUser) {
         // GET user
-        return CommonUtils.modelMap(currentUser, UserMeDTO.class);
+        return CommonUtils.modelMap(sessionUser, UserMeDTO.class);
     }
 
     /**
      * 更新当前用户信息
      *
-     * @param currentUser 当前用户
+     * @param sessionUser 当前用户
      * @return 返回用户信息
      */
     @ResponseBody
     @RequestMapping(value = "/user/me", method = RequestMethod.PUT)
-    public UserMeDTO updateMe(@RequestAttribute("currentUser") UserEntity currentUser) {
+    public UserMeDTO updateMe(@RequestAttribute("sessionUser") UserEntity sessionUser) {
         // GET user
-        return CommonUtils.modelMap(currentUser, UserMeDTO.class);
+        return CommonUtils.modelMap(sessionUser, UserMeDTO.class);
     }
 }
