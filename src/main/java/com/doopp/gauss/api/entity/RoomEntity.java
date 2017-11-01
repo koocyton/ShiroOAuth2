@@ -42,9 +42,6 @@ public class RoomEntity {
     // 房主
     @Getter private UserEntity owner;
 
-    // 前排玩家
-    @Getter private Map<Long, UserEntity> frontUsers = new HashMap<>();
-
     // 围观玩家
     @Getter private Map<Long, UserEntity> watchUsers = new HashMap<>();
 
@@ -60,21 +57,13 @@ public class RoomEntity {
     // 加入到房主
     public void setOwner(UserEntity user) {
         if (this.getOwner()==null) {
-            this.frontUsers.remove(user.getId());
             this.watchUsers.remove(user.getId());
             this.owner = user;
         }
     }
 
-    // 加入到前排
-    public void joinFront(UserEntity user) {
-        this.frontUsers.put(user.getId(), user);
-        this.watchUsers.remove(user.getId());
-    }
-
     // 加入到围观玩家
     public void joinWatch(UserEntity user) {
-        this.frontUsers.remove(user.getId());
         this.watchUsers.put(user.getId(), user);
     }
 
@@ -83,7 +72,6 @@ public class RoomEntity {
         if (this.owner!=null && Objects.equal(this.owner.getId(), user.getId())) {
             this.owner = null;
         }
-        this.frontUsers.remove(user.getId());
         this.watchUsers.remove(user.getId());
     }
 

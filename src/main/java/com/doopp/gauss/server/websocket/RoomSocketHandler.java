@@ -53,10 +53,6 @@ public class RoomSocketHandler extends AbstractWebSocketHandler {
     private void roomPublicTalk(RoomEntity sessionRoom, JSONObject messageObject) throws IOException {
         // to json
         TextMessage message = new TextMessage(messageObject.toJSONString());
-        // send to front user
-        for(UserEntity frontUser : sessionRoom.getFrontUsers().values()) {
-            sockets.get(frontUser.getId()).sendMessage(message);
-        }
         // send to watch user
         for(UserEntity watchUser : sessionRoom.getWatchUsers().values()) {
             sockets.get(watchUser.getId()).sendMessage(message);
@@ -77,7 +73,6 @@ public class RoomSocketHandler extends AbstractWebSocketHandler {
     // text message
     @Override
     protected void handleTextMessage(WebSocketSession socketSession, TextMessage message) throws Exception {
-
         // 在哪个房间
         RoomEntity sessionRoom = this.getSessionRoom(socketSession);
         // 是哪个用户
@@ -227,7 +222,7 @@ public class RoomSocketHandler extends AbstractWebSocketHandler {
         UserEntity sessionUser = this.getSessionUser(socketSession);
         if (sessionRoom!=null) {
             sessionRoom.userLeave(sessionUser);
-            if (sessionRoom.getWatchUsers().size()==0 && sessionRoom.getFrontUsers().size()==0 && sessionRoom.getOwner()==null) {
+            if (sessionRoom.getWatchUsers().size()==0 && sessionRoom.getOwner()==null) {
                 rooms.remove(sessionRoom.getId());
             }
         }
