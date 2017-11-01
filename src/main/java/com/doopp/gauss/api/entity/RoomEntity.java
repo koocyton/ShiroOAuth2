@@ -34,7 +34,7 @@ public class RoomEntity {
     private int id;
 
     // 房间有多少个座位，即最多坐多少人
-    @Getter @Setter private int seatCount;
+    @Getter @Setter private int seatCount=100;
 
     // 房间名
     @Getter @Setter private String name;
@@ -81,6 +81,7 @@ public class RoomEntity {
             this.owner = null;
         }
         this.watchUsers.remove(user.getId());
+        this.gameUsers.remove(user.getId());
     }
 
     // 参加活动的人数

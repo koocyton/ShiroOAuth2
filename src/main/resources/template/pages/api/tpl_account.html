@@ -31,13 +31,6 @@
                     </div>
                 </form>
 
-                <form ng-submit="disconnectRoom('room1');">
-                    <div class="form-group">
-                        <button type="submit" class="btn btn-success">退出房间</button>
-                        <span>{{ socketStatus }}</span>
-                    </div>
-                </form>
-
                 <form ng-submit="callPlayer('room1', 1);">
                     <div class="form-group">
                         <button type="submit" class="btn btn-success">来把狼人杀</button>
@@ -47,17 +40,25 @@
 
                 <form ng-submit="joinGame('room1');">
                     <div class="form-group">
-                        <button type="submit" class="btn btn-success">参加狼人杀</button>
+                        <button type="submit" class="btn btn-success">参加游戏</button>
                         <span>{{ socketStatus }}</span>
                     </div>
                 </form>
 
                 <form ng-submit="leaveGame('room1');">
                     <div class="form-group">
-                        <button type="submit" class="btn btn-success">离开狼人杀</button>
+                        <button type="submit" class="btn btn-success">离开游戏</button>
                         <span>{{ socketStatus }}</span>
                     </div>
                 </form>
+
+                <form ng-submit="disconnectRoom('room1');">
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-success">退出房间</button>
+                        <span>{{ socketStatus }}</span>
+                    </div>
+                </form>
+
             </td>
 
             <td style="width:33%;">
@@ -77,6 +78,20 @@
                     </div>
                     <div class="form-group">
                         <button type="submit" class="btn btn-success">进入房间 socket 2</button>
+                    </div>
+                </form>
+
+                <form ng-submit="joinGame('room2');">
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-success">参加游戏</button>
+                        <span>{{ socketStatus }}</span>
+                    </div>
+                </form>
+
+                <form ng-submit="leaveGame('room2');">
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-success">离开游戏</button>
+                        <span>{{ socketStatus }}</span>
                     </div>
                 </form>
 
@@ -105,6 +120,20 @@
                     </div>
                     <div class="form-group">
                         <button type="submit" class="btn btn-success">进入房间 socket 3</button>
+                    </div>
+                </form>
+
+                <form ng-submit="joinGame('room3');">
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-success">参加游戏</button>
+                        <span>{{ socketStatus }}</span>
+                    </div>
+                </form>
+
+                <form ng-submit="leaveGame('room3');">
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-success">离开游戏</button>
+                        <span>{{ socketStatus }}</span>
                     </div>
                 </form>
 
