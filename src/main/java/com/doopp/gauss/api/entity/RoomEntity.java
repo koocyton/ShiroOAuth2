@@ -34,7 +34,7 @@ public class RoomEntity {
     private int id;
 
     // 房间有多少个座位，即最多坐多少人
-    @Getter @Setter private int seatCount=100;
+    @Getter private int seatCount = 100;
 
     // 房间名
     @Getter @Setter private String name;

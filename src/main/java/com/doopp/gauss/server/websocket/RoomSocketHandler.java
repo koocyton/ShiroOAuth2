@@ -91,6 +91,7 @@ public class RoomSocketHandler extends AbstractWebSocketHandler {
 
         // 如果没有进入房间
         else if (sessionRoom==null) {
+            // logger.info(" >>> null sessionRoom ");
             this.openRoom(socketSession, sessionUser, messageObject);
         }
 
@@ -100,6 +101,8 @@ public class RoomSocketHandler extends AbstractWebSocketHandler {
             UserEntity joinGameMe = sessionRoom.getGameUsers().get(sessionUser.getId());
             // 活动状态
             RoomEntity.GameStatus gameStatus = sessionRoom.getGameStatus();
+
+            // logger.info(" >>> " + action);
 
             // 如果活动正在进行，并且用户加入了游戏
             if (gameStatus.equals(RoomEntity.GameStatus.Playing) && joinGameMe!=null) {
@@ -129,17 +132,17 @@ public class RoomSocketHandler extends AbstractWebSocketHandler {
                     }
                     // set game status
                     sessionRoom.setGameStatus(RoomEntity.GameStatus.Calling);
+                    // send message
+                    this.roomPublicTalk(sessionRoom, messageObject);
                     // return
                     messageObject.put("result", true);
                     socketSession.sendMessage(new TextMessage(messageObject.toJSONString()));
-                    // send message
-                    this.roomPublicTalk(sessionRoom, messageObject);
                 }
             }
 
             // 玩家参与
             else if (action.equals("joinGame")) {
-                logger.info(" >>> " + gameStatus + " >< " + sessionRoom.playerNumber());
+                // logger.info(" >>> " + gameStatus + " >< " + sessionRoom.playerNumber());
                 // 召集阶段，玩家才能申请参与
                 if (gameStatus.equals(RoomEntity.GameStatus.Calling) && sessionRoom.playerNumber()<=12) {
                     // join game
@@ -268,8 +271,12 @@ public class RoomSocketHandler extends AbstractWebSocketHandler {
     // 用户加入房间，普通状态
     private boolean joinRoom(UserEntity watchUser, int roomId, WebSocketSession socketSession) {
         RoomEntity roomSession = rooms.get(roomId);
+        // logger.info(" >> " + roomSession + " >> " + roomSession.getSeatCount() + " >> " + roomSession.getWatchUsers().size());
         if (roomSession!=null && roomSession.getSeatCount()>roomSession.getWatchUsers().size()) {
+            //
             roomSession.joinWatch(watchUser);
+            // 保存在房间列表
+            this.setSessionRoom(socketSession, roomSession);
             // cache 在 socket 列表
             sockets.put(watchUser.getId(), socketSession);
             // cache socket in room
