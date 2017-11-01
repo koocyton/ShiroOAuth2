@@ -272,6 +272,21 @@ let ApiTestController = function($scope, $http) {
         }
     };
 
+    $scope.callPlayer = function(roomName, gameType) {
+        let scopeRoom = eval("$scope." + roomName);
+        scopeRoom.ws.send(angular.toJson({action:"callPlayer", gameType:1 * gameType}));
+    };
+
+    $scope.joinGame = function(roomName) {
+        let scopeRoom = eval("$scope." + roomName);
+        scopeRoom.ws.send(angular.toJson({action:"joinGame"}));
+    };
+
+    $scope.leaveGame = function(roomName) {
+        let scopeRoom = eval("$scope." + roomName);
+        scopeRoom.ws.send(angular.toJson({action:"leaveGame"}));
+    };
+
     $scope.connectRoom = function(roomName) {
         let scopeRoom = eval("$scope." + roomName);
         if (scopeRoom.ws===null) {

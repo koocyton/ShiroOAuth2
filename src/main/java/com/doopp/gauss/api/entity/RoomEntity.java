@@ -52,7 +52,15 @@ public class RoomEntity {
     @Getter @Setter private RoomEntity.GameStatus gameStatus = GameStatus.Resting;
 
     // 游戏类型
-    @Getter @Setter private RoomGame roomGame = null;
+    @Getter private RoomGame roomGame = null;
+
+    // 游戏名
+    @Getter private int gameType = NULL_GAME;
+
+    public void setRoomGame(RoomGame roomGame) {
+        this.roomGame = roomGame;
+        this.gameType = roomGame.getGameType();
+    }
 
     // 加入到房主
     public void setOwner(UserEntity user) {

@@ -72,6 +72,7 @@ dependencies {
 
     // Util
     compile 'com.google.guava:guava:23.2-jre'
+    // compile 'org.mapstruct:mapstruct-jdk8:1.2.0.Final'
     compile 'org.modelmapper:modelmapper:1.1.1'
     compileOnly 'org.projectlombok:lombok:1.16.18'
 

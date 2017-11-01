@@ -110,7 +110,7 @@ public class RoomSocketHandler extends AbstractWebSocketHandler {
             }
 
             // 房主组局
-            else if (action.equals("callPlay")) {
+            else if (action.equals("callPlayer")) {
                 // 房主在房间 的 非游戏时间才能征集游戏玩家
                 if (!gameStatus.equals(RoomEntity.GameStatus.Playing) && sessionUser.getId().equals(sessionRoom.getOwner().getId())) {
                     int gameType = messageObject.getInteger("gameType");
@@ -147,7 +147,7 @@ public class RoomSocketHandler extends AbstractWebSocketHandler {
                 // 人够了就开始游戏
                 if (sessionRoom.playerNumber()>=12) {
                     // 提示游戏参与者开始游戏
-                    TextMessage textMessage = new TextMessage("{action:\"joinGame\", gameType:\"" + sessionRoom.getRoomGame().getGameName() + "\"}");
+                    TextMessage textMessage = new TextMessage("{action:\"joinGame\", gameType:\"" + sessionRoom.getRoomGame().getGameType() + "\"}");
                     this.roomGameTalk(sessionRoom, textMessage);
                     sessionRoom.setGameStatus(RoomEntity.GameStatus.Playing);
                 }
@@ -171,6 +171,12 @@ public class RoomSocketHandler extends AbstractWebSocketHandler {
     public void afterConnectionClosed(WebSocketSession socketSession, CloseStatus status) throws Exception {
         // 关闭连接时，离开房间
         this.leaveRoom(socketSession);
+    }
+
+    // 设置房间
+    private void setSessionRoom(WebSocketSession socketSession, RoomEntity sessionRoom) {
+        socketSession.getAttributes().put("sessionRoomId", sessionRoom.getId());
+        rooms.put(sessionRoom.getId(), sessionRoom);
     }
 
     // 获取房间
@@ -231,7 +237,8 @@ public class RoomSocketHandler extends AbstractWebSocketHandler {
         roomSession.setName(roomName);
         roomSession.setOwner(owner);
         // 保存在房间列表
-        rooms.put(roomSession.getId(), roomSession);
+        this.setSessionRoom(socketSession, roomSession);
+        // rooms.put(roomSession.getId(), roomSession);
         // cache 在 socket 列表
         sockets.put(owner.getId(), socketSession);
         // cache socket in room

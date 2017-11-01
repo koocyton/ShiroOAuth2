@@ -17,5 +17,5 @@ public interface RoomGame {
     void leaveGame();
 
     // 获取游戏名
-    String getGameName();
+    int getGameType();
 }

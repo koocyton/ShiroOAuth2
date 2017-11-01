@@ -10,7 +10,7 @@ import org.springframework.web.socket.WebSocketSession;
 @Service("battleRoyaleGame")
 public class BattleRoyaleGame implements RoomGame {
 
-    private final static String gameName = "BattleRoyale";
+    private final static int gameType = RoomEntity.BATTLE_ROYALE_GAME;
 
     @Override
     public void handleTextMessage(WebSocketSession socketSession, RoomEntity theRoom, UserEntity sendUser, JSONObject message) {
@@ -28,7 +28,7 @@ public class BattleRoyaleGame implements RoomGame {
     }
 
     @Override
-    public String getGameName() {
-        return gameName;
+    public int getGameType() {
+        return gameType;
     }
 }
