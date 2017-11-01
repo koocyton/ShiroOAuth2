@@ -15,4 +15,7 @@ public interface RoomGame {
 
     // 退出游戏时
     void leaveGame();
+
+    // 获取游戏名
+    String getGameName();
 }

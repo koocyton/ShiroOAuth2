@@ -1,5 +1,6 @@
 package com.doopp.gauss.api.entity;
 
+import com.doopp.gauss.api.game.RoomGame;
 import com.google.common.base.Objects;
 import lombok.Getter;
 import lombok.Setter;
@@ -22,11 +23,10 @@ public class RoomEntity {
     }
 
     // 游戏类型
-    public enum GameTypes {
-        WereWolf,
-        BattleRoyale,
-        GuessDraw
-    }
+    public final static int NULL_GAME = 0;
+    public final static int WERE_WOLF_GAME = 1;
+    public final static int BATTLE_ROYALE_GAME = 2;
+    public final static int GUESS_DRAW_GAME = 3;
 
     // 房间 ID
     @Getter
@@ -52,7 +52,7 @@ public class RoomEntity {
     @Getter @Setter private RoomEntity.GameStatus gameStatus = GameStatus.Resting;
 
     // 游戏类型
-    @Getter @Setter private RoomEntity.GameTypes gameType = null;
+    @Getter @Setter private RoomGame roomGame = null;
 
     // 加入到房主
     public void setOwner(UserEntity user) {
@@ -94,6 +94,6 @@ public class RoomEntity {
     public void resetGame() {
         this.gameUsers = new HashMap<>();
         this.gameStatus = GameStatus.Resting;
-        this.gameType = null;
+        this.roomGame = null;
     }
 }

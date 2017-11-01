@@ -3,6 +3,7 @@ package com.doopp.gauss.server.websocket;
 import com.alibaba.fastjson.JSONObject;
 import com.doopp.gauss.api.entity.RoomEntity;
 import com.doopp.gauss.api.entity.UserEntity;
+import com.doopp.gauss.api.game.RoomGame;
 import com.doopp.gauss.api.game.impl.BattleRoyaleGame;
 import com.doopp.gauss.api.game.impl.GuessDrawGame;
 import com.doopp.gauss.api.game.impl.WerewolfGame;
@@ -102,17 +103,9 @@ public class RoomSocketHandler extends AbstractWebSocketHandler {
 
             // 如果活动正在进行，并且用户加入了游戏
             if (gameStatus.equals(RoomEntity.GameStatus.Playing) && joinGameMe!=null) {
-                // 狼人杀
-                if (sessionRoom.getGameType().equals(RoomEntity.GameTypes.WereWolf)) {
-                    werewolfGame.handleTextMessage(socketSession, sessionRoom, sessionUser, messageObject);
-                }
-                // 大逃杀
-                else if (sessionRoom.getGameType().equals(RoomEntity.GameTypes.BattleRoyale)) {
-                    battleRoyaleGame.handleTextMessage(socketSession, sessionRoom, sessionUser, messageObject);
-                }
-                // 你画我猜
-                else if (sessionRoom.getGameType().equals(RoomEntity.GameTypes.GuessDraw)) {
-                    guessDrawGame.handleTextMessage(socketSession, sessionRoom, sessionUser, messageObject);
+                RoomGame roomGame = sessionRoom.getRoomGame();
+                if (roomGame!=null) {
+                    roomGame.handleTextMessage(socketSession, sessionRoom, sessionUser, messageObject);
                 }
             }
 
@@ -120,16 +113,16 @@ public class RoomSocketHandler extends AbstractWebSocketHandler {
             else if (action.equals("callPlay")) {
                 // 房主在房间 的 非游戏时间才能征集游戏玩家
                 if (!gameStatus.equals(RoomEntity.GameStatus.Playing) && sessionUser.getId().equals(sessionRoom.getOwner().getId())) {
-                    // set room game type
-                    switch(messageObject.getString("gameType")) {
-                        case "WereWolf" :
-                            sessionRoom.setGameType(RoomEntity.GameTypes.WereWolf);
+                    int gameType = messageObject.getInteger("gameType");
+                    switch(gameType) {
+                        case RoomEntity.WERE_WOLF_GAME :
+                            sessionRoom.setRoomGame(new WerewolfGame());
                             break;
-                        case "BattleRoyale" :
-                            sessionRoom.setGameType(RoomEntity.GameTypes.BattleRoyale);
+                        case RoomEntity.BATTLE_ROYALE_GAME :
+                            sessionRoom.setRoomGame(new BattleRoyaleGame());
                             break;
-                        case "GuessDraw" :
-                            sessionRoom.setGameType(RoomEntity.GameTypes.GuessDraw);
+                        case RoomEntity.GUESS_DRAW_GAME :
+                            sessionRoom.setRoomGame(new GuessDrawGame());
                             break;
                         default:
                             return;
@@ -154,7 +147,7 @@ public class RoomSocketHandler extends AbstractWebSocketHandler {
                 // 人够了就开始游戏
                 if (sessionRoom.playerNumber()>=12) {
                     // 提示游戏参与者开始游戏
-                    TextMessage textMessage = new TextMessage("{action:\"gameStart\", gameType:\"" + sessionRoom.getGameType() + "\"}");
+                    TextMessage textMessage = new TextMessage("{action:\"joinGame\", gameType:\"" + sessionRoom.getRoomGame().getGameName() + "\"}");
                     this.roomGameTalk(sessionRoom, textMessage);
                     sessionRoom.setGameStatus(RoomEntity.GameStatus.Playing);
                 }
