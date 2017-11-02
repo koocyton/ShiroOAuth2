@@ -7,6 +7,7 @@ import com.doopp.gauss.api.game.RoomGame;
 import com.doopp.gauss.api.game.impl.BattleRoyaleGame;
 import com.doopp.gauss.api.game.impl.GuessDrawGame;
 import com.doopp.gauss.api.game.impl.WerewolfGame;
+import com.sun.xml.internal.messaging.saaj.soap.FastInfosetDataContentHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,14 +35,14 @@ public class RoomSocketHandler extends AbstractWebSocketHandler {
     private static int lastRoomId = 54612;
 
     // Werewolf , BattleRoyale and GuessDraw
-    @Autowired
-    private WerewolfGame werewolfGame;
+    //@Autowired
+    //private WerewolfGame werewolfGame;
 
-    @Autowired
-    private BattleRoyaleGame battleRoyaleGame;
+    //@Autowired
+    //private BattleRoyaleGame battleRoyaleGame;
 
-    @Autowired
-    private GuessDrawGame guessDrawGame;
+    //@Autowired
+    //private GuessDrawGame guessDrawGame;
 
     /*
      * 获取房间列表

@@ -50,6 +50,6 @@ public class WerewolfGame {
     }
 
     private void launch() {
-        taskExecutor.execute(new GameTask());
+        this.taskExecutor.execute(new GameTask());
     }
 }
