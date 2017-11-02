@@ -66,8 +66,8 @@ public class RoomSocketHandler extends AbstractWebSocketHandler {
     // 房间内游戏频道说话
     private void roomGameTalk(RoomEntity sessionRoom, TextMessage message) throws IOException {
         // send to game user
-        for(UserEntity gameUser : sessionRoom.getGameUsers().values()) {
-            sockets.get(gameUser.getId()).sendMessage(message);
+        for(Long userId : sessionRoom.getGameUsersId().values()) {
+            sockets.get(userId).sendMessage(message);
         }
     }
 
@@ -98,7 +98,7 @@ public class RoomSocketHandler extends AbstractWebSocketHandler {
         // 如果在房间内，并且 action 正常
         else {
             // 是否有参加活动
-            UserEntity joinGameMe = sessionRoom.getGameUsers().get(sessionUser.getId());
+            UserEntity joinGameMe = sessionRoom.getGameUser(sessionUser.getId());
             // 活动状态
             RoomEntity.GameStatus gameStatus = sessionRoom.getGameStatus();
 

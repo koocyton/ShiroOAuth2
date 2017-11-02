@@ -46,7 +46,7 @@ public class RoomEntity {
     @Getter private Map<Long, UserEntity> watchUsers = new HashMap<>();
 
     // 游戏玩家
-    @Getter private Map<Long, UserEntity> gameUsers = new HashMap<>();
+    @Getter private Map<Long, Long> gameUsersId = new HashMap<>();
 
     // 游戏状态
     @Getter @Setter private RoomEntity.GameStatus gameStatus = GameStatus.Resting;
@@ -60,6 +60,24 @@ public class RoomEntity {
     public void setRoomGame(RoomGame roomGame) {
         this.roomGame = roomGame;
         this.gameType = roomGame.getGameType();
+    }
+
+    // 按 ID 获取用户
+    public UserEntity getGameUser(Long userId) {
+        Long gameUserId = this.gameUsersId.get(userId);
+        if (gameUserId==null) {
+            return null;
+        }
+        return this.watchUsers.get(gameUserId);
+    }
+
+    // 获取所有房间内的游戏用户
+    public Map<Long, UserEntity> getGameUsers() {
+        Map<Long, UserEntity> gameUsers = new HashMap<>();
+        for(Long userId : gameUsersId.values()) {
+            gameUsers.put(userId, this.watchUsers.get(userId));
+        }
+        return gameUsers;
     }
 
     // 加入到房主
@@ -81,27 +99,27 @@ public class RoomEntity {
             this.owner = null;
         }
         this.watchUsers.remove(user.getId());
-        this.gameUsers.remove(user.getId());
+        this.gameUsersId.remove(user.getId());
     }
 
     // 参加活动的人数
     public int playerNumber() {
-        return this.gameUsers.size();
+        return this.gameUsersId.size();
     }
 
     // 加入活动
     public void joinGame(UserEntity user) {
-        this.gameUsers.put(user.getId(), user);
+        this.gameUsersId.put(user.getId(), user.getId());
     }
 
     // 离开活动
     public void leaveGame(UserEntity user) {
-        this.gameUsers.remove(user.getId());
+        this.gameUsersId.remove(user.getId());
     }
 
     // 重置
     public void resetGame() {
-        this.gameUsers = new HashMap<>();
+        this.gameUsersId = new HashMap<>();
         this.gameStatus = GameStatus.Resting;
         this.roomGame = null;
     }

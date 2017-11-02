@@ -27,7 +27,7 @@ public class RoomDTO {
     private Map<Long, UserDTO> watchUsers = new HashMap<>();
 
     // 游戏玩家
-    private Map<Long, UserDTO> gameUsers = new HashMap<>();
+    private Map<Long, Long> gameUsersId = new HashMap<>();
 
     // 游戏状态
     private RoomEntity.GameStatus gameStatus = RoomEntity.GameStatus.Resting;
