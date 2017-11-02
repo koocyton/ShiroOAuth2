@@ -1,19 +1,18 @@
 package com.doopp.gauss.server.configuration;
 
 
-import com.doopp.gauss.server.task.WerewolfGame;
-import org.springframework.beans.factory.annotation.Qualifier;
+import com.doopp.gauss.server.task.GameTaskDispatcher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 public class TaskExecutorConfiguration {
 
-    @Bean(name="wolfKillGame")
-    public WerewolfGame wolfKillGame(@Qualifier("taskExecutor") ThreadPoolTaskExecutor taskExecutor) {
-        return new WerewolfGame(taskExecutor);
+    @Bean
+    public GameTaskDispatcher gameTaskDispatcher(ThreadPoolTaskExecutor taskExecutor) {
+        return new GameTaskDispatcher(taskExecutor);
     }
 
-    @Bean(name="taskExecutor")
+    @Bean
     public ThreadPoolTaskExecutor taskExecutor () {
         ThreadPoolTaskExecutor threadPoolTaskExecutor = new ThreadPoolTaskExecutor();
         threadPoolTaskExecutor.setCorePoolSize(5);

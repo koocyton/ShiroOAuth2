@@ -7,7 +7,7 @@ import com.doopp.gauss.api.game.RoomGame;
 import com.doopp.gauss.api.game.impl.BattleRoyaleGame;
 import com.doopp.gauss.api.game.impl.GuessDrawGame;
 import com.doopp.gauss.api.game.impl.WerewolfGame;
-import com.sun.xml.internal.messaging.saaj.soap.FastInfosetDataContentHandler;
+import com.doopp.gauss.server.task.GameTaskDispatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,15 +34,9 @@ public class RoomSocketHandler extends AbstractWebSocketHandler {
     // room id
     private static int lastRoomId = 54612;
 
-    // Werewolf , BattleRoyale and GuessDraw
-    //@Autowired
-    //private WerewolfGame werewolfGame;
-
-    //@Autowired
-    //private BattleRoyaleGame battleRoyaleGame;
-
-    //@Autowired
-    //private GuessDrawGame guessDrawGame;
+    // GameTaskDispatcher
+    @Autowired
+    private GameTaskDispatcher gameTaskDispatcher;
 
     /*
      * 获取房间列表
@@ -145,7 +139,7 @@ public class RoomSocketHandler extends AbstractWebSocketHandler {
             else if (action.equals("joinGame")) {
                 // logger.info(" >>> " + gameStatus + " >< " + sessionRoom.playerNumber());
                 // 召集阶段，玩家才能申请参与
-                if (gameStatus.equals(RoomEntity.GameStatus.Calling) && sessionRoom.playerNumber()<=12) {
+                if (gameStatus.equals(RoomEntity.GameStatus.Calling) && sessionRoom.playerNumber()<=3) {
                     // join game
                     sessionRoom.joinGame(sessionUser);
                     // return
@@ -156,12 +150,14 @@ public class RoomSocketHandler extends AbstractWebSocketHandler {
                 }
 
                 // 人够了就开始游戏
-                if (sessionRoom.playerNumber()>=12) {
+                if (sessionRoom.playerNumber()>=3) {
                     // 提示游戏参与者开始游戏
                     TextMessage textMessage = new TextMessage("{action:\"gameStart\", gameType:\"" + sessionRoom.getRoomGame().getGameType() + "\"}");
                     // 发送给游戏参与者
                     this.roomGameTalk(sessionRoom, textMessage);
                     sessionRoom.setGameStatus(RoomEntity.GameStatus.Playing);
+                    // 启用一个新线程来执行队列
+                    gameTaskDispatcher.execute();
                 }
             }
 
