@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Scope("prototype")
-public class WerewolfGame implements RoomGame {
+public class WereWolfGame implements RoomGame {
 
     private final static int gameType = RoomEntity.WERE_WOLF_GAME;
 

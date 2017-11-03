@@ -52,14 +52,13 @@ public class RoomEntity {
     @Getter @Setter private RoomEntity.GameStatus gameStatus = GameStatus.Resting;
 
     // 游戏类型
-    @Getter private RoomGame roomGame = null;
+    // @Getter private RoomGame roomGame = null;
 
     // 游戏名
     @Getter private int gameType = NULL_GAME;
 
-    public void setRoomGame(RoomGame roomGame) {
-        this.roomGame = roomGame;
-        this.gameType = roomGame.getGameType();
+    public void setRoomGame(int gameType) {
+        this.gameType = gameType;
     }
 
     // 按 ID 获取用户
@@ -121,6 +120,6 @@ public class RoomEntity {
     public void resetGame() {
         this.gameUsersId = new HashMap<>();
         this.gameStatus = GameStatus.Resting;
-        this.roomGame = null;
+        this.gameType = NULL_GAME;
     }
 }

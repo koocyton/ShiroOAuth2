@@ -6,7 +6,7 @@ import com.doopp.gauss.api.entity.UserEntity;
 import com.doopp.gauss.api.game.RoomGame;
 import com.doopp.gauss.api.game.impl.BattleRoyaleGame;
 import com.doopp.gauss.api.game.impl.GuessDrawGame;
-import com.doopp.gauss.api.game.impl.WerewolfGame;
+import com.doopp.gauss.api.game.impl.WereWolfGame;
 import com.doopp.gauss.server.task.GameTaskDispatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -97,8 +97,6 @@ public class RoomSocketHandler extends AbstractWebSocketHandler {
             // 活动状态
             RoomEntity.GameStatus gameStatus = sessionRoom.getGameStatus();
 
-            // logger.info(" >>> " + action);
-
             // 如果活动正在进行，并且用户加入了游戏
             if (gameStatus.equals(RoomEntity.GameStatus.Playing) && joinGameMe!=null) {
                 RoomGame roomGame = sessionRoom.getRoomGame();
@@ -114,13 +112,13 @@ public class RoomSocketHandler extends AbstractWebSocketHandler {
                     int gameType = messageObject.getInteger("gameType");
                     switch(gameType) {
                         case RoomEntity.WERE_WOLF_GAME :
-                            sessionRoom.setRoomGame(new WerewolfGame());
+                            sessionRoom.setRoomGame(RoomEntity.WERE_WOLF_GAME);
                             break;
                         case RoomEntity.BATTLE_ROYALE_GAME :
-                            sessionRoom.setRoomGame(new BattleRoyaleGame());
+                            sessionRoom.setRoomGame(RoomEntity.WERE_WOLF_GAME);
                             break;
                         case RoomEntity.GUESS_DRAW_GAME :
-                            sessionRoom.setRoomGame(new GuessDrawGame());
+                            sessionRoom.setRoomGame(RoomEntity.WERE_WOLF_GAME);
                             break;
                         default:
                             return;
@@ -137,7 +135,6 @@ public class RoomSocketHandler extends AbstractWebSocketHandler {
 
             // 玩家参与
             else if (action.equals("joinGame")) {
-                // logger.info(" >>> " + gameStatus + " >< " + sessionRoom.playerNumber());
                 // 召集阶段，玩家才能申请参与
                 if (gameStatus.equals(RoomEntity.GameStatus.Calling) && sessionRoom.playerNumber()<=3) {
                     // join game
@@ -152,12 +149,12 @@ public class RoomSocketHandler extends AbstractWebSocketHandler {
                 // 人够了就开始游戏
                 if (sessionRoom.playerNumber()>=3) {
                     // 提示游戏参与者开始游戏
-                    TextMessage textMessage = new TextMessage("{action:\"gameStart\", gameType:\"" + sessionRoom.getRoomGame().getGameType() + "\"}");
+                    TextMessage textMessage = new TextMessage("{action:\"gameStart\", gameType:\"" + sessionRoom.getGameType() + "\"}");
                     // 发送给游戏参与者
                     this.roomGameTalk(sessionRoom, textMessage);
                     sessionRoom.setGameStatus(RoomEntity.GameStatus.Playing);
                     // 启用一个新线程来执行队列
-                    gameTaskDispatcher.execute();
+                    gameTaskDispatcher.execute("WereWolf", sessionRoom);
                 }
             }
 
