@@ -1,6 +1,9 @@
 package com.doopp.gauss.server.task;
 
 import com.doopp.gauss.api.entity.RoomEntity;
+import com.doopp.gauss.api.game.impl.BattleRoyaleGame;
+import com.doopp.gauss.api.game.impl.GuessDrawGame;
+import com.doopp.gauss.api.game.impl.WereWolfGame;
 import com.doopp.gauss.server.websocket.RoomSocketHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.task.TaskExecutor;
@@ -16,19 +19,28 @@ public class GameTaskDispatcher {
     @Autowired
     RoomSocketHandler roomSocket;
 
+    @Autowired
+    private WereWolfGame wereWolfGame;
+
+    @Autowired
+    private BattleRoyaleGame battleRoyaleGame;
+
+    @Autowired
+    private GuessDrawGame guessDrawGame;
+
     public GameTaskDispatcher(TaskExecutor taskExecutor) {
         this.taskExecutor = taskExecutor;
     }
 
-    public void execute(String className, RoomEntity sessionRoom) {
-        switch(className) {
-            case "WereWolf" :
+    public void execute(int gameType, RoomEntity sessionRoom) {
+        switch(gameType) {
+            case RoomEntity.WERE_WOLF_GAME :
                 this.taskExecutor.execute(new WereWolfGameTask(sessionRoom));
                 break;
-            case "BattleRoyale" :
+            case RoomEntity.GUESS_DRAW_GAME :
                 this.taskExecutor.execute(new GuessDrawTask(sessionRoom));
                 break;
-            case "GuessGraw" :
+            case RoomEntity.BATTLE_ROYALE_GAME :
                 this.taskExecutor.execute(new BattleRoyaleTask(sessionRoom));
                 break;
         }
@@ -48,7 +60,7 @@ public class GameTaskDispatcher {
         public void run() {
 
             while(true) {
-                logger.info(" >>> WereWolfGameTask.run getRoom : " + roomSocket.getRooms());
+                wereWolfGame.handleDaemonMessage(new DaemonMessage());
                 try {
                     Thread.sleep(1000);
                 }
@@ -71,9 +83,8 @@ public class GameTaskDispatcher {
         }
 
         public void run() {
-
+            guessDrawGame.handleDaemonMessage(new DaemonMessage());
             while(true) {
-                logger.info(" >>> GuessDrawTask.run getRooms : " + roomSocket.getRooms());
                 try {
                     Thread.sleep(1000);
                 }
@@ -96,9 +107,8 @@ public class GameTaskDispatcher {
         }
 
         public void run() {
-
+            battleRoyaleGame.handleDaemonMessage(new DaemonMessage());
             while(true) {
-                logger.info(" >>> BattleRoyaleTask.run getRoom : " + roomSocket.getRooms());
                 try {
                     Thread.sleep(1000);
                 }

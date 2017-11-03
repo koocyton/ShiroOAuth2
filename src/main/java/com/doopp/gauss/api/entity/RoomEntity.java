@@ -55,11 +55,7 @@ public class RoomEntity {
     // @Getter private RoomGame roomGame = null;
 
     // 游戏名
-    @Getter private int gameType = NULL_GAME;
-
-    public void setRoomGame(int gameType) {
-        this.gameType = gameType;
-    }
+    @Getter @Setter private int gameType = NULL_GAME;
 
     // 按 ID 获取用户
     public UserEntity getGameUser(Long userId) {
