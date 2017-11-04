@@ -10,11 +10,13 @@ public class WereWolfGameTask implements Runnable {
         this.sessionRoom = sessionRoom;
     }
 
+    // 开始执行
     public void run() {
         delay(100);
         this.gameStart();
     }
 
+    // 游戏开始
     private void gameStart() {
         delay(1000);
     }
@@ -31,7 +33,7 @@ public class WereWolfGameTask implements Runnable {
 
     // 提示
 
-    // 延迟的时间
+    // 延迟一段时间
     private static void delay(int millis) {
         try {
             Thread.sleep(millis);
