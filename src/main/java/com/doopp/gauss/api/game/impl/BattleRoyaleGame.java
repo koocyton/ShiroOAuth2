@@ -13,8 +13,6 @@ public class BattleRoyaleGame implements RoomGame {
 
     private final static int gameType = RoomEntity.BATTLE_ROYALE_GAME;
 
-
-
     @Override
     public void handleDaemonMessage(DaemonMessage daemonMessage) {
 
