@@ -102,7 +102,7 @@ public class RoomSocketHandler extends AbstractWebSocketHandler {
             // 如果活动正在进行，并且用户加入了游戏
             if (gameStatus.equals(RoomEntity.GameStatus.Playing) && joinGameMe!=null) {
                 // 将消息发送到当前房间进行的游戏中去
-                sessionRoom.getGameTask().roomMessageHandle(new RoomMessage("getMessage"));
+                sessionRoom.getGameTask().roomMessageHandle(messageObject);
             }
 
             // 房主组局

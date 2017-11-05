@@ -1,9 +1,10 @@
 package com.doopp.gauss.server.task.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.doopp.gauss.api.entity.RoomEntity;
-import com.doopp.gauss.api.message.RoomMessage;
 import com.doopp.gauss.server.task.GameTask;
 import com.doopp.gauss.server.websocket.RoomSocketHandler;
+import com.google.common.base.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.socket.TextMessage;
@@ -71,8 +72,14 @@ public class WereWolfGameTask implements GameTask {
 
     // 接受房间里传来的消息
     @Override
-    public void roomMessageHandle(RoomMessage message) {
-        logger.info(" >>> message.getAction() " + message.getAction());
+    public void roomMessageHandle(JSONObject messageObject) {
+        String action = messageObject.getString("action");
+        if (Strings.isNullOrEmpty(action)) {
+            return;
+        }
+        if (action.equals("publicTalk")) {
+            this.messageToAll(messageObject.toJSONString());
+        }
     }
 
     // 发送消息到房间
