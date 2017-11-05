@@ -1,12 +1,14 @@
-package com.doopp.gauss.server.task;
+package com.doopp.gauss.server.task.impl;
 
 import com.doopp.gauss.api.entity.RoomEntity;
+import com.doopp.gauss.api.message.RoomMessage;
+import com.doopp.gauss.server.task.GameTask;
 import com.doopp.gauss.server.websocket.RoomSocketHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.socket.TextMessage;
 
-public class WereWolfGameTask implements Runnable {
+public class WereWolfGameTask implements GameTask {
 
     private final Logger logger = LoggerFactory.getLogger(WereWolfGameTask.class);
 
@@ -14,22 +16,26 @@ public class WereWolfGameTask implements Runnable {
 
     private final RoomSocketHandler roomSocketHandler;
 
-    WereWolfGameTask (RoomSocketHandler roomSocketHandler, RoomEntity sessionRoom) {
+    public WereWolfGameTask (RoomSocketHandler roomSocketHandler, RoomEntity sessionRoom) {
         this.sessionRoom = sessionRoom;
         this.roomSocketHandler = roomSocketHandler;
+        this.sessionRoom.setGameTask(this);
     }
 
     // 开始执行
     public void run() {
-        this.gameStart();
+        int loopNumber = 0;
+        while(true) {
+            delay(1000);
+            if (this.allReady(++loopNumber)) {
+                this.gameStart();
+                break;
+            }
+        }
     }
 
     // 游戏开始
     private void gameStart() {
-        while(true) {
-            delay(1000);
-            this.messageToAll("大家好");
-        }
     }
 
     // 抢身份
@@ -61,18 +67,22 @@ public class WereWolfGameTask implements Runnable {
 
     // 天黑了
     private void toNight() {
-
     }
 
-
     // 接受房间里传来的消息
-    private void roomMessageHandle(String message) {
-
+    @Override
+    public void roomMessageHandle(RoomMessage message) {
+        logger.info(" >>> message.getAction() " + message.getAction());
     }
 
     // 发送消息到房间
     private void messageToAll(String message) {
         this.roomSocketHandler.roomGameTalk(this.sessionRoom, new TextMessage(message));
+    }
+
+    // 玩家都准备好了
+    private boolean allReady(int loopNumber) {
+        return loopNumber>=30;
     }
 
     // 延迟一段时间

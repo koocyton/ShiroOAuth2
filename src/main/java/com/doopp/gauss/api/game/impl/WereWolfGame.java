@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.doopp.gauss.api.entity.RoomEntity;
 import com.doopp.gauss.api.entity.UserEntity;
 import com.doopp.gauss.api.game.RoomGame;
+import com.doopp.gauss.api.message.RoomMessage;
 import com.doopp.gauss.server.task.DaemonMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,6 +37,8 @@ public class WereWolfGame implements RoomGame {
         if (action.equals("gameReady") && gameProgress.equals("gameJoin")) {
             gameUser.put(sessionUser.getId(), sessionUser);
         }
+        // 发送消息到 task
+        sessionRoom.getGameTask().roomMessageHandle(new RoomMessage("hello"));
     }
 
     @Override

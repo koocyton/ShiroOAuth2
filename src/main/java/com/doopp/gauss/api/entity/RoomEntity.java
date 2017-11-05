@@ -1,6 +1,7 @@
 package com.doopp.gauss.api.entity;
 
 import com.doopp.gauss.api.game.RoomGame;
+import com.doopp.gauss.server.task.GameTask;
 import com.google.common.base.Objects;
 import lombok.Getter;
 import lombok.Setter;
@@ -52,7 +53,7 @@ public class RoomEntity {
     @Getter @Setter private RoomEntity.GameStatus gameStatus = GameStatus.Resting;
 
     // 游戏类型
-    // @Getter private RoomGame roomGame = null;
+    @Getter @Setter private GameTask gameTask = null;
 
     // 游戏名
     @Getter @Setter private int gameType = NULL_GAME;
