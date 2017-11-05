@@ -21,9 +21,17 @@ public class WereWolfGameTask implements Runnable {
         delay(1000);
     }
 
-    // 开始分派身份
+    // 抢身份
+    private void grabIdentityHandle() {
+    }
+
+    // 分配身份
+    private void assignIdentity() {
+    }
 
     // 提示狼杀人
+    private void assignIdentity() {
+    }
 
     // 提示女巫救人
 
@@ -32,6 +40,17 @@ public class WereWolfGameTask implements Runnable {
     // 提示天亮
 
     // 提示
+
+
+    // 接受房间里传来的消息
+    private void roomMessageHandle(String message) {
+
+    }
+
+    // 发送消息到房间
+    private void sendMessage2Player(String message) {
+
+    }
 
     // 延迟一段时间
     private static void delay(int millis) {
