@@ -3,7 +3,6 @@ package com.doopp.gauss.server.websocket;
 import com.alibaba.fastjson.JSONObject;
 import com.doopp.gauss.api.entity.RoomEntity;
 import com.doopp.gauss.api.entity.UserEntity;
-import com.doopp.gauss.api.message.RoomMessage;
 import com.doopp.gauss.server.task.GameTaskDispatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
