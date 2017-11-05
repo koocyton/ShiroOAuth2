@@ -63,16 +63,33 @@ public class RoomEntity {
         if (gameUserId==null) {
             return null;
         }
-        return this.watchUsers.get(gameUserId);
+        UserEntity oneWatchUser = this.watchUsers.get(gameUserId);
+        if (oneWatchUser!=null) {
+            return oneWatchUser;
+        }
+        else if (this.getOwner()!=null && this.getOwner().getId().equals(userId)) {
+            return this.getOwner();
+        }
+        return null;
     }
 
     // 获取所有房间内的游戏用户
     public Map<Long, UserEntity> getGameUsers() {
         Map<Long, UserEntity> gameUsers = new HashMap<>();
         for(Long userId : gameUsersId.values()) {
-            gameUsers.put(userId, this.watchUsers.get(userId));
+            if (this.getOwner()!=null && this.getOwner().getId().equals(userId)) {
+                gameUsers.put(userId, this.getOwner());
+            }
+            else if (this.watchUsers.get(userId)!=null) {
+                gameUsers.put(userId, this.watchUsers.get(userId));
+            }
         }
         return gameUsers;
+    }
+
+    // 获取所有房间内的游戏用户 ID
+    public Map<Long, Long> getGameUsersId() {
+        return gameUsersId;
     }
 
     // 加入到房主

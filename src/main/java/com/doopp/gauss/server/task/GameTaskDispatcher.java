@@ -10,41 +10,24 @@ public class GameTaskDispatcher {
     private final TaskExecutor taskExecutor;
 
     @Autowired
-    RoomSocketHandler roomSocket;
+    RoomSocketHandler roomSocketHandler;
 
     public GameTaskDispatcher(TaskExecutor taskExecutor) {
         this.taskExecutor = taskExecutor;
     }
 
     public void execute(int gameType, RoomEntity sessionRoom) {
+
         switch(gameType) {
             case RoomEntity.WERE_WOLF_GAME :
-                this.taskExecutor.execute(new WereWolfGameTask(sessionRoom));
+                this.taskExecutor.execute(new WereWolfGameTask(roomSocketHandler, sessionRoom));
                 break;
-            case RoomEntity.GUESS_DRAW_GAME :
-                this.taskExecutor.execute(new GuessDrawTask());
-                break;
-            case RoomEntity.BATTLE_ROYALE_GAME :
-                this.taskExecutor.execute(new BattleRoyaleTask());
-                break;
-        }
-    }
-
-    /*
-     * 你画我猜
-     */
-    private class GuessDrawTask implements Runnable {
-
-        public void run() {
-        }
-    }
-
-    /*
-     * 大逃杀
-     */
-    private class BattleRoyaleTask implements Runnable {
-
-        public void run() {
+            //case RoomEntity.GUESS_DRAW_GAME :
+            //    this.taskExecutor.execute(new GuessDrawTask());
+            //    break;
+            //case RoomEntity.BATTLE_ROYALE_GAME :
+            //    this.taskExecutor.execute(new BattleRoyaleTask());
+            //    break;
         }
     }
 }

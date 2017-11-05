@@ -1,24 +1,35 @@
 package com.doopp.gauss.server.task;
 
 import com.doopp.gauss.api.entity.RoomEntity;
+import com.doopp.gauss.server.websocket.RoomSocketHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.web.socket.TextMessage;
 
 public class WereWolfGameTask implements Runnable {
 
-    private RoomEntity sessionRoom;
+    private final Logger logger = LoggerFactory.getLogger(WereWolfGameTask.class);
 
-    WereWolfGameTask (RoomEntity sessionRoom) {
+    private final RoomEntity sessionRoom;
+
+    private final RoomSocketHandler roomSocketHandler;
+
+    WereWolfGameTask (RoomSocketHandler roomSocketHandler, RoomEntity sessionRoom) {
         this.sessionRoom = sessionRoom;
+        this.roomSocketHandler = roomSocketHandler;
     }
 
     // 开始执行
     public void run() {
-        delay(100);
         this.gameStart();
     }
 
     // 游戏开始
     private void gameStart() {
-        delay(1000);
+        while(true) {
+            delay(1000);
+            this.messageToAll("大家好");
+        }
     }
 
     // 抢身份
@@ -30,16 +41,28 @@ public class WereWolfGameTask implements Runnable {
     }
 
     // 提示狼杀人
-    private void assignIdentity() {
+    private void wolfKilling() {
     }
 
     // 提示女巫救人
+    private void witchHelp() {
+
+    }
 
     // 提示预言家查询身份
+    private void seerViewIdentity() {
+
+    }
 
     // 提示天亮
+    private void toDay() {
 
-    // 提示
+    }
+
+    // 天黑了
+    private void toNight() {
+
+    }
 
 
     // 接受房间里传来的消息
@@ -48,8 +71,8 @@ public class WereWolfGameTask implements Runnable {
     }
 
     // 发送消息到房间
-    private void sendMessage2Player(String message) {
-
+    private void messageToAll(String message) {
+        this.roomSocketHandler.roomGameTalk(this.sessionRoom, new TextMessage(message));
     }
 
     // 延迟一段时间

@@ -67,10 +67,15 @@ public class RoomSocketHandler extends AbstractWebSocketHandler {
     }
 
     // 房间内游戏频道说话
-    private void roomGameTalk(RoomEntity sessionRoom, TextMessage message) throws IOException {
+    public void roomGameTalk(RoomEntity sessionRoom, TextMessage message) {
         // send to game user
         for(Long userId : sessionRoom.getGameUsersId().values()) {
-            sockets.get(userId).sendMessage(message);
+            try {
+                sockets.get(userId).sendMessage(message);
+            }
+            catch(IOException e) {
+                logger.warn(" >>> sockets.get(userId).sendMessage(" + message.getPayload() + ")");
+            }
         }
     }
 
