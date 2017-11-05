@@ -3,9 +3,7 @@ package com.doopp.gauss.server.websocket;
 import com.alibaba.fastjson.JSONObject;
 import com.doopp.gauss.api.entity.RoomEntity;
 import com.doopp.gauss.api.entity.UserEntity;
-import com.doopp.gauss.api.game.impl.BattleRoyaleGame;
-import com.doopp.gauss.api.game.impl.GuessDrawGame;
-import com.doopp.gauss.api.game.impl.WereWolfGame;
+import com.doopp.gauss.api.message.RoomMessage;
 import com.doopp.gauss.server.task.GameTaskDispatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,15 +34,6 @@ public class RoomSocketHandler extends AbstractWebSocketHandler {
     // GameTaskDispatcher
     @Autowired
     private GameTaskDispatcher gameTaskDispatcher;
-
-    @Autowired
-    private WereWolfGame wereWolfGame;
-
-    @Autowired
-    private BattleRoyaleGame battleRoyaleGame;
-
-    @Autowired
-    private GuessDrawGame guessDrawGame;
 
     /*
      * 获取房间列表
@@ -112,18 +101,8 @@ public class RoomSocketHandler extends AbstractWebSocketHandler {
 
             // 如果活动正在进行，并且用户加入了游戏
             if (gameStatus.equals(RoomEntity.GameStatus.Playing) && joinGameMe!=null) {
-                // dispatch game type
-                switch(sessionRoom.getGameType()) {
-                    case RoomEntity.WERE_WOLF_GAME:
-                        wereWolfGame.handleTextMessage(socketSession, sessionRoom, sessionUser, messageObject);
-                        break;
-                    case RoomEntity.BATTLE_ROYALE_GAME:
-                        battleRoyaleGame.handleTextMessage(socketSession, sessionRoom, sessionUser, messageObject);
-                        break;
-                    case RoomEntity.GUESS_DRAW_GAME:
-                        guessDrawGame.handleTextMessage(socketSession, sessionRoom, sessionUser, messageObject);
-                        break;
-                }
+                // 将消息发送到当前房间进行的游戏中去
+                sessionRoom.getGameTask().roomMessageHandle(new RoomMessage("getMessage"));
             }
 
             // 房主组局
