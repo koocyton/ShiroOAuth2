@@ -7,20 +7,26 @@ let ApiRoomController = function($scope, $http) {
     $scope.ws = [];
 
     for(let ii=0; ii<12; ii++) {
-        $scope.clients[ii] = {account:"kton" + ii + "@gmail.com", password:"123456"}
+        $scope.clients[ii] = {
+            account  : "kton" + ii + "@gmail.com",
+            password : "123456",
+            roomName : "西屋独居",
+            roomId : 54613,
+            roomTalk : "我要说 ..."
+        };
         $scope.ws[ii] = null;
     }
 
-    let showMessage = function(ii, messageObject) {
-        // $scope.ws[ii].send(angular.toJson(messageObject));
+    $scope.roomTalk = function(ii) {
+        sendMessage(ii, {action: "publicTalk", roomName: $scope.clients[ii].roomTalk})
     };
 
-    let createRoom = function(ii) {
-        sendMessage(ii, {action: "createRoom", roomName: "西屋独居"})
+    $scope.createRoom = function(ii) {
+        sendMessage(ii, {action: "createRoom", roomName: $scope.clients[ii].roomName})
     };
 
-    let joinRoom = function(ii) {
-        sendMessage(ii, {action: "joinRoom", roomId: 54613})
+    $scope.joinRoom = function(ii) {
+        sendMessage(ii, {action: "joinRoom", roomId: $scope.clients[ii].roomId})
     };
 
     let sendMessage = function(ii, messageObject) {
@@ -32,20 +38,18 @@ let ApiRoomController = function($scope, $http) {
         if ($scope.ws[ii]===null) {
             //
             $scope.ws[ii] = WebSocketService
-                .connect("/room-socket?access-token=" + accessToken)
+                .connect("/room-socket?access-token=" + accessToken + "&ii=" + ii)
                 .onClose(function (e) {
-
                 })
                 .onMessage(function(e) {
-
                 })
                 .onOpen(function(e){
                     if (ii===0) {
-                        createRoom(ii);
+                        $scope.createRoom(ii);
                     }
                     else {
                         setTimeout(function(){
-                            joinRoom(ii);
+                            $scope.joinRoom(ii);
                         }, 1000);
                     }
                 });

@@ -1,9 +1,9 @@
 <textarea style="resize: none;width:100%;height:300px;"></textarea>
 
 <div class="input-group" style="margin:5px auto;">
-    <input type="text" class="form-control" placeholder="what are you say ?">
+    <input type="text" class="form-control" placeholder="what are you say ?" ng-model="clients[0].roomTalk">
     <span class="input-group-btn">
-        <button class="btn btn-success" type="button">发言</button>
+        <button class="btn btn-success" type="button" ng-click="roomTalk(0)">发言</button>
     </span>
 </div>
 
