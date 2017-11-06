@@ -22,4 +22,12 @@ public class WebController {
     public String apiDoc() {
         return "api/doc";
     }
+
+    /*
+     * 长连接 ，房间示例
+     */
+    @RequestMapping(value = "/api-room")
+    public String apiRoom() {
+        return "api/room";
+    }
 }
