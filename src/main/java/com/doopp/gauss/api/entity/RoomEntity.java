@@ -1,6 +1,5 @@
 package com.doopp.gauss.api.entity;
 
-import com.doopp.gauss.api.game.RoomGame;
 import com.doopp.gauss.server.task.GameTask;
 import com.google.common.base.Objects;
 import lombok.Getter;
