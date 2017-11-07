@@ -93,6 +93,9 @@ public class RoomSocketHandler extends AbstractWebSocketHandler {
 
         // 如果在房间内，并且 action 正常
         else {
+            //
+            messageObject.put("sendUserId", sessionUser.getId());
+            messageObject.put("sendUserName", sessionUser.getNickname());
             // 是否有参加活动
             UserEntity joinGameMe = sessionRoom.getGameUser(sessionUser.getId());
             // 活动状态
@@ -138,11 +141,12 @@ public class RoomSocketHandler extends AbstractWebSocketHandler {
                 if (gameStatus.equals(RoomEntity.GameStatus.Calling) && sessionRoom.playerNumber()<=3) {
                     // join game
                     sessionRoom.joinGame(sessionUser);
+                    //
+                    TextMessage messageText = new TextMessage(messageObject.toJSONString());
                     // return
                     messageObject.put("result", true);
-                    socketSession.sendMessage(new TextMessage(messageObject.toJSONString()));
-                    // send message
-                    this.roomPublicTalk(sessionRoom, messageObject);
+                    // socketSession.sendMessage(messageText);
+                    roomGameTalk(sessionRoom, messageText);
                 }
 
                 // 人够了就开始游戏

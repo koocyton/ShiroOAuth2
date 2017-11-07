@@ -1,5 +1,5 @@
-<div class="scroll-container opacity-92" id="request_history" style="resize: none;width:100%;height:300px;overflow:scroll; padding:20px;">
-    <code id="message_${id}" ng-repeat="message in clients[${id}].messageList track by $index">
+<div class="scroll-container opacity-92" id="message_${id}" style="resize: none;width:100%;height:300px;overflow:scroll; padding:20px;">
+    <code ng-repeat="message in clients[${id}].messageList track by $index">
         {{ message }}
         <br>
     </code>

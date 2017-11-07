@@ -19,7 +19,7 @@ let ApiRoomController = function($scope, $http) {
     }
 
     $scope.callPlayer = function(ii) {
-        sendMessage(ii, {action: "callPlayer"})
+        sendMessage(ii, {action: "callPlayer", gameType: 1})
     };
 
     $scope.joinGame = function(ii) {
