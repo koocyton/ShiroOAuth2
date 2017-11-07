@@ -1,9 +1,14 @@
-<textarea style="resize: none;width:100%;height:300px;"></textarea>
+<div class="scroll-container opacity-92" id="request_history" style="resize: none;width:100%;height:300px;overflow:scroll; padding:20px;">
+    <code id="message_${id}" ng-repeat="message in clients[${id}].messageList track by $index">
+        {{ message }}
+        <br>
+    </code>
+</div>
 
 <div class="input-group" style="margin:5px auto;">
-    <input type="text" class="form-control" placeholder="what are you say ?" ng-model="clients[0].roomTalk">
+    <input type="text" class="form-control" placeholder="what are you say ?" ng-model="clients[${id}].talkMessage">
     <span class="input-group-btn">
-        <button class="btn btn-success" type="button" ng-click="roomTalk(0)">发言</button>
+        <button class="btn btn-success" type="button" ng-click="publicTalk(${id})">发言</button>
     </span>
 </div>
 
@@ -52,8 +57,22 @@
     </div>
 </div>
 
+<div>
+    <div class="input-group" style="margin:5px auto;width:100%;float:left;">
+        <span class="input-group-btn">
+            <button class="btn btn-info" type="button" ng-click="callPlayer(${id})">发起游戏</button>
+        </span>
+        <span class="input-group-btn">
+            <button class="btn btn-success" type="button" ng-click="joinGame(${id})">参加游戏</button>
+        </span>
+        <span class="input-group-btn">
+            <button class="btn btn-warning" type="button" ng-click="leaveGame(${id})">退出游戏</button>
+        </span>
+    </div>
+</div>
+
 <div class="input-group" style="margin:5px auto;">
-    <input type="text" class="form-control" placeholder="user1">
+    <input type="text" class="form-control" placeholder="user${id}">
     <span class="input-group-btn">
         <button class="btn btn-success" type="button">登陆</button>
     </span>

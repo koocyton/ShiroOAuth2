@@ -39,9 +39,10 @@ TokenService.prototype.checkToken = function(successCall, errorCall) {
  * 长链接
  */
 let WebSocketService = function(uri) {
-    this.ws = /^ws:\/\//.test(uri)
+    let protocol = (window.location.protocol==="https") ? "wss\:\/\/" : "ws\:\/\/";
+    this.ws = /^wss?:\/\//.test(uri)
         ? new WebSocket(uri)
-        : new WebSocket("ws://"+window.location.host+uri);
+        : new WebSocket(protocol + window.location.host + uri);
 };
 WebSocketService.connect = function(uri) {
     return new WebSocketService(uri);
