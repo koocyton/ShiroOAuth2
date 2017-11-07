@@ -239,9 +239,12 @@ public class RoomSocketHandler extends AbstractWebSocketHandler {
         UserEntity sessionUser = this.getSessionUser(socketSession);
         if (sessionRoom!=null) {
             // 退出房间
-            sessionRoom.userLeave(sessionUser);
-            if (sessionRoom.getWatchUsers().size()==0 && sessionRoom.getOwner()==null) {
-                rooms.remove(sessionRoom.getId());
+            synchronized ("leaveRoom_" + sessionRoom.getId()) {
+                sessionRoom.userLeave(sessionUser);
+                // logger.info(" >>> " + sessionRoom.getId() + " : " + sessionRoom.getWatchUsers().size() + " : " + sessionRoom.getOwner());
+                if (sessionRoom.getWatchUsers().size() == 0 && sessionRoom.getOwner() == null) {
+                    rooms.remove(sessionRoom.getId());
+                }
             }
         }
         // 关闭链接

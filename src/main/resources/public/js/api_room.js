@@ -53,6 +53,7 @@ let ApiRoomController = function($scope, $http) {
         let nn = $scope.clients[ii].messageList.length;
         $scope.clients[ii].messageList[nn] = " >>> " + angular.toJson(messageObject);
         $scope.ws[ii].send(angular.toJson(messageObject));
+        $scope.$apply();
         scrollWindow(ii);
     };
 
@@ -65,6 +66,7 @@ let ApiRoomController = function($scope, $http) {
                 .onMessage(function(e) {
                     let nn = $scope.clients[ii].messageList.length;
                     $scope.clients[ii].messageList[nn] = " <<< " + e.data;
+                    $scope.$apply();
                     scrollWindow(ii);
                 })
                 .onOpen(function(e){
