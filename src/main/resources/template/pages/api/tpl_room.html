@@ -1,13 +1,15 @@
 <div class="container">
-    <div class="input-group" style="width:300px;float:left;">
-        <input type="text" class="form-control" name="roomId" placeholder="房间 ID" ng-model="roomId" value="${roomId}">
-    </div>
-    <div class="input-group" style="width:300px;float:left;">
-        <input type="text" class="form-control" name="namePrefix" placeholder="账号前缀" ng-model="namePrefix" value="${namePrefix}">
-        <span class="input-group-btn">
-            <button class="btn btn-success" type="button">重置登陆</button>
-        </span>
-    </div>
+    <form action="/register12" method="post">
+        <div class="input-group" style="width:300px;float:left;">
+            <input type="text" class="form-control" placeholder="房间 ID" ng-model="roomId" value="${roomId}">
+        </div>
+        <div class="input-group" style="width:500px;float:left;">
+            <input type="text" class="form-control" name="namePrefix" placeholder="账号前缀" ng-model="namePrefix" value="${namePrefix}">
+            <span class="input-group-btn">
+                <button class="btn btn-success" type="submit">换个账号前缀</button>
+            </span>
+        </div>
+    </form>
 </div>
 
 <br>

@@ -1,17 +1,26 @@
 package com.doopp.gauss.api.controller;
 
+import com.doopp.gauss.api.entity.UserEntity;
+import com.doopp.gauss.api.service.AccountService;
 import com.doopp.gauss.server.websocket.RoomSocketHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 @Controller
 public class WebController {
 
     @Autowired
     RoomSocketHandler roomSocketHandler;
+
+    @Autowired
+    private AccountService accountService;
 
     /*
      * API 说明
@@ -33,21 +42,27 @@ public class WebController {
      * 长连接 ，房间示例
      */
     @RequestMapping(value = "/api-room")
-    public String apiRoom(ModelMap modelMap) {
+    public String apiRoom(HttpServletRequest request, ModelMap modelMap) {
+        String namePrefix = request.getParameter("namePrefix");
+        if (namePrefix==null) {
+            namePrefix = "kton";
+        }
         int roomId = 1 + roomSocketHandler.getLastRoomId();
-        String namePrefix = this.getRandomString();
         modelMap.addAttribute("roomId", roomId);
         modelMap.addAttribute("namePrefix", namePrefix);
         return "api/room";
     }
 
-    private String getRandomString(){
-        String str = "abcdefghijklmnopqrstuvwxyz";
-        StringBuffer sbf = new StringBuffer();
-        int len = str.length();
-        for (int i = 0; i < 10; i++) {
-            sbf.append(str.charAt((int) Math.round(Math.random() * (len-1))));
+    /*
+     * 注册一个新号
+     */
+    @RequestMapping(value = "/register12", method = RequestMethod.POST)
+    public String register(@RequestParam("namePrefix") String namePrefix) throws Exception {
+        for(int ii=0; ii<=11; ii++) {
+            String name = namePrefix + "_" + ii;
+            UserEntity user = accountService.registerThenGetUser(name + "@gmail.com", "123456", name);
+            accountService.registerSession(user);
         }
-        return sbf.toString();
+        return "forward:/api-room?namePrefix=" + namePrefix;
     }
 }

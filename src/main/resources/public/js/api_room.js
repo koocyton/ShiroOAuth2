@@ -11,12 +11,12 @@ let ApiRoomController = function($scope, $http) {
 
     for(let ii=0; ii<12; ii++) {
         $scope.clients[ii] = {
-            account  : "kton" + ii + "@gmail.com",
+            account  : $scope.namePrefix + "_" + ii + "@gmail.com",
             password : "123456",
             roomName : "西屋独居",
-            roomId : 54613,
-            talkMessage : "我要说 ...",
-            messageList : []
+            talkMessage : "你是一头铁狼",
+            messageList : [],
+            nickName: $scope.namePrefix + "_" + ii
         };
         $scope.ws[ii] = null;
     }
