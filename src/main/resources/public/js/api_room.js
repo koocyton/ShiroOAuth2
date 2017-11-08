@@ -2,6 +2,9 @@
 
 let ApiRoomController = function($scope, $http) {
 
+    $scope.roomId = roomId;
+    $scope.namePrefix = namePrefix;
+
     $scope.clients = [];
 
     $scope.ws = [];
@@ -39,7 +42,7 @@ let ApiRoomController = function($scope, $http) {
     };
 
     $scope.autoJoinRoom = function(ii) {
-        sendMessage(ii, {action: "joinRoom", roomId: $scope.clients[ii].roomId})
+        sendMessage(ii, {action: "joinRoom", roomId: $scope.roomId})
     };
 
     let scrollWindow=function(ii) {

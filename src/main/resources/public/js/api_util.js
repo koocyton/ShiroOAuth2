@@ -38,14 +38,13 @@ TokenService.prototype.checkToken = function(successCall, errorCall) {
 /*
  * 长链接
  */
-let WebSocketService = function(uri) {
-    let protocol = (window.location.protocol==="https") ? "wss\:\/\/" : "ws\:\/\/";
-    this.ws = /^wss?:\/\//.test(uri)
-        ? new WebSocket(uri)
-        : new WebSocket(protocol + window.location.host + uri);
+let WebSocketService = function(url) {
+    let protocol = /^https/.test(window.location.protocol) ? "wss\:\/\/" : "ws\:\/\/";
+    this.ws = /^ws/.test(url) ? new WebSocket(url) : new WebSocket(protocol + window.location.host + url);
 };
-WebSocketService.connect = function(uri) {
-    return new WebSocketService(uri);
+
+WebSocketService.connect = function(url) {
+    return new WebSocketService(url);
 };
 WebSocketService.prototype.onOpen = function(callOpen) {
     if (typeof callOpen==="function") {
