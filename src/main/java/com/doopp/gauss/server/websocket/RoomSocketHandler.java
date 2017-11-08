@@ -51,7 +51,9 @@ public class RoomSocketHandler extends AbstractWebSocketHandler {
         }
         // send to owner user
         UserEntity owner = sessionRoom.getOwner();
-        sockets.get(owner.getId()).sendMessage(message);
+        if (owner!=null) {
+            sockets.get(owner.getId()).sendMessage(message);
+        }
     }
 
     // 房间内游戏频道说话
@@ -285,5 +287,10 @@ public class RoomSocketHandler extends AbstractWebSocketHandler {
             return true;
         }
         return false;
+    }
+
+    // 获取一个空的房间号
+    public int getLastRoomId() {
+        return lastRoomId;
     }
 }
