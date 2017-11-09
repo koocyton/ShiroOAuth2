@@ -9,6 +9,7 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -57,12 +58,13 @@ public class WebController {
      * 注册一个新号
      */
     @RequestMapping(value = "/register12", method = RequestMethod.POST)
-    public String register(@RequestParam("namePrefix") String namePrefix) throws Exception {
+    public String register(@RequestParam("namePrefix") String namePrefix, ModelMap modelMap) throws Exception {
         for(int ii=0; ii<=11; ii++) {
             String name = namePrefix + "_" + ii;
             UserEntity user = accountService.registerThenGetUser(name + "@gmail.com", "123456", name);
             accountService.registerSession(user);
         }
-        return "forward:/api-room?namePrefix=" + namePrefix;
+        modelMap.addAttribute("url", "/api-room?namePrefix=" + namePrefix);
+        return "api/redirect";
     }
 }

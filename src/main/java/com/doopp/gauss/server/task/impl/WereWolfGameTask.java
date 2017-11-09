@@ -17,6 +17,12 @@ public class WereWolfGameTask implements GameTask {
 
     private final RoomSocketHandler roomSocketHandler;
 
+    private String[] identitys = new String[] {
+            "wolf", "wolf", "wolf", "wolf",
+            "villager", "villager", "villager", "villager",
+            "witch", "hunter", "seer", "cupit"
+    };
+
     public WereWolfGameTask (RoomSocketHandler roomSocketHandler, RoomEntity sessionRoom) {
         this.sessionRoom = sessionRoom;
         this.roomSocketHandler = roomSocketHandler;
@@ -37,6 +43,7 @@ public class WereWolfGameTask implements GameTask {
 
     // 游戏开始
     private void gameStart() {
+        this.assignIdentity();
     }
 
     // 抢身份
@@ -45,6 +52,9 @@ public class WereWolfGameTask implements GameTask {
 
     // 分配身份
     private void assignIdentity() {
+        for(String identity: this.identitys) {
+
+        }
     }
 
     // 提示狼杀人

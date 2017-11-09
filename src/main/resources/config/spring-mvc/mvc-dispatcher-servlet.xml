@@ -9,4 +9,14 @@
     <aop:config proxy-target-class="true"></aop:config>
     //-->
 
+    <!--
+    <bean class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor"/>
+    <bean class="org.springframework.context.annotation.CommonAnnotationBeanPostProcessor"/>
+    <bean class="org.springframework.beans.factory.annotation.RequiredAnnotationBeanPostProcessor"/>
+
+    <bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">
+        <property name="ignoreDefaultModelOnRedirect" value="false"/>
+    </bean>
+    //-->
+
 </beans>
