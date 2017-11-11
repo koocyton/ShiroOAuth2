@@ -61,7 +61,7 @@ public class WebController {
     public String register(@RequestParam("namePrefix") String namePrefix, ModelMap modelMap) throws Exception {
         for(int ii=0; ii<=11; ii++) {
             String name = namePrefix + "_" + ii;
-            UserEntity user = accountService.registerThenGetUser(name + "@gmail.com", "123456", name);
+            UserEntity user = accountService.getUserOnRegister(name + "@gmail.com", "123456", name);
             accountService.registerSession(user);
         }
         modelMap.addAttribute("url", "/api-room?namePrefix=" + namePrefix);

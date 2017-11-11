@@ -5,8 +5,6 @@ import com.doopp.gauss.api.entity.dto.SessionKeyDTO;
 import com.doopp.gauss.api.entity.dto.UserMeDTO;
 import com.doopp.gauss.api.service.AccountService;
 import com.doopp.gauss.api.utils.CommonUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -19,8 +17,6 @@ import org.springframework.web.bind.annotation.*;
 @Controller
 @RequestMapping(value = "api/v1/")
 public class AccountController {
-
-    private final Logger logger = LoggerFactory.getLogger(AccountController.class);
 
     @Autowired
     private AccountService accountService;
@@ -54,7 +50,7 @@ public class AccountController {
                                   @RequestParam("password") String password,
                                   @RequestParam("nickName") String nickName) throws Exception {
 
-        UserEntity user = accountService.registerThenGetUser(account, password, nickName);
+        UserEntity user = accountService.getUserOnRegister(account, password, nickName);
         String accessToken = accountService.registerSession(user);
         return new SessionKeyDTO(accessToken);
     }

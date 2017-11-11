@@ -23,7 +23,7 @@ public interface AccountService {
      * @return 用户信息
      * @throws Exception 注册异常，账号或密码不合格
      */
-    UserEntity registerThenGetUser(String account, String password, String nickName) throws Exception;
+    UserEntity getUserOnRegister(String account, String password, String nickName) throws Exception;
 
     /**
      * 通过 access-token 获取用户信息

@@ -9,16 +9,11 @@ import com.doopp.gauss.server.redis.CustomShadedJedis;
 import org.apache.oltu.oauth2.as.issuer.MD5Generator;
 import org.apache.oltu.oauth2.as.issuer.OAuthIssuer;
 import org.apache.oltu.oauth2.as.issuer.OAuthIssuerImpl;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 @Service("accountService")
 public class AccountServiceImpl implements AccountService {
-
-    private final Logger logger = LoggerFactory.getLogger(AccountServiceImpl.class);
 
     @Autowired
     private UserDao userDao;
@@ -61,7 +56,7 @@ public class AccountServiceImpl implements AccountService {
      * @throws Exception 注册异常，账号或密码不合格
      */
     @Override
-    public UserEntity registerThenGetUser(String account, String password, String nickName) throws Exception
+    public UserEntity getUserOnRegister(String account, String password, String nickName) throws Exception
     {
         // 当前时间
         int currentTime = (int)(System.currentTimeMillis() / 1000);
@@ -109,12 +104,13 @@ public class AccountServiceImpl implements AccountService {
         String accessToken = oauthIssuerImpl.accessToken();
         // clean last token cache
         String lastToken = sessionRedis.get(user.getId().toString());
-        if (lastToken!=null) {
+        if (lastToken != null) {
             sessionRedis.del(lastToken);
         }
         // cache access token
         sessionRedis.set(accessToken, user.getId().toString());
         sessionRedis.set(user.getId().toString(), accessToken);
+        userRedis.set(user.getId().toString().getBytes(), user);
         return accessToken;
     }
 
@@ -135,9 +131,7 @@ public class AccountServiceImpl implements AccountService {
         // get user
         Object userObject = userRedis.get(userId.getBytes());
         if (userObject==null) {
-            UserEntity user = userDao.fetchById(Long.valueOf(userId));
-            userRedis.set(userId.getBytes(), user);
-            return user;
+            return null;
         }
         return (UserEntity) userObject;
     }
