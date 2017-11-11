@@ -107,11 +107,13 @@ public class RoomEntity {
 
     // 离开房间
     public void userLeave(UserEntity user) {
-        if (this.owner!=null && Objects.equal(this.owner.getId(), user.getId())) {
-            this.owner = null;
+        synchronized ("leave_room_" + String.valueOf(this.getId())) {
+            if (this.owner != null && Objects.equal(this.owner.getId(), user.getId())) {
+                this.owner = null;
+            }
+            this.watchUsers.remove(user.getId());
+            this.gameUsersId.remove(user.getId());
         }
-        this.watchUsers.remove(user.getId());
-        this.gameUsersId.remove(user.getId());
     }
 
     // 参加活动的人数

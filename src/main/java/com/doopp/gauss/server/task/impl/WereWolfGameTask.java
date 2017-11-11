@@ -1,5 +1,44 @@
 package com.doopp.gauss.server.task.impl;
 
+/**
+ *  协议部分
+ *
+ *  进入白天  {"action":"toDay"}
+ *  进入夜晚  {"action":"toNight"}
+ *
+ *  狼开始行动  s {"action":"wolfAction"}
+ *  狼选择杀人  c {"action":"wolfKill", "player":1, "kill":2}
+ *  狼选择杀人  c {"action":"wolfKill", "player":1, "kill":0}
+ *
+ *  预言家开始行动  s {"action":"seerAction"}
+ *  预言家查看  c {"action":"seerCheck", "player":3, "check":3, }
+ *  告诉预言家这个人的身份  s {"action":"seerCheck", "player":3, "check":3, "result":"villager"}
+ *
+ *  女巫开始行动  s {"action":"seerAction"}
+ *  女巫救人  c {"action":"seerRescue", "player":3, "check":3,}
+ *  女巫下毒  c {"action":"seerPoison", "player":3, "check":3, "result":"villager"}
+ *
+ *  平安夜   s  {"action":"safelyNight"}
+ *  有人被杀 s  {"action":"killingNight", "players":[3,4]}
+ *
+ *  触发猎人技能 s {"action":"hunterAction"}
+ *  猎人射击 c {"action":"hunterShot", "players":4, "kill":5}
+ *
+ *  触发猎人技能 s {"action":"hunterAction"}
+ *  猎人射击 c {"action":"hunterShot", "players":4, "kill":5}
+ *
+ *  发言 s {"action":"talkStage", "player":2, "time":30}
+ *  跳过发言 c {"action":"talkStage", "player":2, "time":30}
+ *
+ *  开始投票 s {"action":"voteAction"}
+ *  投票给 c {"action":"voteKill"}
+ *  放弃投票 c {"action":"voteWaiver"}
+ *
+ *  有人被票决  {"action":"ticketKill", "players":[3,4]}
+ *  平票  {"action":"flatTicket", "players":[3,4]}
+ *
+ */
+
 import com.alibaba.fastjson.JSONObject;
 import com.doopp.gauss.api.entity.RoomEntity;
 import com.doopp.gauss.server.task.GameTask;
@@ -9,7 +48,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.socket.TextMessage;
 
-import java.util.Collection;
 import java.util.Random;
 
 public class WereWolfGameTask implements GameTask {
@@ -20,7 +58,7 @@ public class WereWolfGameTask implements GameTask {
 
     private final RoomSocketHandler roomSocketHandler;
 
-    private String[] identitys = new String[] {
+    private final String[] identitys = new String[] {
             "wolf", "wolf", "wolf", "wolf",
             "villager", "villager", "villager", "villager",
             "witch", "hunter", "seer", "cupit"
@@ -56,40 +94,49 @@ public class WereWolfGameTask implements GameTask {
     // 分配身份
     private void assignIdentity() {
         Random random= new Random();
-        String[] newIdentity = new String[12];
-        for(int ii=0; ii<identitys.length; ii++) {
-            int index = random.nextInt(identitys.length);
-            newIdentity[ii] = identitys[index];
+        String[] _identitys = this.identitys.clone();
+        for(int ii=0; ii<this.identitys.length; ii++) {
+            int nn = random.nextInt(this.identitys.length);
+            this.identitys[ii] = _identitys[nn];
         }
-        Collection<Long> gameUsersId = sessionRoom.getGameUsersId().values();
-        for(int ii=0; ii<newIdentity.length; ii++) {
-        }
+        this.messageToAll(JSONObject.toJSONString(this.identitys));
+        this.toBegin();
     }
 
     // 提示狼杀人
-    private void wolfKilling() {
+    private void wolfAction() {
+
+        this.messageToAll(JSONObject.toJSONString(new Object()));
     }
 
     // 提示女巫救人
-    private void witchHelp() {
+    private void witchAction() {
 
     }
 
     // 提示预言家查询身份
-    private void seerViewIdentity() {
+    private void seerAction() {
 
+    }
+
+    private void toBegin() {
+        toNight();
     }
 
     // 提示天亮
     private void toDay() {
-
+        toNight();
     }
 
     // 天黑了
     private void toNight() {
+        this.wolfAction();
+        this.seerAction();
+        toDay();
     }
 
     // 接受房间里传来的消息
+    // 已经将非游戏内的用户的信息过滤
     @Override
     public void roomMessageHandle(JSONObject messageObject) {
         String action = messageObject.getString("action");

@@ -140,7 +140,7 @@ public class RoomSocketHandler extends AbstractWebSocketHandler {
             // 玩家参与
             else if (action.equals("joinGame")) {
                 // 召集阶段，玩家才能申请参与
-                if (gameStatus.equals(RoomEntity.GameStatus.Calling) && sessionRoom.playerNumber()<=3) {
+                if (gameStatus.equals(RoomEntity.GameStatus.Calling) && sessionRoom.playerNumber()<=4) {
                     // join game
                     sessionRoom.joinGame(sessionUser);
                     //
@@ -152,7 +152,7 @@ public class RoomSocketHandler extends AbstractWebSocketHandler {
                 }
 
                 // 人够了就开始游戏
-                if (gameStatus.equals(RoomEntity.GameStatus.Calling) && sessionRoom.playerNumber()>=3) {
+                if (gameStatus.equals(RoomEntity.GameStatus.Calling) && sessionRoom.playerNumber()>=4) {
                     // 提示游戏参与者开始游戏
                     TextMessage textMessage = new TextMessage("{action:\"gameStart\", gameType:\"" + sessionRoom.getGameType() + "\"}");
                     // 发送给游戏参与者
@@ -241,13 +241,11 @@ public class RoomSocketHandler extends AbstractWebSocketHandler {
         UserEntity sessionUser = this.getSessionUser(socketSession);
         if (sessionRoom!=null) {
             // 退出房间
-            synchronized ("leaveRoom_" + sessionRoom.getId()) {
-                sessionRoom.userLeave(sessionUser);
-                // logger.info(" >>> " + sessionRoom.getId() + " : " + sessionRoom.getWatchUsers().size() + " : " + sessionRoom.getOwner());
-                if (sessionRoom.getWatchUsers().size() == 0 && sessionRoom.getOwner() == null) {
-                    rooms.remove(sessionRoom.getId());
-                    sessionRoom=null;
-                }
+            sessionRoom.userLeave(sessionUser);
+            // logger.info(" >>> " + sessionRoom.getId() + " : " + sessionRoom.getWatchUsers().size() + " : " + sessionRoom.getOwner());
+            if (sessionRoom.getWatchUsers().size() == 0 && sessionRoom.getOwner() == null) {
+                rooms.remove(sessionRoom.getId());
+                sessionRoom.setGameTask(null);
             }
         }
         // 关闭链接
