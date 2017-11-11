@@ -152,7 +152,7 @@ public class RoomSocketHandler extends AbstractWebSocketHandler {
                 }
 
                 // 人够了就开始游戏
-                if (sessionRoom.playerNumber()>=3) {
+                if (gameStatus.equals(RoomEntity.GameStatus.Calling) && sessionRoom.playerNumber()>=3) {
                     // 提示游戏参与者开始游戏
                     TextMessage textMessage = new TextMessage("{action:\"gameStart\", gameType:\"" + sessionRoom.getGameType() + "\"}");
                     // 发送给游戏参与者
@@ -246,6 +246,7 @@ public class RoomSocketHandler extends AbstractWebSocketHandler {
                 // logger.info(" >>> " + sessionRoom.getId() + " : " + sessionRoom.getWatchUsers().size() + " : " + sessionRoom.getOwner());
                 if (sessionRoom.getWatchUsers().size() == 0 && sessionRoom.getOwner() == null) {
                     rooms.remove(sessionRoom.getId());
+                    sessionRoom=null;
                 }
             }
         }

@@ -9,6 +9,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.socket.TextMessage;
 
+import java.util.Collection;
+import java.util.Random;
+
 public class WereWolfGameTask implements GameTask {
 
     private final Logger logger = LoggerFactory.getLogger(WereWolfGameTask.class);
@@ -52,8 +55,14 @@ public class WereWolfGameTask implements GameTask {
 
     // 分配身份
     private void assignIdentity() {
-        for(String identity: this.identitys) {
-
+        Random random= new Random();
+        String[] newIdentity = new String[12];
+        for(int ii=0; ii<identitys.length; ii++) {
+            int index = random.nextInt(identitys.length);
+            newIdentity[ii] = identitys[index];
+        }
+        Collection<Long> gameUsersId = sessionRoom.getGameUsersId().values();
+        for(int ii=0; ii<newIdentity.length; ii++) {
         }
     }
 
@@ -99,7 +108,7 @@ public class WereWolfGameTask implements GameTask {
 
     // 玩家都准备好了
     private boolean allReady(int loopNumber) {
-        return loopNumber>=30;
+        return loopNumber>=10;
     }
 
     // 延迟一段时间
