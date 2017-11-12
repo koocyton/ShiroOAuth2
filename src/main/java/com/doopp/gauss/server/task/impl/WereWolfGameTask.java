@@ -7,16 +7,14 @@ package com.doopp.gauss.server.task.impl;
  *  进入夜晚  {"action":"toNight"}
  *
  *  狼开始行动  s {"action":"wolfAction"}
- *  狼选择杀人  c {"action":"wolfKill", "player":1, "kill":2}
- *  狼选择杀人  c {"action":"wolfKill", "player":1, "kill":0}
+ *  狼选择杀人  c {"action":"wolfAction", "kill":1, "kill":2}
  *
  *  预言家开始行动  s {"action":"seerAction"}
- *  预言家查看  c {"action":"seerCheck", "player":3, "check":3, }
- *  告诉预言家这个人的身份  s {"action":"seerCheck", "player":3, "check":3, "result":"villager"}
+ *  预言家查看  c {"action":"seerAction", "check":3, }
+ *  告诉预言家这个人的身份  s {"action":"identityRevealing", "identity":"villager"}
  *
  *  女巫开始行动  s {"action":"seerAction"}
- *  女巫救人  c {"action":"seerRescue", "player":3, "check":3,}
- *  女巫下毒  c {"action":"seerPoison", "player":3, "check":3, "result":"villager"}
+ *  女巫行动  c {"action":"seerAction", "help":3, "kill":3,}
  *
  *  平安夜   s  {"action":"safelyNight"}
  *  有人被杀 s  {"action":"killingNight", "players":[3,4]}
@@ -104,19 +102,39 @@ public class WereWolfGameTask implements GameTask {
     }
 
     // 提示狼杀人
-    private void wolfAction() {
-
-        this.messageToAll(JSONObject.toJSONString(new Object()));
+    private void wolfActionTrigger() {
+        JSONObject wolfAction = new JSONObject();
+        wolfAction.put("action", "wolfAction");
+        this.messageToAll(wolfAction.toJSONString());
     }
 
-    // 提示女巫救人
-    private void witchAction() {
-
+    // 提示女巫行动
+    private void witchActionTrigger() {
+        JSONObject seerAction = new JSONObject();
+        seerAction.put("action", "seerAction");
+        this.messageToAll(seerAction.toJSONString());
     }
 
     // 提示预言家查询身份
-    private void seerAction() {
+    private void seerActionTrigger() {
+        JSONObject seerAction = new JSONObject();
+        seerAction.put("action", "seerAction");
+        this.messageToAll(seerAction.toJSONString());
+    }
 
+    // 狼杀人监听
+    private void wolfActionListen(JSONObject messageObject) {
+        // 狼人杀人完毕，触发女巫开始行动
+        this.witchActionTrigger();
+    }
+
+    // 女巫活动监听
+    private void witchActionListen(JSONObject messageObject) {
+    }
+
+    // 提示预言家查询身份
+    private void seerActionListen(JSONObject messageObject) {
+        messageObject.getString("checkNumber");
     }
 
     private void toBegin() {
@@ -130,9 +148,8 @@ public class WereWolfGameTask implements GameTask {
 
     // 天黑了
     private void toNight() {
-        this.wolfAction();
-        this.seerAction();
-        toDay();
+        this.wolfActionTrigger();
+        this.seerActionTrigger();
     }
 
     // 接受房间里传来的消息
@@ -143,8 +160,23 @@ public class WereWolfGameTask implements GameTask {
         if (Strings.isNullOrEmpty(action)) {
             return;
         }
-        if (action.equals("publicTalk")) {
-            this.messageToAll(messageObject.toJSONString());
+        switch(action) {
+            // 公共频道说话
+            case "publicTalk":
+                this.messageToAll(messageObject.toJSONString());
+                break;
+            // 狼人行动
+            case "wolfAction":
+                this.wolfActionListen(messageObject);
+                break;
+            // 女巫行动
+            case "witchAction":
+                this.witchActionListen(messageObject);
+                break;
+            // 预言家行动
+            case "seerAction":
+                this.seerActionListen(messageObject);
+                break;
         }
     }
 
