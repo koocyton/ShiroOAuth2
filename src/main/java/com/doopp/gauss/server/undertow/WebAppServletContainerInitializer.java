@@ -35,22 +35,26 @@ public class WebAppServletContainerInitializer implements ServletContainerInitia
 
         // root web application context
         AnnotationConfigWebApplicationContext rootWebAppContext = new AnnotationConfigWebApplicationContext();
-        rootWebAppContext.register(ApplicationConfiguration.class);
-        rootWebAppContext.register(WebMvcConfigurer.class);
+        rootWebAppContext.register(ApplicationConfiguration.class, WebMvcConfigurer.class);
+        // rootWebAppContext.register(WebMvcConfigurer.class);
         // rootWebAppContext.scan("com.doopp.gauss.server.configuration");
         ctx.addListener(new ContextLoaderListener(rootWebAppContext));
 
         // set spring mvc servlet
-        DispatcherServlet dispatcherServlet = new DispatcherServlet();
-        // dispatcherServlet.setContextClass(WebApplicationContext.class);
-        dispatcherServlet.setContextConfigLocation("classpath:config/spring-mvc/mvc-dispatcher-servlet.xml");
-        ServletRegistration.Dynamic dispatcher = ctx.addServlet("mvc-dispatcher", dispatcherServlet);//DispatcherServlet.class);
+        //注解扫描上下文
+        AnnotationConfigWebApplicationContext webApplicationContext = new AnnotationConfigWebApplicationContext();
+        DispatcherServlet dispatcherServlet = new DispatcherServlet(webApplicationContext);
+        // dispatcherServlet.setContextConfigLocation("classpath:config/spring-mvc/mvc-dispatcher-servlet.xml");
+        ServletRegistration.Dynamic dispatcher = ctx.addServlet("mvc-dispatcher", dispatcherServlet);
         dispatcher.setLoadOnStartup(1);
         dispatcher.addMapping("/*");
 
         // 添加 druid sql 监控
         ServletRegistration.Dynamic druidDispatcher = ctx.addServlet("DruidStatView", com.alibaba.druid.support.http.StatViewServlet.class);
-        druidDispatcher.addMapping("/d/*");
+        druidDispatcher.setInitParameter("resetEnable", "false");
+        druidDispatcher.setInitParameter("loginUsername", "druidAdmin");
+        druidDispatcher.setInitParameter("loginPassword", "druidPassword");
+        druidDispatcher.addMapping("/druid/*");
     }
 
     @Override

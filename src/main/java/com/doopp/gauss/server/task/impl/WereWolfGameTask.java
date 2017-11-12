@@ -42,6 +42,7 @@ import com.doopp.gauss.api.entity.RoomEntity;
 import com.doopp.gauss.server.task.GameTask;
 import com.doopp.gauss.server.websocket.RoomSocketHandler;
 import com.google.common.base.Strings;
+import com.google.common.collect.Range;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.socket.TextMessage;
@@ -50,7 +51,7 @@ import java.util.Random;
 
 public class WereWolfGameTask implements GameTask {
 
-    private final Logger logger = LoggerFactory.getLogger(WereWolfGameTask.class);
+    private final static Logger logger = LoggerFactory.getLogger(WereWolfGameTask.class);
 
     private final RoomEntity sessionRoom;
 
@@ -82,11 +83,20 @@ public class WereWolfGameTask implements GameTask {
 
     // 游戏开始
     private void gameStart() {
-        this.assignIdentity();
+        this.grabIdentityTrigger();
     }
 
-    // 抢身份
-    private void grabIdentityHandle() {
+    // 开始抢身份
+    private void grabIdentityTrigger() {
+        JSONObject grabIdentity = new JSONObject();
+        grabIdentity.put("action", "grabIdentity");
+        grabIdentity.put("identity", new String[]{"identity", "wolf"});
+        this.messageToAll(grabIdentity.toJSONString());
+    }
+
+    // 返回抢身份信息
+    private void grabIdentityListen(JSONObject messageObject) {
+        this.assignIdentity();
     }
 
     // 分配身份
@@ -143,11 +153,18 @@ public class WereWolfGameTask implements GameTask {
 
     // 提示天亮
     private void toDay() {
+        JSONObject toDay = new JSONObject();
+        toDay.put("action", "toDay");
+        this.messageToAll(toDay.toJSONString());
         toNight();
     }
 
     // 天黑了
     private void toNight() {
+        JSONObject toNight = new JSONObject();
+        toNight.put("action", "toNight");
+        this.messageToAll(toNight.toJSONString());
+        delay(5000);
         this.wolfActionTrigger();
         this.seerActionTrigger();
     }
@@ -187,7 +204,7 @@ public class WereWolfGameTask implements GameTask {
 
     // 玩家都准备好了
     private boolean allReady(int loopNumber) {
-        return loopNumber>=10;
+        return loopNumber>=1;
     }
 
     // 延迟一段时间

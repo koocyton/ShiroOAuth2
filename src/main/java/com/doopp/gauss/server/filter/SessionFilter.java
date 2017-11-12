@@ -51,18 +51,22 @@ public class SessionFilter extends OncePerRequestFilter {
 
         // 不过滤的uri
         String[] notFilters = new String[] {
+
+            // api
             "/api/v1/register",
             "/api/v1/login",
-            "/api/v1/fast-login",
             "/api/v1/logout",
-            "/demo",
-            "/api-help",
+
+            // static
             "/js",
             "/image",
             "/css",
             "/favicon.ico",
             "/webjars",
-            "/d/druid"
+
+            // helper
+            "/helper",
+            "/druid"
         };
 
         // 请求的uri
@@ -75,7 +79,7 @@ public class SessionFilter extends OncePerRequestFilter {
 
         // 如果uri中包含不过滤的uri，则不进行过滤
         for (String notFilter : notFilters) {
-            if (uri.contains(notFilter) || uri.equals("/api") || uri.equals("/api-doc") || uri.equals("/api-room") || uri.equals("/register12")) {
+            if (uri.contains(notFilter)) {
                 doFilter = false;
                 break;
             }

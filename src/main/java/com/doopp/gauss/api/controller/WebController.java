@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 @Controller
+@RequestMapping(value = "/helper")
 public class WebController {
 
     @Autowired
@@ -26,23 +27,23 @@ public class WebController {
     /*
      * API 说明
      */
-    @RequestMapping(value = "/api")
+    @RequestMapping(value = "")
     public String apiHelp() {
-        return "api/help";
+        return "helper/api";
     }
 
     /*
      * API 文档
      */
-    @RequestMapping(value = "/api-doc")
+    @RequestMapping(value = "/doc")
     public String apiDoc() {
-        return "api/doc";
+        return "helper/doc";
     }
 
     /*
      * 长连接 ，房间示例
      */
-    @RequestMapping(value = "/api-room")
+    @RequestMapping(value = "/room")
     public String apiRoom(HttpServletRequest request, ModelMap modelMap) {
         String namePrefix = request.getParameter("namePrefix");
         if (namePrefix==null) {
@@ -51,7 +52,7 @@ public class WebController {
         int roomId = 1 + roomSocketHandler.getLastRoomId();
         modelMap.addAttribute("roomId", roomId);
         modelMap.addAttribute("namePrefix", namePrefix);
-        return "api/room";
+        return "helper/room";
     }
 
     /*
@@ -65,6 +66,14 @@ public class WebController {
             accountService.registerSession(user);
         }
         modelMap.addAttribute("url", "/api-room?namePrefix=" + namePrefix);
-        return "api/redirect";
+        return "helper/redirect";
+    }
+
+    /*
+     * 进入游戏
+     */
+    @RequestMapping(value = "/app-demo", method = RequestMethod.POST)
+    public String appDemo() {
+        return "helper/app-demo";
     }
 }

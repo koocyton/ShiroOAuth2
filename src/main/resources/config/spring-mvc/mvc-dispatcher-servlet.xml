@@ -4,6 +4,8 @@
        xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
+    <!-- 这个文件目前不起作用了，可以删除，只是保留有这些配置做参考 -->
+
     <!-- 强制使用CGLIB代理 -->
     <!--
     <aop:config proxy-target-class="true"></aop:config>
