@@ -72,7 +72,7 @@ public class WebController {
     /*
      * 进入游戏
      */
-    @RequestMapping(value = "/app-demo", method = RequestMethod.POST)
+    @RequestMapping(value = "/app-demo", method = RequestMethod.GET)
     public String appDemo() {
         return "helper/app-demo";
     }
