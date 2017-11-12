@@ -72,7 +72,7 @@ public class WebController {
             UserEntity user = accountService.getUserOnRegister(name + "@gmail.com", "123456", name);
             accountService.registerSession(user);
         }
-        modelMap.addAttribute("url", "/api-room?namePrefix=" + namePrefix);
+        modelMap.addAttribute("url", "/helper/room?namePrefix=" + namePrefix);
         return "helper/redirect";
     }
 
