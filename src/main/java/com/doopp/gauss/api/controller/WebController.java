@@ -15,7 +15,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 @Controller
-@RequestMapping(value = "/helper")
 public class WebController {
 
     @Autowired
@@ -27,7 +26,15 @@ public class WebController {
     /*
      * API 说明
      */
-    @RequestMapping(value = "")
+    @RequestMapping(value = "/api")
+    public String api() {
+        return "helper/api";
+    }
+
+    /*
+     * API 说明
+     */
+    @RequestMapping(value = "/helper")
     public String apiHelp() {
         return "helper/api";
     }
@@ -35,7 +42,7 @@ public class WebController {
     /*
      * API 文档
      */
-    @RequestMapping(value = "/doc")
+    @RequestMapping(value = "/helper/doc")
     public String apiDoc() {
         return "helper/doc";
     }
@@ -43,7 +50,7 @@ public class WebController {
     /*
      * 长连接 ，房间示例
      */
-    @RequestMapping(value = "/room")
+    @RequestMapping(value = "/helper/room")
     public String apiRoom(HttpServletRequest request, ModelMap modelMap) {
         String namePrefix = request.getParameter("namePrefix");
         if (namePrefix==null) {
@@ -58,7 +65,7 @@ public class WebController {
     /*
      * 注册一个新号
      */
-    @RequestMapping(value = "/register12", method = RequestMethod.POST)
+    @RequestMapping(value = "/helper/register12", method = RequestMethod.POST)
     public String register(@RequestParam("namePrefix") String namePrefix, ModelMap modelMap) throws Exception {
         for(int ii=0; ii<=11; ii++) {
             String name = namePrefix + "_" + ii;
@@ -72,7 +79,7 @@ public class WebController {
     /*
      * 进入游戏
      */
-    @RequestMapping(value = "/app-demo", method = RequestMethod.GET)
+    @RequestMapping(value = "/helper/app-demo", method = RequestMethod.GET)
     public String appDemo() {
         return "helper/app-demo";
     }
