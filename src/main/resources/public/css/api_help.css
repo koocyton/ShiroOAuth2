@@ -2,7 +2,7 @@ body{overflow:hidden;}
 label{font-weight:normal;}
 input,button,button:focus,button:active,button:visited,a:focus,a:active{outline:none;}
 
-body .container{width:100%;background-color:#333333;}
+body .container{width:100%;}
 .blur-10 {-webkit-filter:blur(10px); -moz-filter:blur(10px); -ms-filter:blur(10px); filter:blur(10px);}
 
 /* 背景图 */

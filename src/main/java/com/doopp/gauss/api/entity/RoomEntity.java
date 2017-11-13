@@ -87,11 +87,6 @@ public class RoomEntity {
         return gameUsers;
     }
 
-    // 获取所有房间内的游戏用户 ID
-    public Map<Long, Long> getGameUsersId() {
-        return gameUsersId;
-    }
-
     // 加入到房主
     public void setOwner(UserEntity user) {
         if (this.getOwner()==null) {
