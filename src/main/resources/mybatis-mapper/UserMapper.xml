@@ -2,9 +2,9 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.doopp.gauss.api.dao.UserDao">
+<mapper namespace="com.doopp.gauss.common.utils.dao.UserDao">
 
-    <select id="fetchList" resultType="com.doopp.gauss.api.entity.UserEntity">
+    <select id="fetchList" resultType="com.doopp.gauss.common.utils.entity.UserEntity">
         SELECT
           *
         FROM
@@ -36,7 +36,7 @@
         </where>
     </select>
 
-    <select id="fetchById" parameterType="Long" resultType="com.doopp.gauss.api.entity.UserEntity">
+    <select id="fetchById" parameterType="Long" resultType="com.doopp.gauss.common.utils.entity.UserEntity">
         SELECT
             *
         FROM
@@ -46,7 +46,7 @@
         LIMIT 1
     </select>
 
-    <select id="fetchListByIds" resultType="com.doopp.gauss.api.entity.UserEntity">
+    <select id="fetchListByIds" resultType="com.doopp.gauss.common.utils.entity.UserEntity">
         SELECT
             *
         FROM
@@ -57,7 +57,7 @@
             #{offset,jdbcType=INTEGER}, #{limit,jdbcType=INTEGER}
     </select>
 
-    <select id="fetchUserFriends" parameterType="Long" resultType="com.doopp.gauss.api.entity.UserEntity">
+    <select id="fetchUserFriends" parameterType="Long" resultType="com.doopp.gauss.common.utils.entity.UserEntity">
         SELECT
             *
         FROM
@@ -66,7 +66,7 @@
             id in (select friends from `user` where id=#{id,jdbcType=INTEGER})
     </select>
 
-    <select id="fetchByAccount" parameterType="String" resultType="com.doopp.gauss.api.entity.UserEntity">
+    <select id="fetchByAccount" parameterType="String" resultType="com.doopp.gauss.common.utils.entity.UserEntity">
         SELECT
             *
         FROM
@@ -85,14 +85,14 @@
             id=${id,jdbcType=BIGINT}
     </delete>
 
-    <insert id="create" parameterType="com.doopp.gauss.api.entity.UserEntity" useGeneratedKeys="true" keyColumn="id">
+    <insert id="create" parameterType="com.doopp.gauss.common.utils.entity.UserEntity" useGeneratedKeys="true" keyColumn="id">
         INSERT INTO `user`
           (id, account, password, salt, nickname, portrait, friends, gender, created_at)
         VALUES
           (${id}, #{account}, #{password}, #{salt}, #{nickname}, #{portrait}, #{friends}, ${gender}, ${created_at})
     </insert>
 
-    <update id="update" parameterType="com.doopp.gauss.api.entity.UserEntity">
+    <update id="update" parameterType="com.doopp.gauss.common.utils.entity.UserEntity">
         UPDATE
             `user`
         SET

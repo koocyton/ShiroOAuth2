@@ -1,4 +1,4 @@
-package com.doopp.gauss.api.utils;
+package com.doopp.gauss.common.utils;
 
 import com.google.common.base.Strings;
 import org.modelmapper.ModelMapper;

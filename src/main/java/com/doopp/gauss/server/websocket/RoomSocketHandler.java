@@ -1,8 +1,8 @@
 package com.doopp.gauss.server.websocket;
 
 import com.alibaba.fastjson.JSONObject;
-import com.doopp.gauss.api.entity.RoomEntity;
-import com.doopp.gauss.api.entity.UserEntity;
+import com.doopp.gauss.common.entity.Room;
+import com.doopp.gauss.common.entity.User;
 import com.doopp.gauss.server.task.GameTaskDispatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +25,7 @@ public class RoomSocketHandler extends AbstractWebSocketHandler {
     private static final Map<Long, WebSocketSession> sockets = new HashMap<>();
 
     // room`s session
-    private static final Map<Integer, RoomEntity> rooms = new HashMap<>();
+    private static final Map<Integer, Room> rooms = new HashMap<>();
 
     // room id
     private static int lastRoomId = 54612;
@@ -37,27 +37,27 @@ public class RoomSocketHandler extends AbstractWebSocketHandler {
     /*
      * 获取房间列表
      */
-    public Map<Integer, RoomEntity> getRooms() {
+    public Map<Integer, Room> getRooms() {
         return rooms;
     }
 
     // 房间内公共频道说话
-    private void roomPublicTalk(RoomEntity sessionRoom, JSONObject messageObject) throws IOException {
+    private void roomPublicTalk(Room sessionRoom, JSONObject messageObject) throws IOException {
         // to json
         TextMessage message = new TextMessage(messageObject.toJSONString());
         // send to watch user
-        for(UserEntity watchUser : sessionRoom.getWatchUsers().values()) {
+        for(User watchUser : sessionRoom.getWatchUsers().values()) {
             sockets.get(watchUser.getId()).sendMessage(message);
         }
         // send to owner user
-        UserEntity owner = sessionRoom.getOwner();
+        User owner = sessionRoom.getOwner();
         if (owner!=null) {
             sockets.get(owner.getId()).sendMessage(message);
         }
     }
 
     // 房间内游戏频道说话
-    public void roomGameTalk(RoomEntity sessionRoom, TextMessage message) {
+    public void roomGameTalk(Room sessionRoom, TextMessage message) {
         // send to game user
         for(Long userId : sessionRoom.getGameUsersId().values()) {
             try {
@@ -73,9 +73,9 @@ public class RoomSocketHandler extends AbstractWebSocketHandler {
     @Override
     protected void handleTextMessage(WebSocketSession socketSession, TextMessage message) throws Exception {
         // 在哪个房间
-        RoomEntity sessionRoom = this.getSessionRoom(socketSession);
+        Room sessionRoom = this.getSessionRoom(socketSession);
         // 是哪个用户
-        UserEntity sessionUser = this.getSessionUser(socketSession);
+        User sessionUser = this.getSessionUser(socketSession);
         // 校验消息
         JSONObject messageObject = JSONObject.parseObject(message.getPayload());
         // get action
@@ -99,12 +99,12 @@ public class RoomSocketHandler extends AbstractWebSocketHandler {
             messageObject.put("sendUserId", sessionUser.getId());
             messageObject.put("sendUserName", sessionUser.getNickname());
             // 是否有参加活动
-            UserEntity joinGameMe = sessionRoom.getGameUser(sessionUser.getId());
+            User joinGameMe = sessionRoom.getGameUser(sessionUser.getId());
             // 活动状态
-            RoomEntity.GameStatus gameStatus = sessionRoom.getGameStatus();
+            Room.GameStatus gameStatus = sessionRoom.getGameStatus();
 
             // 如果活动正在进行，并且用户加入了游戏
-            if (gameStatus.equals(RoomEntity.GameStatus.Playing) && joinGameMe!=null) {
+            if (gameStatus.equals(Room.GameStatus.Playing) && joinGameMe!=null) {
                 // 将消息发送到当前房间进行的游戏中去
                 sessionRoom.getGameTask().roomMessageHandle(messageObject);
             }
@@ -112,23 +112,23 @@ public class RoomSocketHandler extends AbstractWebSocketHandler {
             // 房主组局
             else if (action.equals("callPlayer")) {
                 // 房主在房间 的 非游戏时间才能征集游戏玩家
-                if (!gameStatus.equals(RoomEntity.GameStatus.Playing) && sessionUser.getId().equals(sessionRoom.getOwner().getId())) {
+                if (!gameStatus.equals(Room.GameStatus.Playing) && sessionUser.getId().equals(sessionRoom.getOwner().getId())) {
                     int gameType = messageObject.getInteger("gameType");
                     switch(gameType) {
-                        case RoomEntity.WERE_WOLF_GAME :
-                            sessionRoom.setGameType(RoomEntity.WERE_WOLF_GAME);
+                        case Room.WERE_WOLF_GAME :
+                            sessionRoom.setGameType(Room.WERE_WOLF_GAME);
                             break;
-                        case RoomEntity.BATTLE_ROYALE_GAME :
-                            sessionRoom.setGameType(RoomEntity.WERE_WOLF_GAME);
+                        case Room.BATTLE_ROYALE_GAME :
+                            sessionRoom.setGameType(Room.WERE_WOLF_GAME);
                             break;
-                        case RoomEntity.GUESS_DRAW_GAME :
-                            sessionRoom.setGameType(RoomEntity.WERE_WOLF_GAME);
+                        case Room.GUESS_DRAW_GAME :
+                            sessionRoom.setGameType(Room.WERE_WOLF_GAME);
                             break;
                         default:
                             return;
                     }
                     // set game status
-                    sessionRoom.setGameStatus(RoomEntity.GameStatus.Calling);
+                    sessionRoom.setGameStatus(Room.GameStatus.Calling);
                     // send message
                     this.roomPublicTalk(sessionRoom, messageObject);
                     // return
@@ -140,7 +140,7 @@ public class RoomSocketHandler extends AbstractWebSocketHandler {
             // 玩家参与
             else if (action.equals("joinGame")) {
                 // 召集阶段，玩家才能申请参与
-                if (gameStatus.equals(RoomEntity.GameStatus.Calling) && sessionRoom.playerNumber()<=4) {
+                if (gameStatus.equals(Room.GameStatus.Calling) && sessionRoom.playerNumber()<=4) {
                     // join game
                     sessionRoom.joinGame(sessionUser);
                     //
@@ -152,12 +152,12 @@ public class RoomSocketHandler extends AbstractWebSocketHandler {
                 }
 
                 // 人够了就开始游戏
-                if (gameStatus.equals(RoomEntity.GameStatus.Calling) && sessionRoom.playerNumber()>=4) {
+                if (gameStatus.equals(Room.GameStatus.Calling) && sessionRoom.playerNumber()>=4) {
                     // 提示游戏参与者开始游戏
                     TextMessage textMessage = new TextMessage("{action:\"gameStart\", gameType:\"" + sessionRoom.getGameType() + "\"}");
                     // 发送给游戏参与者
                     this.roomGameTalk(sessionRoom, textMessage);
-                    sessionRoom.setGameStatus(RoomEntity.GameStatus.Playing);
+                    sessionRoom.setGameStatus(Room.GameStatus.Playing);
                     // 启用一个新线程来执行队列
                     gameTaskDispatcher.execute(sessionRoom.getGameType(), sessionRoom);
                 }
@@ -165,7 +165,7 @@ public class RoomSocketHandler extends AbstractWebSocketHandler {
 
             // 玩家退出组局
             else if (action.equals("leaveGame")) {
-                if (gameStatus.equals(RoomEntity.GameStatus.Calling)) {
+                if (gameStatus.equals(Room.GameStatus.Calling)) {
                     // return
                     messageObject.put("result", true);
                     socketSession.sendMessage(new TextMessage(messageObject.toJSONString()));
@@ -187,24 +187,24 @@ public class RoomSocketHandler extends AbstractWebSocketHandler {
     }
 
     // 设置房间
-    private void setSessionRoom(WebSocketSession socketSession, RoomEntity sessionRoom) {
+    private void setSessionRoom(WebSocketSession socketSession, User sessionRoom) {
         socketSession.getAttributes().put("sessionRoomId", sessionRoom.getId());
         rooms.put(sessionRoom.getId(), sessionRoom);
     }
 
     // 获取房间
-    private RoomEntity getSessionRoom(WebSocketSession socketSession) {
+    private Room getSessionRoom(WebSocketSession socketSession) {
         int roomId = (int) socketSession.getAttributes().get("sessionRoomId");
         return roomId==0 ? null : rooms.get(roomId);
     }
 
     // 获取用户
-    private UserEntity getSessionUser(WebSocketSession socketSession) {
-        return (UserEntity) socketSession.getAttributes().get("sessionUser");
+    private User getSessionUser(WebSocketSession socketSession) {
+        return (User) socketSession.getAttributes().get("sessionUser");
     }
 
     // 开房
-    private void openRoom(WebSocketSession socketSession, UserEntity sessionUser, JSONObject messageObject) throws Exception {
+    private void openRoom(WebSocketSession socketSession, User sessionUser, JSONObject messageObject) throws Exception {
         // get action
         String action = messageObject.getString("action");
         // 创建房间
@@ -237,8 +237,8 @@ public class RoomSocketHandler extends AbstractWebSocketHandler {
 
     // 离开房间
     private void leaveRoom(WebSocketSession socketSession) {
-        RoomEntity sessionRoom = this.getSessionRoom(socketSession);
-        UserEntity sessionUser = this.getSessionUser(socketSession);
+        Room sessionRoom = this.getSessionRoom(socketSession);
+        User sessionUser = this.getSessionUser(socketSession);
         if (sessionRoom!=null) {
             // 退出房间
             sessionRoom.userLeave(sessionUser);
@@ -253,8 +253,8 @@ public class RoomSocketHandler extends AbstractWebSocketHandler {
     }
 
     // 房主创建房间
-    private void createRoom(UserEntity owner, String roomName, WebSocketSession socketSession) {
-        RoomEntity roomSession = new RoomEntity();
+    private void createRoom(User owner, String roomName, WebSocketSession socketSession) {
+        Room roomSession = new Room();
         synchronized ("createChatRoom") {
             roomSession.setId(++lastRoomId);
         }
@@ -270,8 +270,8 @@ public class RoomSocketHandler extends AbstractWebSocketHandler {
     }
 
     // 用户加入房间，普通状态
-    private boolean joinRoom(UserEntity watchUser, int roomId, WebSocketSession socketSession) {
-        RoomEntity roomSession = rooms.get(roomId);
+    private boolean joinRoom(User watchUser, int roomId, WebSocketSession socketSession) {
+        Room roomSession = rooms.get(roomId);
         // logger.info(" >> " + roomSession + " >> " + roomSession.getSeatCount() + " >> " + roomSession.getWatchUsers().size());
         if (roomSession!=null && roomSession.getSeatCount()>roomSession.getWatchUsers().size()) {
             //

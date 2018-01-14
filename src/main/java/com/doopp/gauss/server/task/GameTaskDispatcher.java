@@ -1,6 +1,5 @@
 package com.doopp.gauss.server.task;
 
-import com.doopp.gauss.api.entity.RoomEntity;
 import com.doopp.gauss.server.task.impl.WereWolfGameTask;
 import com.doopp.gauss.server.websocket.RoomSocketHandler;
 import org.springframework.beans.factory.annotation.Autowired;

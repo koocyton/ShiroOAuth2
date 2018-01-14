@@ -1,4 +1,4 @@
-package com.doopp.gauss.api.utils;
+package com.doopp.gauss.common.utils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

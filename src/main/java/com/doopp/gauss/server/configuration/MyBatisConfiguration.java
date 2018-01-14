@@ -73,7 +73,7 @@ public class MyBatisConfiguration {
     @Bean
     public MapperScannerConfigurer mapperScannerConfigurer() {
         MapperScannerConfigurer mapperScannerConfigurer = new MapperScannerConfigurer();
-        mapperScannerConfigurer.setBasePackage("com.doopp.gauss.api.dao");
+        mapperScannerConfigurer.setBasePackage("com.doopp.gauss.common.utils.dao");
         mapperScannerConfigurer.setSqlSessionFactoryBeanName("sqlSessionFactoryBean");
         return mapperScannerConfigurer;
     }

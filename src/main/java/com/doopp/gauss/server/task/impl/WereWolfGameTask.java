@@ -38,11 +38,9 @@ package com.doopp.gauss.server.task.impl;
  */
 
 import com.alibaba.fastjson.JSONObject;
-import com.doopp.gauss.api.entity.RoomEntity;
 import com.doopp.gauss.server.task.GameTask;
 import com.doopp.gauss.server.websocket.RoomSocketHandler;
 import com.google.common.base.Strings;
-import com.google.common.collect.Range;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.socket.TextMessage;

@@ -2,6 +2,8 @@ package com.doopp.gauss.server.filter;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletContext;
@@ -9,18 +11,18 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.doopp.gauss.api.Exception.EmptyException;
-import com.doopp.gauss.api.entity.UserEntity;
-import com.doopp.gauss.api.service.AccountService;
-import com.doopp.gauss.server.redis.CustomShadedJedis;
+import com.doopp.gauss.common.entity.User;
+import com.doopp.gauss.common.service.UserService;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
+import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 
 /*
  * Created by henry on 2017/4/16.
@@ -29,11 +31,6 @@ import org.slf4j.LoggerFactory;
 public class SessionFilter extends OncePerRequestFilter {
 
     private final Logger logger = LoggerFactory.getLogger(SessionFilter.class);
-
-    // private final RedisSessionHelper redisSessionHelper = new RedisSessionHelper();
-
-    //@Autowired
-    //private ShardedJedis sessionRedis;
 
     /*
      * 登录验证过滤器
@@ -47,7 +44,7 @@ public class SessionFilter extends OncePerRequestFilter {
         // get bean
         ServletContext servletContext = request.getServletContext();
         ApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(servletContext);
-        AccountService accountService = (AccountService) ctx.getBean("accountService");
+        UserService userService = (UserService) ctx.getBean("userService");
 
         // 不过滤的uri
         String[] notFilters = new String[] {
@@ -89,16 +86,16 @@ public class SessionFilter extends OncePerRequestFilter {
         try {
             if (doFilter) {
                 // 从 header 里拿到 access token
-                String accessToken = request.getHeader("access-token");
+                String sessionToken = request.getHeader("session-token");
 
                 // 从 url query 里获取 access token
-                if (accessToken==null) {
-                    accessToken = request.getParameter("access-token");
+                if (sessionToken==null) {
+                    sessionToken = request.getParameter("session-token");
                 }
 
-                // 如果 token 存在，且长度正确
-                if (accessToken!=null && accessToken.length()>=32) {
-                    UserEntity user = accountService.getUserByToken(accessToken);
+                // 如果 token 存在，反解 token
+                if (sessionToken!=null) {
+                    User user = userService.getUserBySessionToken(sessionToken);
                     // 如果能找到用户
                     if (user!=null) {
                         request.setAttribute("sessionUser", user);
@@ -135,4 +132,23 @@ public class SessionFilter extends OncePerRequestFilter {
         PrintWriter out = response.getWriter();
         out.write(data);
     }
+
+    //    private static void displayPortal(HttpServletRequest request, HttpServletResponse response, Manager manager) throws Exception {
+    //        // assign
+    //        Map<String, Object> model = new HashMap<>();
+    //        model.put("manager", manager);
+    //
+    //        // get bean
+    //        ServletContext servletContext = request.getServletContext();
+    //        ApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(servletContext);
+    //        FreeMarkerConfigurer freeMarkerConfigurer = (FreeMarkerConfigurer) ctx.getBean("freeMarkerConfigurer");
+    //
+    //        // template
+    //        String data = FreeMarkerTemplateUtils.processTemplateIntoString(
+    //                freeMarkerConfigurer.getConfiguration().getTemplate("backend/portal.html"), model);
+    //        response.setCharacterEncoding("UTF-8");
+    //        response.setContentType("text/html; charset=UTF-8");
+    //        PrintWriter out = response.getWriter();
+    //        out.write(data);
+    //    }
 }

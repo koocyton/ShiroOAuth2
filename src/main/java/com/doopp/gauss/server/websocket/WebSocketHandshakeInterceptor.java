@@ -1,6 +1,6 @@
 package com.doopp.gauss.server.websocket;
 
-import com.doopp.gauss.api.entity.UserEntity;
+import com.doopp.gauss.common.entity.User;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.http.server.ServletServerHttpRequest;
@@ -23,7 +23,7 @@ public class WebSocketHandshakeInterceptor extends HttpSessionHandshakeIntercept
 
         // 将用户信息带入到 socket 里面
         ServletServerHttpRequest serverRequest = (ServletServerHttpRequest) request;
-        UserEntity user = (UserEntity) serverRequest.getServletRequest().getAttribute("sessionUser");
+        User user = (User) serverRequest.getServletRequest().getAttribute("sessionUser");
         // init session user
         attributes.put("sessionUser", user);
         // init session room id

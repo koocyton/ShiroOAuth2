@@ -1,7 +1,6 @@
-package com.doopp.gauss.api.entity;
+package com.doopp.gauss.common.entity;
 
 import com.doopp.gauss.server.task.GameTask;
-import com.google.common.base.Objects;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,7 +12,7 @@ import java.util.Map;
  *
  * Created by Henry on 2017/10/26.
  */
-public class RoomEntity {
+public class Room {
 
     // 游戏状态
     public enum GameStatus {
@@ -40,16 +39,16 @@ public class RoomEntity {
     @Getter @Setter private String name;
 
     // 房主
-    @Getter private UserEntity owner;
+    @Getter private User owner;
 
     // 围观玩家
-    @Getter private Map<Long, UserEntity> watchUsers = new HashMap<>();
+    @Getter private Map<Long, User> watchUsers = new HashMap<>();
 
     // 游戏玩家
     @Getter private Map<Long, Long> gameUsersId = new HashMap<>();
 
     // 游戏状态
-    @Getter @Setter private RoomEntity.GameStatus gameStatus = GameStatus.Resting;
+    @Getter @Setter private User.GameStatus gameStatus = GameStatus.Resting;
 
     // 游戏类型
     @Getter @Setter private GameTask gameTask = null;
@@ -58,12 +57,12 @@ public class RoomEntity {
     @Getter @Setter private int gameType = NULL_GAME;
 
     // 按 ID 获取用户
-    public UserEntity getGameUser(Long userId) {
+    public User getGameUser(Long userId) {
         Long gameUserId = this.gameUsersId.get(userId);
         if (gameUserId==null) {
             return null;
         }
-        UserEntity oneWatchUser = this.watchUsers.get(gameUserId);
+        User oneWatchUser = this.watchUsers.get(gameUserId);
         if (oneWatchUser!=null) {
             return oneWatchUser;
         }
@@ -74,8 +73,8 @@ public class RoomEntity {
     }
 
     // 获取所有房间内的游戏用户
-    public Map<Long, UserEntity> getGameUsers() {
-        Map<Long, UserEntity> gameUsers = new HashMap<>();
+    public Map<Long, User> getGameUsers() {
+        Map<Long, User> gameUsers = new HashMap<>();
         for(Long userId : gameUsersId.values()) {
             if (this.getOwner()!=null && this.getOwner().getId().equals(userId)) {
                 gameUsers.put(userId, this.getOwner());
@@ -88,7 +87,7 @@ public class RoomEntity {
     }
 
     // 加入到房主
-    public void setOwner(UserEntity user) {
+    public void setOwner(User user) {
         if (this.getOwner()==null) {
             this.watchUsers.remove(user.getId());
             this.owner = user;
@@ -96,14 +95,14 @@ public class RoomEntity {
     }
 
     // 加入到围观玩家
-    public void joinWatch(UserEntity user) {
+    public void joinWatch(User user) {
         this.watchUsers.put(user.getId(), user);
     }
 
     // 离开房间
-    public void userLeave(UserEntity user) {
+    public void userLeave(User user) {
         synchronized ("leave_room_" + String.valueOf(this.getId())) {
-            if (this.owner != null && Objects.equal(this.owner.getId(), user.getId())) {
+            if (this.owner != null && this.owner.getId().equals(user.getId())) {
                 this.owner = null;
             }
             this.watchUsers.remove(user.getId());
@@ -117,12 +116,12 @@ public class RoomEntity {
     }
 
     // 加入活动
-    public void joinGame(UserEntity user) {
+    public void joinGame(User user) {
         this.gameUsersId.put(user.getId(), user.getId());
     }
 
     // 离开活动
-    public void leaveGame(UserEntity user) {
+    public void leaveGame(User user) {
         this.gameUsersId.remove(user.getId());
     }
 

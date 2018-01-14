@@ -1,4 +1,4 @@
-package com.doopp.gauss.api.utils;
+package com.doopp.gauss.common.utils;
 
 import java.math.BigInteger;
 import java.security.InvalidKeyException;

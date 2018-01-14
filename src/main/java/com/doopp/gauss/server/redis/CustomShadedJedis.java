@@ -6,8 +6,6 @@ import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer
 import redis.clients.jedis.ShardedJedis;
 import redis.clients.jedis.ShardedJedisPool;
 
-import java.util.Set;
-
 public class CustomShadedJedis {
 
     private final Logger logger = LoggerFactory.getLogger(CustomShadedJedis.class);
