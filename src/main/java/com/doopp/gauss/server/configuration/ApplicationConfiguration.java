@@ -10,9 +10,10 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 @Import({
     CommonUtil.class,
     EhcacheConfiguration.class,
-    RedisConfiguration.class,
+    // RedisConfiguration.class,
     MyBatisConfiguration.class,
-    TaskExecutorConfiguration.class
+    TaskExecutorConfiguration.class,
+    WebSocketConfiguration.class
 })
 
 @ComponentScan(basePackages={"com.doopp.gauss"}, excludeFilters={

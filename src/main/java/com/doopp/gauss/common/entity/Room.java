@@ -48,7 +48,7 @@ public class Room {
     @Getter private Map<Long, Long> gameUsersId = new HashMap<>();
 
     // 游戏状态
-    @Getter @Setter private User.GameStatus gameStatus = GameStatus.Resting;
+    @Getter @Setter private Room.GameStatus gameStatus = GameStatus.Resting;
 
     // 游戏类型
     @Getter @Setter private GameTask gameTask = null;

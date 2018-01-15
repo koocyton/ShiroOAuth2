@@ -21,7 +21,7 @@ public class WebSocketConfiguration extends WebMvcConfigurerAdapter implements W
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
 
-        registry.addHandler(roomSocketHandler(),"/room-socket")
+        registry.addHandler(roomSocketHandler(),"/game-room")
             .addInterceptors(new WebSocketHandshakeInterceptor())
             .setAllowedOrigins("*");
 

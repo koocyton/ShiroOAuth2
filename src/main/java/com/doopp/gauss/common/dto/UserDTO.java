@@ -1,15 +1,14 @@
-package com.doopp.gauss.common.entity;
+package com.doopp.gauss.common.dto;
 
 import lombok.Data;
 
-import java.io.Serializable;
-
 /**
- * user entity
+ * 来用对外开发的 User
+ * @author Administrator
+ *
  */
-
 @Data
-public class User implements Serializable {
+public class UserDTO {
 
     // 编号
     private Long id;

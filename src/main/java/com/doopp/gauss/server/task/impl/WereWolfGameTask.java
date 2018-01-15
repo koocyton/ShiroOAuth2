@@ -38,9 +38,9 @@ package com.doopp.gauss.server.task.impl;
  */
 
 import com.alibaba.fastjson.JSONObject;
+import com.doopp.gauss.common.entity.Room;
 import com.doopp.gauss.server.task.GameTask;
 import com.doopp.gauss.server.websocket.RoomSocketHandler;
-import com.google.common.base.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.socket.TextMessage;
@@ -51,7 +51,7 @@ public class WereWolfGameTask implements GameTask {
 
     private final static Logger logger = LoggerFactory.getLogger(WereWolfGameTask.class);
 
-    private final RoomEntity sessionRoom;
+    private final Room sessionRoom;
 
     private final RoomSocketHandler roomSocketHandler;
 
@@ -61,7 +61,7 @@ public class WereWolfGameTask implements GameTask {
             "witch", "hunter", "seer", "cupit"
     };
 
-    public WereWolfGameTask (RoomSocketHandler roomSocketHandler, RoomEntity sessionRoom) {
+    public WereWolfGameTask (RoomSocketHandler roomSocketHandler, Room sessionRoom) {
         this.sessionRoom = sessionRoom;
         this.roomSocketHandler = roomSocketHandler;
         this.sessionRoom.setGameTask(this);
@@ -172,7 +172,7 @@ public class WereWolfGameTask implements GameTask {
     @Override
     public void roomMessageHandle(JSONObject messageObject) {
         String action = messageObject.getString("action");
-        if (Strings.isNullOrEmpty(action)) {
+        if (action==null) {
             return;
         }
         switch(action) {

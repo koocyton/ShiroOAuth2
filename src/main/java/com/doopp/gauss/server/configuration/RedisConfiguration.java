@@ -42,8 +42,6 @@ public class RedisConfiguration {
     {
         String s1 = applicationProperties.getProperty("redis.server.session.1");
         String s2 = applicationProperties.getProperty("redis.server.session.2");
-        //System.out.print(" >>>>>>>>>>>>>>> " + s1 + " \n >>>>>>>>>>>>>>> " + s2 + "\n");
-        // shard redis
         ShardedJedisPool shardedJedisPool = this.shardedJedisPool(jedisPoolConfig, s1, s2);
         CustomShadedJedis customShadedJedis = new CustomShadedJedis();
         customShadedJedis.setShardedJedisPool(shardedJedisPool);
@@ -55,8 +53,6 @@ public class RedisConfiguration {
     {
         String s1 = applicationProperties.getProperty("redis.server.user.1");
         String s2 = applicationProperties.getProperty("redis.server.user.2");
-        //System.out.print(" >>>>>>>>>>>>>>> " + s1 + " \n >>>>>>>>>>>>>>> " + s2 + "\n");
-        // shard redis
         ShardedJedisPool shardedJedisPool = this.shardedJedisPool(jedisPoolConfig, s1, s2);
         CustomShadedJedis customShadedJedis = new CustomShadedJedis();
         customShadedJedis.setShardedJedisPool(shardedJedisPool);

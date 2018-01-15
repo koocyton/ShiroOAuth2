@@ -97,7 +97,7 @@ public class RoomSocketHandler extends AbstractWebSocketHandler {
         else {
             //
             messageObject.put("sendUserId", sessionUser.getId());
-            messageObject.put("sendUserName", sessionUser.getNickname());
+            messageObject.put("sendUserName", sessionUser.getNickName());
             // 是否有参加活动
             User joinGameMe = sessionRoom.getGameUser(sessionUser.getId());
             // 活动状态
@@ -187,7 +187,7 @@ public class RoomSocketHandler extends AbstractWebSocketHandler {
     }
 
     // 设置房间
-    private void setSessionRoom(WebSocketSession socketSession, User sessionRoom) {
+    private void setSessionRoom(WebSocketSession socketSession, Room sessionRoom) {
         socketSession.getAttributes().put("sessionRoomId", sessionRoom.getId());
         rooms.put(sessionRoom.getId(), sessionRoom);
     }

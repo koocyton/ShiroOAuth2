@@ -1,5 +1,6 @@
 package com.doopp.gauss.server.task;
 
+import com.doopp.gauss.common.entity.Room;
 import com.doopp.gauss.server.task.impl.WereWolfGameTask;
 import com.doopp.gauss.server.websocket.RoomSocketHandler;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,10 +17,10 @@ public class GameTaskDispatcher {
         this.taskExecutor = taskExecutor;
     }
 
-    public void execute(int gameType, RoomEntity sessionRoom) {
+    public void execute(int gameType, Room sessionRoom) {
 
         switch(gameType) {
-            case RoomEntity.WERE_WOLF_GAME :
+            case Room.WERE_WOLF_GAME :
                 this.taskExecutor.execute(new WereWolfGameTask(roomSocketHandler, sessionRoom));
                 break;
             //case RoomEntity.GUESS_DRAW_GAME :

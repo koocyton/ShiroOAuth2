@@ -11,9 +11,9 @@ import java.util.List;
  */
 public interface UserDao {
 
-    void create(User userEntity);
+    void create(User user);
 
-    void update(User userEntity);
+    void update(User user);
 
     void delete(int id);
 

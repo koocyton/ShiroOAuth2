@@ -55,23 +55,23 @@ public class WebMvcConfigurer extends WebMvcConfigurerAdapter{
         return commonsMultipartResolver;
     }
 
-    // 模版
-    @Bean
-    public FreeMarkerConfigurer freeMarkerConfigurer() {
-        FreeMarkerConfigurer freeMarkerConfigurer = new FreeMarkerConfigurer();
-        freeMarkerConfigurer.setTemplateLoaderPath("classpath:/template/pages/");
-        freeMarkerConfigurer.setDefaultEncoding("UTF-8");
-        return freeMarkerConfigurer;
-    }
-
-    @Bean
-    public FreeMarkerViewResolver freeMarkerViewResolver() {
-        FreeMarkerViewResolver freeMarkerViewResolver = new FreeMarkerViewResolver();
-        freeMarkerViewResolver.setSuffix(".html");
-        freeMarkerViewResolver.setContentType("text/html;charset=UTF-8");
-        freeMarkerViewResolver.setRequestContextAttribute("rc");
-        return freeMarkerViewResolver;
-    }
+//    // 模版
+//    @Bean
+//    public FreeMarkerConfigurer freeMarkerConfigurer() {
+//        FreeMarkerConfigurer freeMarkerConfigurer = new FreeMarkerConfigurer();
+//        freeMarkerConfigurer.setTemplateLoaderPath("classpath:/template/pages/");
+//        freeMarkerConfigurer.setDefaultEncoding("UTF-8");
+//        return freeMarkerConfigurer;
+//    }
+//
+//    @Bean
+//    public FreeMarkerViewResolver freeMarkerViewResolver() {
+//        FreeMarkerViewResolver freeMarkerViewResolver = new FreeMarkerViewResolver();
+//        freeMarkerViewResolver.setSuffix(".html");
+//        freeMarkerViewResolver.setContentType("text/html;charset=UTF-8");
+//        freeMarkerViewResolver.setRequestContextAttribute("rc");
+//        return freeMarkerViewResolver;
+//    }
 
     @Override
     public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {

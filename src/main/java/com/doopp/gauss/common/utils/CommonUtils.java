@@ -1,14 +1,8 @@
 package com.doopp.gauss.common.utils;
 
-import com.google.common.base.Strings;
-import org.modelmapper.ModelMapper;
-
 import javax.servlet.http.HttpServletRequest;
 
 public class CommonUtils {
-
-    // Data Object to Out Object
-    private final static ModelMapper modelMapper = new ModelMapper();
 
     /**
      * Returns 是否是移动客户端
@@ -44,7 +38,7 @@ public class CommonUtils {
     {
         String ip = request.getHeader("X-Forwarded-For");
         //
-        if (Strings.isNullOrEmpty(ip) && !"unKnown".equalsIgnoreCase(ip)) {
+        if (ip!=null && !"unKnown".equalsIgnoreCase(ip)) {
             //多次反向代理后会有多个ip值，第一个ip才是真实ip
             int index = ip.indexOf(",");
             if (index != -1) {
@@ -54,17 +48,10 @@ public class CommonUtils {
             }
         }
         ip = request.getHeader("X-Real-IP");
-        if (Strings.isNullOrEmpty(ip) && !"unKnown".equalsIgnoreCase(ip)) {
+        if (ip!=null && !"unKnown".equalsIgnoreCase(ip)) {
             return ip;
         }
         return request.getRemoteAddr();
     }
 
-    public static <D> D modelMap(Object source, Class<D> destinationType) {
-        return modelMapper.map(source, destinationType);
-    }
-
-    public static <D> D modelMap(Object source, Class<D> destinationType, String typeMapName) {
-        return modelMapper.map(source, destinationType, typeMapName);
-    }
 }

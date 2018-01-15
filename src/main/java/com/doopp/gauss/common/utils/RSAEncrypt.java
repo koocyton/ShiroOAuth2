@@ -265,8 +265,8 @@ public class RSAEncrypt {
      * @throws Exception 加密过程中的异常信息
      */
     public byte[] encrypt(RSAPublicKey publicKey, byte[] plainTextData) throws Exception {
-        if (privateKey == null) {
-            throw new Exception("加密私钥为空, 请设置");
+        if (publicKey == null) {
+            throw new Exception("加密公钥为空, 请设置");
         }
         try {
             Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
@@ -300,8 +300,8 @@ public class RSAEncrypt {
      * @return 明文
      */
     public byte[] decrypt(RSAPublicKey publicKey, byte[] cipherData) throws Exception {
-        if (privateKey == null) {
-            throw new Exception("解密私钥为空, 请设置");
+        if (publicKey == null) {
+            throw new Exception("解密公钥为空, 请设置");
         }
         try {
             Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
