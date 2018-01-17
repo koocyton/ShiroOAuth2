@@ -9,23 +9,18 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.util.Base64;
 import java.util.Properties;
 
 @Service("userService")
 public class UserServiceImpl implements UserService {
 
-    private final static Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
-
     @Autowired
     private Properties applicationProperties;
 
     @Override
     public User getUserBySessionToken(String sessionToken) throws Exception {
-        // String publicKey = this.applicationProperties.getProperty("session.rsa.publicKey");
-        String publicKey = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCMknZckLzXEOXIyBIUxpwW25C5cugliBa8aCWtkRt8aU4Wmlo3y76YtOsuhrXdIItV/pyXukANiIiKTXryAmHjotsgUaXCoZ1ELTM5fTafsFABoT6m9SdRbDI9S3ylT1Mspv2tKbXzxzgz+b70x/aLmcvJK6BxtzIjUnIUx8Uc7wIDAQAB";
-        sessionToken = "AGiQKqdq0/pmQpP0ca2tWLq6Bp7omVcnOAFCw/f48VZsxwZHh8b6S6IjjM7ts7ztGnK8xGRE0UfT43IjF9s6a9BTnBMLkVtKrWEFZ+r5hghvQWRixSG85MJrYFqauYM+MBiUzLIsGoSvTK6r3Tzq/3Z6iF3j26hIXDkVXLCpEAQ=";
+        String publicKey = this.applicationProperties.getProperty("session.rsa.publicKey");
         byte[] decryptData = RSAEncrypt.decryptByPublicKey(publicKey, Base64.getDecoder().decode(sessionToken));
         if (decryptData==null) {
             throw new Exception("session token is failed");

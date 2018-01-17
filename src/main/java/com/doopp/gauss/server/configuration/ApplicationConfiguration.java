@@ -9,10 +9,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 @Import({
     CommonUtil.class,
-    // EhcacheConfiguration.class,
-    // RedisConfiguration.class,
     MyBatisConfiguration.class,
-    TaskExecutorConfiguration.class,
     WebSocketConfiguration.class
 })
 
