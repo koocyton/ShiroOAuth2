@@ -40,6 +40,7 @@ public class GameSocketHandler extends AbstractWebSocketHandler {
         // get action
         String action = messageObject.getString("action");
 
+        logger.info(" >>> " + messageObject);
         // 如果 Action 异常
         if (action==null) {
             // socketSession.close();
@@ -56,6 +57,7 @@ public class GameSocketHandler extends AbstractWebSocketHandler {
 
     @Override
     public void afterConnectionEstablished(WebSocketSession socketSession) throws Exception {
+        socketSession.sendMessage(new TextMessage("{\"action\":\"user-connected\"}"));
         User sessionUser = userDao.getUserBySocketSession(socketSession);
         Room sessionRoom = roomDao.userJoinRoom(sessionUser);
         socketSession.getAttributes().put("roomId", sessionRoom.getId());
@@ -66,6 +68,7 @@ public class GameSocketHandler extends AbstractWebSocketHandler {
     public void afterConnectionClosed(WebSocketSession socketSession, CloseStatus status) throws Exception {
         User sessionUser = userDao.getUserBySocketSession(socketSession);
         Room sessionRoom = roomDao.getRoomBySocketSession(socketSession);
+        logger.info("\n >>> " + sessionUser + "\n >>> " + sessionRoom);
         roomDao.userLeaveRoom(sessionRoom.getId(), sessionUser);
         socketSession.getAttributes().remove("sessionUser");
         socketSession.getAttributes().remove("sessionRoomId");

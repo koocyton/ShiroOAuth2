@@ -18,4 +18,17 @@ public class Room {
         null, null, null, null, null, null,
         null, null, null, null, null, null,
     };
+
+    public void removeUser(int index) {
+        this.users[index] = null;
+    }
+
+    public void removeUser(User user) {
+        for(int ii=0; ii<users.length; ii++) {
+            if (this.users[ii].getId().equals(user.getId())) {
+                this.users[ii] = null;
+                break;
+            }
+        }
+    }
 }

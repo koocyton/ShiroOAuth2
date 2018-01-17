@@ -2,6 +2,8 @@ package com.doopp.gauss.common.dao;
 
 import com.doopp.gauss.common.entity.Room;
 import com.doopp.gauss.common.entity.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.socket.WebSocketSession;
 
@@ -10,6 +12,9 @@ import java.util.Map;
 
 @Repository("roomDao")
 public class RoomDao {
+
+    // logger
+    private final static Logger logger = LoggerFactory.getLogger(RoomDao.class);
 
     // room`s session
     private static final Map<Integer, Room> rooms = new HashMap<>();
@@ -22,6 +27,8 @@ public class RoomDao {
 
     // 拿到房间
     public Room getRoomById(int roomId) {
+        logger.info("\n >>> " + freeRooms);
+        logger.info("\n >>> " + rooms);
         Room room = freeRooms.get(roomId);
         if (room==null) {
             rooms.get(roomId);
@@ -38,14 +45,7 @@ public class RoomDao {
     // 用户离开房间
     public void userLeaveRoom(int roomId, User user) {
         Room room = getRoomById(roomId);
-        if (room!=null) {
-            User[] users = room.getUsers();
-            for (int ii=0; ii<users.length; ii++) {
-                if (users[ii] == user) {
-                    users[ii] = null;
-                }
-            }
-        }
+        room.removeUser(user);
     }
 
     // 用户加入房间
