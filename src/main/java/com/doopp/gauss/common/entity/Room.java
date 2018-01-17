@@ -1,13 +1,6 @@
 package com.doopp.gauss.common.entity;
 
-import com.doopp.gauss.server.task.GameTask;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * 房间的实体

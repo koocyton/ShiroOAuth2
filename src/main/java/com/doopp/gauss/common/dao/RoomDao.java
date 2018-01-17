@@ -2,10 +2,9 @@ package com.doopp.gauss.common.dao;
 
 import com.doopp.gauss.common.entity.Room;
 import com.doopp.gauss.common.entity.User;
-import com.doopp.gauss.server.websocket.GameSocketHandler;
 import org.springframework.stereotype.Repository;
+import org.springframework.web.socket.WebSocketSession;
 
-import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,9 +20,32 @@ public class RoomDao {
     // room id
     private static int lastRoomId = 54612;
 
+    // 拿到房间
+    public Room getRoomById(int roomId) {
+        Room room = freeRooms.get(roomId);
+        if (room==null) {
+            rooms.get(roomId);
+        }
+        return room;
+    }
+
+    // 拿到房间
+    public Room getRoomBySocketSession(WebSocketSession socketSession) {
+        int roomId = (int) socketSession.getAttributes().get("sessionRoomId");
+        return this.getRoomById(roomId);
+    }
+
     // 用户离开房间
     public void userLeaveRoom(int roomId, User user) {
-        Room room = freeRooms.get(roomId);
+        Room room = getRoomById(roomId);
+        if (room!=null) {
+            User[] users = room.getUsers();
+            for (int ii=0; ii<users.length; ii++) {
+                if (users[ii] == user) {
+                    users[ii] = null;
+                }
+            }
+        }
     }
 
     // 用户加入房间

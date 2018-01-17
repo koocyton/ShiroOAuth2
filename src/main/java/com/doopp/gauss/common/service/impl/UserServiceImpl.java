@@ -1,11 +1,8 @@
 package com.doopp.gauss.common.service.impl;
 
-import com.doopp.gauss.common.dao.UserDao;
 import com.doopp.gauss.common.entity.User;
 import com.doopp.gauss.common.service.UserService;
 import com.doopp.gauss.common.utils.RSAEncrypt;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

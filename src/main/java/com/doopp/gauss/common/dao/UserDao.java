@@ -1,35 +1,35 @@
 package com.doopp.gauss.common.dao;
 
+import com.doopp.gauss.common.entity.Room;
 import com.doopp.gauss.common.entity.User;
-import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Repository;
+import org.springframework.web.socket.WebSocketSession;
 
-import java.util.List;
-
+import javax.annotation.Resource;
 
 /*
  * Created by henry on 2017/7/4.
  */
-public interface UserDao {
+@Repository("userDao")
+public class UserDao {
 
-    void create(User user);
+    @Resource
+    private RoomDao roomDao;
 
-    void update(User user);
+    // 拿到用户
+    public User getUserBySocketSession(WebSocketSession socketSession) {
+        return (User) socketSession.getAttributes().get("sessionUser");
+    }
 
-    void delete(int id);
+    // 拿到房间里的用户
+    public User[] getUsersInRoom(WebSocketSession socketSession) {
+        int roomId = (int) socketSession.getAttributes().get("sessionRoomId");
+        return this.getUsersInRoom(roomId);
+    }
 
-    Long count(String where);
-
-    Long count();
-
-    User fetchById(long id);
-
-    List<User> fetchUserFriends(Long id);
-
-    List<User> fetchListByIds(@Param("ids") String ids, @Param("offset") int offset, @Param("limit") int limit);
-
-    User fetchByAccount(String account);
-
-    List<User> get(@Param("offset") int offset, @Param("limit") int limit);
-
-    List<User> get(@Param("where") String where, @Param("offset") int offset, @Param("limit") int limit);
+    // 拿到房间里的用户
+    public User[] getUsersInRoom(int roomId) {
+        Room room = roomDao.getRoomById(roomId);
+        return room.getUsers();
+    }
 }

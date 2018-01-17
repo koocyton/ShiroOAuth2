@@ -9,7 +9,6 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 @Import({
     CommonUtil.class,
-    MyBatisConfiguration.class,
     WebSocketConfiguration.class
 })
 
