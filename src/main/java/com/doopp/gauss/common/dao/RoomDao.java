@@ -27,8 +27,6 @@ public class RoomDao {
 
     // 拿到房间
     public Room getRoomById(int roomId) {
-        logger.info("\n >>> " + freeRooms);
-        logger.info("\n >>> " + rooms);
         Room room = freeRooms.get(roomId);
         if (room==null) {
             rooms.get(roomId);
