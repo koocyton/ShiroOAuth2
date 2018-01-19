@@ -110,4 +110,8 @@ public class GameSocketHandler extends AbstractWebSocketHandler {
         }
         return inRoomSockets;
     }
+
+    public WebSocketSession getSocket(Long userId) {
+        return sockets.get(userId);
+    }
 }

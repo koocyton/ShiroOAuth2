@@ -57,6 +57,15 @@ public interface PlayService {
     void sendResults(Room room, String message);
 
 
-    // 下发，开始轮流发言
-    void callSpeak(Room room);
+    // 下发，轮流发言
+    void callAllSpeak(Room room);
+
+    // 下发，指定发言
+    void callOneSpeak(Room room, User user);
+
+    // 下发，投票选择杀狼
+    void callVoter(Room room);
+
+    // 下发
+    void callGameOver(Room room);
 }
