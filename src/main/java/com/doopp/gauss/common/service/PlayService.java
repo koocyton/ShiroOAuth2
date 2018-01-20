@@ -12,19 +12,6 @@ public interface PlayService {
     // 接受用户准备好了的消息
     void readyAction(Room room, User user);
 
-    // 所有游戏准备好了后，游戏开始
-    void callGameStart(Room room);
-
-
-    // 先随机派发用户身份
-    void distributeIdentity(Room room);
-
-    // 下发，进入夜晚
-    void enterNight(Room room);
-
-    // 下发，进入白天
-    void enterDay(Room room);
-
     // 上行，狼人杀人
     void werewolfAction(Room room, User user);
 

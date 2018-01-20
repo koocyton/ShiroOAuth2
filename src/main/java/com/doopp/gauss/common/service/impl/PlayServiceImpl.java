@@ -15,7 +15,6 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
 import java.io.IOException;
-import java.util.Random;
 
 @Service("playService")
 public class PlayServiceImpl implements PlayService {
@@ -71,105 +70,6 @@ public class PlayServiceImpl implements PlayService {
             room.setStatus(2);
             this.gameTaskExecutor.execute(new WerewolfGameTask(room));
         }
-    }
-
-    // 所有游戏准备好了后，游戏开始
-    @Override
-    public void callGameStart(Room room) {
-        this.sendMessage(room, "{\"action\":\"game-start\"}");
-    }
-
-    // 先随机派发用户身份
-    @Override
-    public void distributeIdentity(Room room) {
-        Random random= new Random();
-        String[] identities = this.identities.clone();
-        boolean[] bool = new boolean[identities.length];
-        User[] wolfUser = new User[]{};
-        // 分配身份
-        for(int ii=0; ii<identities.length; ii++) {
-            int nn = random.nextInt(identities.length);
-            if(bool[ii]){
-                continue;
-            }
-            room.getUsers()[ii].setIdentity(identities[nn]);
-            // 如果是狼人
-            if (identities[nn].equals(WOF_ID)) {
-                int z = wolfUser.length;
-                wolfUser[z] = room.getUsers()[ii];
-            }
-            this.sendMessage(room.getUsers()[ii], "{\"\":\"\"}");
-            bool[ii]=true;
-        }
-        // 通知狼的身份
-        for(User user : wolfUser) {
-            this.sendMessage(user, "{\"action\":\"all-wolf\"}");
-        }
-    }
-
-    // 下发，进入夜晚
-    @Override
-    public void enterNight(Room room) {
-        this.callWerewolf(room, 40);
-        this.callSeer(room, 40);
-        this.callWitch(room, 40);
-        this.enterDay(room);
-    }
-
-    // 下发，进入白天
-    @Override
-    public void enterDay(Room room) {
-        this.sendLastNightResult(room);
-        this.callHunter(room);
-        if (this.checkVictory()) {
-            this.sendResults(room, "");
-            return;
-        }
-        this.callAllSpeak(room);
-        this.callVoter(room);
-        this.callHunter(room);
-        if (this.checkVictory()) {
-            this.sendResults(room, "");
-            return;
-        }
-        enterNight(room);
-    }
-
-    // 发送昨晚的结果
-    private void sendLastNightResult(Room room) {
-
-    }
-
-    // 下发，狼人出来杀人
-    private void callWerewolf(Room room, int duration) {
-    }
-
-    // 下发，预言家查身份
-    private void callSeer(Room room, int duration) {
-    }
-
-    // 下发，女巫救人或毒杀
-    private void callWitch(Room room, int duration) {
-    }
-
-    // 下发，猎人杀人
-    private void callHunter(Room room) {
-    }
-
-    private void callAllSpeak(Room room) {
-        for(User user : room.getUsers()) {
-            if (user.isLiving()) {
-                this.callOneSpeak(user);
-                delay(30);
-            }
-        }
-    }
-
-    private void callVoter(Room room) {
-    }
-
-    private void callOneSpeak(User user) {
-        sendMessage(user, "{\"action\":\"speak\", \"user\":"+user.getId()+", \"timeLimit\":30}");
     }
 
     // 上行，狼人杀人
