@@ -4,10 +4,12 @@ import com.alibaba.fastjson.JSONObject;
 import com.doopp.gauss.common.entity.Room;
 import com.doopp.gauss.common.entity.User;
 import com.doopp.gauss.common.service.PlayService;
+import com.doopp.gauss.common.task.WerewolfGameTask;
 import com.doopp.gauss.server.websocket.GameSocketHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -34,6 +36,9 @@ public class PlayServiceImpl implements PlayService {
 
     @Autowired
     GameSocketHandler gameSocketHandler;
+
+    @Autowired
+    ThreadPoolTaskExecutor gameTaskExecutor;
 
     // 用户发送的命令转发
     @Override
@@ -63,7 +68,8 @@ public class PlayServiceImpl implements PlayService {
         }
         // 都准备好了，就开始游戏
         if (allReady) {
-            this.distributeIdentity(room);
+            room.setStatus(2);
+            this.gameTaskExecutor.execute(new WerewolfGameTask(room));
         }
     }
 
@@ -71,8 +77,6 @@ public class PlayServiceImpl implements PlayService {
     @Override
     public void callGameStart(Room room) {
         this.sendMessage(room, "{\"action\":\"game-start\"}");
-        delay(2);
-        this.distributeIdentity(room);
     }
 
     // 先随机派发用户身份
@@ -101,26 +105,21 @@ public class PlayServiceImpl implements PlayService {
         for(User user : wolfUser) {
             this.sendMessage(user, "{\"action\":\"all-wolf\"}");
         }
-        this.enterNight(room);
     }
 
     // 下发，进入夜晚
     @Override
     public void enterNight(Room room) {
-        this.callWerewolf(room);
-        this.callSeer(room);
     }
 
     // 下发，进入白天
     @Override
     public void enterDay(Room room) {
-
     }
 
     // 下发，狼人出来杀人
     @Override
     public void callWerewolf(Room room) {
-
     }
 
     // 上行，狼人杀人
