@@ -1,18 +1,19 @@
 package com.doopp.gauss.common.service;
 
+import com.alibaba.fastjson.JSONObject;
 import com.doopp.gauss.common.entity.Room;
 import com.doopp.gauss.common.entity.User;
 
 public interface PlayService {
 
     // 用户发送的命令转发
-    void actionDispatcher();
+    void actionDispatcher(Room room, User user, String action, JSONObject messageObject);
 
     // 接受用户准备好了的消息
     void readyAction(Room room, User user);
 
     // 所有游戏准备好了后，游戏开始
-    void gameStart(Room room);
+    void callGameStart(Room room);
 
 
     // 先随机派发用户身份
@@ -61,7 +62,7 @@ public interface PlayService {
     void callAllSpeak(Room room);
 
     // 下发，指定发言
-    void callOneSpeak(Room room, User user);
+    void callOneSpeak(User user);
 
     // 下发，投票选择杀狼
     void callVoter(Room room);

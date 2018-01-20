@@ -5,9 +5,11 @@ import com.doopp.gauss.common.dao.RoomDao;
 import com.doopp.gauss.common.dao.UserDao;
 import com.doopp.gauss.common.entity.Room;
 import com.doopp.gauss.common.entity.User;
+import com.doopp.gauss.common.service.PlayService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.socket.CloseStatus;
+import org.springframework.web.socket.PongMessage;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.AbstractWebSocketHandler;
@@ -31,10 +33,12 @@ public class GameSocketHandler extends AbstractWebSocketHandler {
     @Resource
     private UserDao userDao;
 
+    @Resource
+    private PlayService playService;
+
     // text message
     @Override
     protected void handleTextMessage(WebSocketSession socketSession, TextMessage message) throws Exception {
-
         // 校验消息
         JSONObject messageObject = JSONObject.parseObject(message.getPayload());
         // get action
@@ -42,15 +46,15 @@ public class GameSocketHandler extends AbstractWebSocketHandler {
 
         // 如果 Action 异常
         if (action==null) {
-            // socketSession.close();
+            logger.info("handleTextMessage : a null action message");
         }
         // 聊天
-        else if (action.equals("action-speak")) {
+        else if (action.equals("speak")) {
             this.actionSpeak(socketSession, messageObject);
         }
         // 游戏操作
-        else if (action.equals("action-play")) {
-            this.actionPlay(socketSession, messageObject);
+        else if (action.contains("play-")) {
+            this.actionPlay(socketSession, messageObject, action);
         }
     }
 
@@ -94,7 +98,10 @@ public class GameSocketHandler extends AbstractWebSocketHandler {
     }
 
     // 网游戏
-    private void actionPlay(WebSocketSession socketSession, JSONObject messageObject) {
+    private void actionPlay(WebSocketSession socketSession, JSONObject messageObject, String action) {
+        User sessionUser = userDao.getUserBySocketSession(socketSession);
+        Room sessionRoom = roomDao.getRoomBySocketSession(socketSession);
+        playService.actionDispatcher(sessionRoom, sessionUser, action, messageObject);
     }
 
     // 取出当前用户所在房间的 sockets

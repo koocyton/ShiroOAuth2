@@ -9,7 +9,7 @@ import java.io.Serializable;
  */
 
 @Data
-public class User implements Serializable {
+public class User {
 
     // 编号
     private Long id;
@@ -31,4 +31,14 @@ public class User implements Serializable {
 
     // 好友
     private String friends;
+
+    // 游戏状态
+    private int status;
+
+    // 游戏里的身份
+    private String identity;
+
+    public boolean isLiving() {
+        return (this.status==1);
+    }
 }
