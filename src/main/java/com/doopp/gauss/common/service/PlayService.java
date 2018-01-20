@@ -25,47 +25,21 @@ public interface PlayService {
     // 下发，进入白天
     void enterDay(Room room);
 
-
-    // 下发，狼人出来杀人
-    void callWerewolf(Room room);
-
     // 上行，狼人杀人
     void werewolfAction(Room room, User user);
 
-
-    // 下发，预言家查身份
-    void callSeer(Room room);
-
     // 上行，预言家查身份
     void seerAction(Room room, User user);
-
-
-    // 下发，女巫救人或毒杀
-    void callWitch(Room room);
 
     // 上行，女巫救人或毒杀
     void witchAction(Room room, User user);
 
 
-    // 下发，猎人杀人
-    void callHunter(Room room);
-
     // 上行，猎人杀人
     void hunterAction(Room room, User user);
 
-
     // 下发，结果
     void sendResults(Room room, String message);
-
-
-    // 下发，轮流发言
-    void callAllSpeak(Room room);
-
-    // 下发，指定发言
-    void callOneSpeak(User user);
-
-    // 下发，投票选择杀狼
-    void callVoter(Room room);
 
     // 下发
     void callGameOver(Room room);
