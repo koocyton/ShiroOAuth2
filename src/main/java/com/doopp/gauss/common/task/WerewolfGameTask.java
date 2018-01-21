@@ -12,12 +12,23 @@ import java.util.Random;
 
 public class WerewolfGameTask implements Runnable {
 
+    private static String WOF_ID = "wolf";
+    private static String VLG_ID = "villager";
+    private static String WIH_ID = "witch";
+    private static String HNT_ID = "hunter";
+    private static String SER_ID = "seer";
+    private static String CPT_ID = "cupid";
+
+    private final String[] identities = new String[] {
+        WOF_ID, WOF_ID, WOF_ID, WOF_ID, VLG_ID, VLG_ID, VLG_ID, VLG_ID, WIH_ID, HNT_ID, SER_ID, CPT_ID
+    };
+
     // logger
     private final static Logger logger = LoggerFactory.getLogger(WerewolfGameTask.class);
 
     private final static PlayService playService = (PlayService) ApplicationContextUtil.getBean("playService");
 
-    @Autowired
+    // 这个线程处理的房间
     private final Room room;
 
     public WerewolfGameTask (Room room) {
@@ -25,29 +36,19 @@ public class WerewolfGameTask implements Runnable {
     }
 
     public void run() {
-        playService.callGameStart(room);
-        delay(5000);
-        playService.distributeIdentity(room);
-        delay(3000);
-        playService.enterNight(room);
-        while(true) {
-            delay(1000);
-            if (true) {
-                playService.enterDay(room);
-            }
-        }
+        this.callGameStart(room);
+        this.distributeIdentity(room);
+        this.enterNight(room);
     }
 
-
     // 所有游戏准备好了后，游戏开始
-    @Override
-    public void callGameStart(Room room) {
-        this.sendMessage(room, "{\"action\":\"game-start\"}");
+    private void callGameStart(Room room) {
+        playService.sendMessage(room, "{\"action\":\"game-start\"}");
+        playService.delay(5);
     }
 
     // 先随机派发用户身份
-    @Override
-    public void distributeIdentity(Room room) {
+    private void distributeIdentity(Room room) {
         Random random= new Random();
         String[] identities = this.identities.clone();
         boolean[] bool = new boolean[identities.length];
@@ -64,27 +65,27 @@ public class WerewolfGameTask implements Runnable {
                 int z = wolfUser.length;
                 wolfUser[z] = room.getUsers()[ii];
             }
-            this.sendMessage(room.getUsers()[ii], "{\"\":\"\"}");
+            playService.sendMessage(room.getUsers()[ii], "{\"action\":\"distribute-identity\", \"identity\":\"" + room.getUsers()[ii].getIdentity() + "\"}");
             bool[ii]=true;
         }
         // 通知狼的身份
         for(User user : wolfUser) {
-            this.sendMessage(user, "{\"action\":\"all-wolf\"}");
+            playService.sendMessage(user, "{\"action\":\"wolf-identity\", \"users\":[1,2,3]}");
         }
+        //
+        playService.delay(3);
     }
 
     // 下发，进入夜晚
-    @Override
-    public void enterNight(Room room) {
-        this.callWerewolf(room, 40);
-        this.callSeer(room, 40);
-        this.callWitch(room, 40);
+    private void enterNight(Room room) {
+        this.callWerewolf(room);
+        this.callSeer(room);
+        this.callWitch(room);
         this.enterDay(room);
     }
 
     // 下发，进入白天
-    @Override
-    public void enterDay(Room room) {
+    private void enterDay(Room room) {
         this.sendLastNightResult(room);
         this.callHunter(room);
         if (this.checkVictory()) {
@@ -107,26 +108,75 @@ public class WerewolfGameTask implements Runnable {
     }
 
     // 下发，狼人出来杀人
-    private void callWerewolf(Room room, int duration) {
+    private void callWerewolf(Room room) {
+        User[] users = room.getUsers();
+        User[] wolfs = new User[]{};
+        int ii = 0;
+        // 拿到谁是狼
+        for(User user : users) {
+            if (user!=null && user.getIdentity().equals(WOF_ID)) {
+                wolfs[ii++] = user;
+            }
+        }
+        // 狼开始行动
+        for(User user : wolfs) {
+            playService.sendMessage(user, "{\"action\":\"wolf-killings\"");
+        }
+        int maxLoopNumber = 40;
+        int nowLoopNumber = 0;
+        // 遍历检擦狼是否执行完成
+        while(true) {
+            playService.delay(1);
+            boolean allAction = true;
+            for(User user : wolfs) {
+                if (user.getAction == false) {
+                    allAction = false;
+                }
+            }
+            nowLoopNumber++;
+            if (allAction || nowLoopNumber>maxLoopNumber) {
+                this.callWitch(room);
+            }
+        }
     }
 
     // 下发，预言家查身份
-    private void callSeer(Room room, int duration) {
+    private void callSeer(Room room) {
+        playService.delay(40);
     }
 
     // 下发，女巫救人或毒杀
-    private void callWitch(Room room, int duration) {
+    private void callWitch(Room room) {
+        playService.delay(40);
     }
 
     // 下发，猎人杀人
     private void callHunter(Room room) {
+        playService.delay(40);
+    }
+
+
+
+    // 下发，结果
+    private void sendResults(Room room, String message) {
+
+    }
+
+    // 下发，游戏结束
+    private void callGameOver(Room room) {
+
+    }
+
+    // 检查胜利
+    private boolean checkVictory() {
+        return true;
     }
 
     private void callAllSpeak(Room room) {
         for(User user : room.getUsers()) {
             if (user.isLiving()) {
                 this.callOneSpeak(user);
-                delay(30);
+                playService.delay(30);
             }
         }
     }
@@ -136,15 +186,5 @@ public class WerewolfGameTask implements Runnable {
 
     private void callOneSpeak(User user) {
         playService.sendMessage(user, "{\"action\":\"speak\", \"user\":"+user.getId()+", \"timeLimit\":30}");
-    }
-
-    // 延迟一段时间
-    private static void delay(int millis) {
-        try {
-            Thread.sleep(millis);
-        }
-        catch (InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 }

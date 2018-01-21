@@ -14,7 +14,7 @@ public class Room {
     private int id;
 
     // 房间的用户
-    private User[] users = {
+    private Player[] players = {
         null, null, null, null, null, null,
         null, null, null, null, null, null,
     };
@@ -25,14 +25,23 @@ public class Room {
     // 房间游戏开局的类型      0:普通(normal)    1:高阶(high)
     private int gameLevel = 0;
 
-    public void removeUser(int index) {
-        this.users[index] = null;
+    public void playerLeave(int index) {
+        this.players[index] = null;
     }
 
-    public void removeUser(User user) {
-        for(int ii=0; ii<users.length; ii++) {
-            if (this.users[ii].getId().equals(user.getId())) {
-                this.users[ii] = null;
+    public void playerLeave(Player player) {
+        for(int ii=0; ii<players.length; ii++) {
+            if (this.players[ii].getId().equals(player.getId())) {
+                this.players[ii] = null;
+                break;
+            }
+        }
+    }
+
+    public void playerJoin(Player player) {
+        for(int ii=0; ii<players.length; ii++) {
+            if (this.players[ii].getId().equals(player.getId())) {
+                this.players[ii] = null;
                 break;
             }
         }

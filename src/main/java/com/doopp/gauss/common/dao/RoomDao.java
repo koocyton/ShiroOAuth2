@@ -1,7 +1,7 @@
 package com.doopp.gauss.common.dao;
 
 import com.doopp.gauss.common.entity.Room;
-import com.doopp.gauss.common.entity.User;
+import com.doopp.gauss.common.entity.Player;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
@@ -41,40 +41,36 @@ public class RoomDao {
     }
 
     // 用户离开房间
-    public void userLeaveRoom(int roomId, User user) {
+    public void playerLeaveRoom(int roomId, Player player) {
         Room room = getRoomById(roomId);
-        room.removeUser(user);
+        room.playerLeave(player);
     }
 
     // 用户加入房间
-    public Room userJoinRoom(User user) {
+    public Room playerJoinRoom(Player player) {
         for (Room room : freeRooms.values()) {
-            room = userJoinByRoom(room, user);
+            room = this.playerJoinByRoom(room, player);
             if (room!=null) {
+                player.setRoomId(room.getId());
                 return room;
             }
         }
-        return userJoinSpaceRoom(user);
+        Room room = playerJoinSpaceRoom(player);
+        player.setRoomId(room.getId());
+        return room;
     }
 
     // 用户加入指定房间
-    private Room userJoinByRoom(Room room, User user) {
-        User[] users = room.getUsers();
-        for (int ii=0; ii<users.length; ii++) {
-            if (users[ii]==null) {
-                users[ii] = user;
-                return room;
-            }
-        }
-        return null;
+    private Room playerJoinByRoom(Room room, Player player) {
+        room.playerJoin(player);
+        return room;
     }
 
     // 用户加入空房间
-    private Room userJoinSpaceRoom(User user) {
+    private Room playerJoinSpaceRoom(Player player) {
         Room room = new Room();
         room.setId(++lastRoomId);
-        User[] users = room.getUsers();
-        users[0] = user;
+        room.playerJoin(player);
         freeRooms.put(room.getId(), room);
         return room;
     }

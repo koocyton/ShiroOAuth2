@@ -19,17 +19,6 @@ import java.io.IOException;
 @Service("playService")
 public class PlayServiceImpl implements PlayService {
 
-    private static String WOF_ID = "wolf";
-    private static String VLG_ID = "villager";
-    private static String WIH_ID = "witch";
-    private static String HNT_ID = "hunter";
-    private static String SER_ID = "seer";
-    private static String CPT_ID = "cupid";
-
-    private final String[] identities = new String[] {
-        WOF_ID, WOF_ID, WOF_ID, WOF_ID, VLG_ID, VLG_ID, VLG_ID, VLG_ID, WIH_ID, HNT_ID, SER_ID, CPT_ID
-    };
-
     // logger
     private final static Logger logger = LoggerFactory.getLogger(PlayServiceImpl.class);
 
@@ -95,24 +84,9 @@ public class PlayServiceImpl implements PlayService {
 
     }
 
-    // 下发，结果
-    @Override
-    public void sendResults(Room room, String message) {
-
-    }
-
-    @Override
-    public void callGameOver(Room room) {
-
-    }
-
-    // 检查胜利
-    private boolean checkVictory() {
-        return true;
-    }
-
     // 发送信息
-    private void sendMessage(User user, String message) {
+    @Override
+    public void sendMessage(User user, String message) {
         if (user!=null) {
             TextMessage textMessage = new TextMessage(message);
             WebSocketSession socketSession = gameSocketHandler.getSocket(user.getId());
@@ -126,16 +100,18 @@ public class PlayServiceImpl implements PlayService {
     }
 
     // 发送信息
-    private void sendMessage(Room room, String message) {
+    @Override
+    public void sendMessage(Room room, String message) {
         for(int ii=0; ii<room.getUsers().length; ii++) {
             this.sendMessage(room.getUsers()[ii], message);
         }
     }
 
     // 延迟一段时间
-    private static void delay(int millis) {
+    @Override
+    public void delay(float second) {
         try {
-            Thread.sleep(millis);
+            Thread.sleep((int) second * 1000);
         }
         catch (InterruptedException e) {
             e.printStackTrace();

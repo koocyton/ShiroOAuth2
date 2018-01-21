@@ -25,9 +25,11 @@ public interface PlayService {
     // 上行，猎人杀人
     void hunterAction(Room room, User user);
 
-    // 下发，结果
-    void sendResults(Room room, String message);
+    void sendMessage(User user, String message);
 
-    // 下发
-    void callGameOver(Room room);
+    // 发送信息
+    void sendMessage(Room room, String message);
+
+    // 延迟一段时间
+    void delay(float second);
 }

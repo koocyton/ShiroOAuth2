@@ -2,14 +2,13 @@ package com.doopp.gauss.server.websocket;
 
 import com.alibaba.fastjson.JSONObject;
 import com.doopp.gauss.common.dao.RoomDao;
-import com.doopp.gauss.common.dao.UserDao;
+import com.doopp.gauss.common.dao.PlayerDao;
+import com.doopp.gauss.common.entity.Player;
 import com.doopp.gauss.common.entity.Room;
-import com.doopp.gauss.common.entity.User;
 import com.doopp.gauss.common.service.PlayService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.socket.CloseStatus;
-import org.springframework.web.socket.PongMessage;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.AbstractWebSocketHandler;
@@ -31,7 +30,7 @@ public class GameSocketHandler extends AbstractWebSocketHandler {
     private RoomDao roomDao;
 
     @Resource
-    private UserDao userDao;
+    private PlayerDao playerDao;
 
     @Resource
     private PlayService playService;
@@ -61,20 +60,17 @@ public class GameSocketHandler extends AbstractWebSocketHandler {
     @Override
     public void afterConnectionEstablished(WebSocketSession socketSession) throws Exception {
         socketSession.sendMessage(new TextMessage("{\"action\":\"user-connected\"}"));
-        User sessionUser = userDao.getUserBySocketSession(socketSession);
-        Room sessionRoom = roomDao.userJoinRoom(sessionUser);
-        socketSession.getAttributes().put("sessionRoomId", sessionRoom.getId());
-        sockets.put(sessionUser.getId(), socketSession);
+        Player player = (Player) socketSession.getAttributes().get("sessionPlayer");
+        roomDao.playerJoinRoom(player);
+        sockets.put(player.getId(), socketSession);
     }
 
     @Override
     public void afterConnectionClosed(WebSocketSession socketSession, CloseStatus status) throws Exception {
-        User sessionUser = userDao.getUserBySocketSession(socketSession);
-        Room sessionRoom = roomDao.getRoomBySocketSession(socketSession);
-        roomDao.userLeaveRoom(sessionRoom.getId(), sessionUser);
-        socketSession.getAttributes().remove("sessionUser");
-        socketSession.getAttributes().remove("sessionRoomId");
-        sockets.remove(sessionUser.getId());
+        Player player = (Player) socketSession.getAttributes().get("sessionPlayer");
+        roomDao.playerLeaveRoom(player.getRoomId(), player);
+        socketSession.getAttributes().remove("sessionPlayer");
+        sockets.remove(player.getId());
     }
 
     @Override
@@ -87,10 +83,10 @@ public class GameSocketHandler extends AbstractWebSocketHandler {
     // 房间内公共频道说话
     private void actionSpeak(WebSocketSession socketSession, JSONObject messageObject) throws IOException {
         WebSocketSession[] inRoomSockets = this.getSocketsInRoom(socketSession);
-        User sessionUser = userDao.getUserBySocketSession(socketSession);
+        Player player = (Player) socketSession.getAttributes().get("sessionPlayer");
         for (WebSocketSession userSocketSession : inRoomSockets) {
             if (!userSocketSession.equals(socketSession)) {
-                messageObject.put("sender", sessionUser.getNickName());
+                messageObject.put("sender", player.getNickName());
                 TextMessage message = new TextMessage(messageObject.toJSONString());
                 userSocketSession.sendMessage(message);
             }
@@ -99,19 +95,21 @@ public class GameSocketHandler extends AbstractWebSocketHandler {
 
     // 网游戏
     private void actionPlay(WebSocketSession socketSession, JSONObject messageObject, String action) {
-        User sessionUser = userDao.getUserBySocketSession(socketSession);
-        Room sessionRoom = roomDao.getRoomBySocketSession(socketSession);
-        playService.actionDispatcher(sessionRoom, sessionUser, action, messageObject);
+        Player player = (Player) socketSession.getAttributes().get("sessionPlayer");
+        Room room = roomDao.getRoomById(player.getRoomId());
+        playService.actionDispatcher(room, player, action, messageObject);
     }
 
     // 取出当前用户所在房间的 sockets
     private WebSocketSession[] getSocketsInRoom(WebSocketSession socketSession) {
-        User[] users = userDao.getUsersInRoom(socketSession);
+        Player player = (Player) socketSession.getAttributes().get("sessionPlayer");
+        Room room = roomDao.getRoomById(player.getRoomId());
+        Player[] players = room.getPlayers();
         WebSocketSession[] inRoomSockets = {};
         int ii = inRoomSockets.length;
-        for (User user : users) {
-            if (user!=null) {
-                inRoomSockets[ii] = sockets.get(user.getId());
+        for (Player otherPlayer : players) {
+            if (otherPlayer!=null) {
+                inRoomSockets[ii] = sockets.get(otherPlayer.getId());
                 ii++;
             }
         }
