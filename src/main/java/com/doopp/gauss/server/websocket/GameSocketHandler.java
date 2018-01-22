@@ -2,10 +2,11 @@ package com.doopp.gauss.server.websocket;
 
 import com.alibaba.fastjson.JSONObject;
 import com.doopp.gauss.common.dao.RoomDao;
-import com.doopp.gauss.common.dao.PlayerDao;
 import com.doopp.gauss.common.entity.Player;
 import com.doopp.gauss.common.entity.Room;
 import com.doopp.gauss.common.service.PlayService;
+import lombok.Getter;
+import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.socket.CloseStatus;
@@ -26,11 +27,17 @@ public class GameSocketHandler extends AbstractWebSocketHandler {
     // socket`s session
     private static final Map<Long, WebSocketSession> sockets = new HashMap<>();
 
-    @Resource
-    private RoomDao roomDao;
+    // room`s session
+    private static final Map<Integer, Room> rooms = new HashMap<>();
+
+    // freeRoom`s session
+    private static final Map<Integer, Integer> freeRoomIds = new HashMap<>();
+
+    // room id
+    private static int lastRoomId = 54612;
 
     @Resource
-    private PlayerDao playerDao;
+    private RoomDao roomDao;
 
     @Resource
     private PlayService playService;
@@ -59,7 +66,7 @@ public class GameSocketHandler extends AbstractWebSocketHandler {
 
     @Override
     public void afterConnectionEstablished(WebSocketSession socketSession) throws Exception {
-        socketSession.sendMessage(new TextMessage("{\"action\":\"user-connected\"}"));
+        socketSession.sendMessage(new TextMessage("{\"action\":\"player-connected\"}"));
         Player player = (Player) socketSession.getAttributes().get("sessionPlayer");
         roomDao.playerJoinRoom(player);
         sockets.put(player.getId(), socketSession);
@@ -116,7 +123,15 @@ public class GameSocketHandler extends AbstractWebSocketHandler {
         return inRoomSockets;
     }
 
-    public WebSocketSession getSocket(Long userId) {
+    public WebSocketSession getWebsocketById(Long userId) {
         return sockets.get(userId);
+    }
+
+    public Room getRoomById(int roomId) {
+        return rooms.get(roomId);
+    }
+
+    public Map<Integer, Integer> getFreeRoomIds() {
+        return freeRoomIds;
     }
 }

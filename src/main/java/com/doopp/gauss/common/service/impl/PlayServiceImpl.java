@@ -1,8 +1,9 @@
 package com.doopp.gauss.common.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.doopp.gauss.common.dao.RoomDao;
 import com.doopp.gauss.common.entity.Room;
-import com.doopp.gauss.common.entity.User;
+import com.doopp.gauss.common.entity.Player;
 import com.doopp.gauss.common.service.PlayService;
 import com.doopp.gauss.common.task.WerewolfGameTask;
 import com.doopp.gauss.server.websocket.GameSocketHandler;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
+import javax.annotation.Resource;
 import java.io.IOException;
 
 @Service("playService")
@@ -22,35 +24,50 @@ public class PlayServiceImpl implements PlayService {
     // logger
     private final static Logger logger = LoggerFactory.getLogger(PlayServiceImpl.class);
 
-    @Autowired
-    GameSocketHandler gameSocketHandler;
+    @Resource
+    private RoomDao roomDao;
 
     @Autowired
-    ThreadPoolTaskExecutor gameTaskExecutor;
+    private GameSocketHandler gameSocketHandler;
+
+    @Autowired
+    private ThreadPoolTaskExecutor gameTaskExecutor;
 
     // 用户发送的命令转发
     @Override
-    public void actionDispatcher(Room room, User user, String playAction, JSONObject messageObject) {
+    public void actionDispatcher(Room room, Player player, String playAction, JSONObject messageObject) {
         switch(playAction) {
             case "play-ready":
-                this.readyAction(room, user);
+                this.readyAction(room, player);
+                break;
+            case "play-werewolf":
+                this.werewolfAction(room, player, messageObject);
+                break;
+            case "play-seer":
+                this.seerAction(room, player, messageObject);
+                break;
+            case "play-witch":
+                this.witchAction(room, player, messageObject);
+                break;
+            case "play-hunter":
+                this.hunterAction(room, player, messageObject);
                 break;
         }
     }
 
     // 接受用户准备好了的消息
     @Override
-    public void readyAction(Room room, User user) {
+    public void readyAction(Room room, Player player) {
         boolean allReady = true;
-        for(int ii=0; ii<room.getUsers().length; ii++) {
-            if (room.getUsers()[ii]==null) {
+        for(int ii=0; ii<room.getPlayers().length; ii++) {
+            if (room.getPlayers()[ii]==null) {
                 allReady = false;
                 continue;
             }
-            if (room.getUsers()[ii]==user) {
-                room.getUsers()[ii].setStatus(1);
+            if (room.getPlayers()[ii]==player) {
+                room.getPlayers()[ii].setStatus(1);
             }
-            if (room.getUsers()[ii].getStatus()==0) {
+            if (room.getPlayers()[ii].getStatus()==0) {
                 allReady = false;
             }
         }
@@ -63,33 +80,43 @@ public class PlayServiceImpl implements PlayService {
 
     // 上行，狼人杀人
     @Override
-    public void werewolfAction(Room room, User user) {
+    public void werewolfAction(Room room, Player player, JSONObject messageObject) {
+        Long choiceTarget = messageObject.getLong("choice-target");
+        Player choicePlayer = roomDao.getPlayerById(room, choiceTarget);
+        roomDao.wolfChoiceKill(player, choicePlayer);
     }
 
     // 上行，预言家查身份
     @Override
-    public void seerAction(Room room, User user) {
-
+    public void seerAction(Room room, Player player, JSONObject messageObject) {
+        Long choiceTarget = messageObject.getLong("choice-target");
+        Player choicePlayer = roomDao.getPlayerById(room, choiceTarget);
+        roomDao.seerChoiceCheck(player, choicePlayer);
     }
 
     // 上行，女巫救人或毒杀
     @Override
-    public void witchAction(Room room, User user) {
-
+    public void witchAction(Room room, Player player, JSONObject messageObject) {
+        Long choiceTarget = messageObject.getLong("choice-target");
+        Player choicePlayer = roomDao.getPlayerById(room, choiceTarget);
+        roomDao.witchChoiceKill(player, choicePlayer);
+        roomDao.witchChoiceHelp(player, choicePlayer);
     }
 
     // 上行，猎人杀人
     @Override
-    public void hunterAction(Room room, User user) {
-
+    public void hunterAction(Room room, Player player, JSONObject messageObject) {
+        Long choiceTarget = messageObject.getLong("choice-target");
+        Player choicePlayer = roomDao.getPlayerById(room, choiceTarget);
+        room.hunterChoiceKill(player, choicePlayer);
     }
 
     // 发送信息
     @Override
-    public void sendMessage(User user, String message) {
-        if (user!=null) {
+    public void sendMessage(Player player, String message) {
+        if (player!=null) {
             TextMessage textMessage = new TextMessage(message);
-            WebSocketSession socketSession = gameSocketHandler.getSocket(user.getId());
+            WebSocketSession socketSession = gameSocketHandler.getSocket(player.getId());
             try {
                 socketSession.sendMessage(textMessage);
             }
@@ -102,8 +129,8 @@ public class PlayServiceImpl implements PlayService {
     // 发送信息
     @Override
     public void sendMessage(Room room, String message) {
-        for(int ii=0; ii<room.getUsers().length; ii++) {
-            this.sendMessage(room.getUsers()[ii], message);
+        for(int ii=0; ii<room.getPlayers().length; ii++) {
+            this.sendMessage(room.getPlayers()[ii], message);
         }
     }
 

@@ -2,12 +2,12 @@ package com.doopp.gauss.common.dao;
 
 import com.doopp.gauss.common.entity.Room;
 import com.doopp.gauss.common.entity.Player;
+import com.doopp.gauss.server.websocket.GameSocketHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-import org.springframework.web.socket.WebSocketSession;
 
-import java.util.HashMap;
 import java.util.Map;
 
 @Repository("roomDao")
@@ -16,43 +16,31 @@ public class RoomDao {
     // logger
     private final static Logger logger = LoggerFactory.getLogger(RoomDao.class);
 
-    // room`s session
-    private static final Map<Integer, Room> rooms = new HashMap<>();
-
-    // freeRoom`s session
-    private static final Map<Integer, Room> freeRooms = new HashMap<>();
-
-    // room id
-    private static int lastRoomId = 54612;
+    // socket handle
+    @Autowired
+    private GameSocketHandler gameSocketHandler;
 
     // 拿到房间
     public Room getRoomById(int roomId) {
-        Room room = freeRooms.get(roomId);
-        if (room==null) {
-            rooms.get(roomId);
-        }
-        return room;
+        return gameSocketHandler.getRoomById(roomId);
     }
 
-    // 拿到房间
-    public Room getRoomBySocketSession(WebSocketSession socketSession) {
-        int roomId = (int) socketSession.getAttributes().get("sessionRoomId");
-        return this.getRoomById(roomId);
+    // 所有房间
+    public Map<Integer, Integer> getFreeRoomIds() {
+        return gameSocketHandler.getFreeRoomIds();
     }
 
     // 用户离开房间
     public void playerLeaveRoom(int roomId, Player player) {
-        Room room = getRoomById(roomId);
-        room.playerLeave(player);
+        Room room = this.getRoomById(roomId);
+        this.playerLeave(room, player);
     }
 
     // 用户加入房间
     public Room playerJoinRoom(Player player) {
-        for (Room room : freeRooms.values()) {
-            room = this.playerJoinByRoom(room, player);
-            if (room!=null) {
-                player.setRoomId(room.getId());
-                return room;
+        if (this.getFreeRoomIds().size()>=1) {
+            for (Integer roomId : this.getFreeRoomIds().values()) {
+                return this.getRoomById(roomId);
             }
         }
         Room room = playerJoinSpaceRoom(player);
@@ -70,8 +58,33 @@ public class RoomDao {
     private Room playerJoinSpaceRoom(Player player) {
         Room room = new Room();
         room.setId(++lastRoomId);
-        room.playerJoin(player);
-        freeRooms.put(room.getId(), room);
+        room.setPlayers(new Player[]{player});
+        gameSocketHandler.addRoom(roomId);
         return room;
+    }
+
+    public void playerLeave(Room room, int index) {
+        Player[] players = room.getPlayers();
+        players[index] = null;
+    }
+
+    public void playerLeave(Room room, Player player) {
+        Player[] players = room.getPlayers();
+        for(int ii=0; ii<players.length; ii++) {
+            if (players[ii].getId().equals(player.getId())) {
+                players[ii] = null;
+                break;
+            }
+        }
+    }
+
+    public void playerJoin(Room room, Player player) {
+        Player[] players = room.getPlayers();
+        for(int ii=0; ii<players.length; ii++) {
+            if (players[ii].getId().equals(player.getId())) {
+                players[ii] = null;
+                break;
+            }
+        }
     }
 }

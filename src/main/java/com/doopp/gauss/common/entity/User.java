@@ -37,9 +37,4 @@ public class User {
 
     // 游戏里的身份
     private String identity;
-
-    // 是否存活
-    public boolean isLiving() {
-        return (this.status==1);
-    }
 }
