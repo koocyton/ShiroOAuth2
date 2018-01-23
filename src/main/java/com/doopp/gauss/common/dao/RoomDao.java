@@ -20,14 +20,22 @@ public class RoomDao {
     @Autowired
     private GameSocketHandler gameSocketHandler;
 
-    // 拿到房间
-    public Room getRoomById(int roomId) {
+    // 拿到制定 ID 的房间
+    private Room getRoomById(int roomId) {
         return gameSocketHandler.getRoomById(roomId);
     }
 
-    // 所有房间
-    public Map<Integer, Integer> getFreeRoomIds() {
-        return gameSocketHandler.getFreeRoomIds();
+    // 获得一个空闲的房间房间
+    private Room getFreeRoom() {
+        gameSocketHandler.getFreeRoomIds().forEach((k,v)->
+            return this.getRoomById(roomId);
+        );
+        if (gameSocketHandler.getFreeRoomIds().size()!=0) {
+            for (Integer roomId : gameSocketHandler.getFreeRoomIds().forEach(); values()) {
+                return this.getRoomById(roomId);
+            }
+        }
+        return  null;
     }
 
     // 用户离开房间
@@ -38,24 +46,16 @@ public class RoomDao {
 
     // 用户加入房间
     public Room playerJoinRoom(Player player) {
-        if (this.getFreeRoomIds().size()>=1) {
-            for (Integer roomId : this.getFreeRoomIds().values()) {
-                return this.getRoomById(roomId);
-            }
+        Room room = this.getFreeRoom();
+        if (room==null) {
+            room = playerCreateRoom(player);
+            player.setRoomId(room.getId());
         }
-        Room room = playerJoinSpaceRoom(player);
-        player.setRoomId(room.getId());
-        return room;
-    }
-
-    // 用户加入指定房间
-    private Room playerJoinByRoom(Room room, Player player) {
-        room.playerJoin(player);
         return room;
     }
 
     // 用户加入空房间
-    private Room playerJoinSpaceRoom(Player player) {
+    private Room playerCreateRoom(Player player) {
         Room room = new Room();
         room.setId(++lastRoomId);
         room.setPlayers(new Player[]{player});
