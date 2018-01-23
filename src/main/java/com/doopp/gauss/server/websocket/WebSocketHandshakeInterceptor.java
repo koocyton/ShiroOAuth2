@@ -26,7 +26,7 @@ public class WebSocketHandshakeInterceptor extends HttpSessionHandshakeIntercept
         // 将用户信息带入到 socket 里面
         ServletServerHttpRequest serverRequest = (ServletServerHttpRequest) request;
         User user = (User) serverRequest.getServletRequest().getAttribute("sessionUser");
-        Player player = UserMapper.INSTANCE.userToPlay(user);
+        Player player = UserMapper.INSTANCE.userToPlayer(user);
         player.setRoomId(0);
         // init session user
         attributes.put("sessionPlayer", player);

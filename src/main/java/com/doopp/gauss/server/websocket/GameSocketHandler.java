@@ -1,14 +1,14 @@
 package com.doopp.gauss.server.websocket;
 
 import com.alibaba.fastjson.JSONObject;
+import com.doopp.gauss.common.dao.PlayerDao;
 import com.doopp.gauss.common.dao.RoomDao;
 import com.doopp.gauss.common.entity.Player;
 import com.doopp.gauss.common.entity.Room;
 import com.doopp.gauss.common.service.PlayService;
-import lombok.Getter;
-import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -17,6 +17,7 @@ import org.springframework.web.socket.handler.AbstractWebSocketHandler;
 import javax.annotation.Resource;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 public class GameSocketHandler extends AbstractWebSocketHandler {
@@ -27,20 +28,14 @@ public class GameSocketHandler extends AbstractWebSocketHandler {
     // socket`s session
     private static final Map<Long, WebSocketSession> sockets = new HashMap<>();
 
-    // room`s session
-    private static final Map<Integer, Room> rooms = new HashMap<>();
+    @Autowired
+    private PlayService playService;
 
-    // freeRoom`s session
-    private static final Map<Integer, Integer> freeRoomIds = new HashMap<>();
-
-    // room id
-    private static int lastRoomId = 54612;
+    @Resource
+    private PlayerDao playerDao;
 
     @Resource
     private RoomDao roomDao;
-
-    @Resource
-    private PlayService playService;
 
     // text message
     @Override
@@ -68,14 +63,15 @@ public class GameSocketHandler extends AbstractWebSocketHandler {
     public void afterConnectionEstablished(WebSocketSession socketSession) throws Exception {
         socketSession.sendMessage(new TextMessage("{\"action\":\"player-connected\"}"));
         Player player = (Player) socketSession.getAttributes().get("sessionPlayer");
-        roomDao.playerJoinRoom(player);
+        playerDao.playerJoinRoom(player);
         sockets.put(player.getId(), socketSession);
     }
 
     @Override
     public void afterConnectionClosed(WebSocketSession socketSession, CloseStatus status) throws Exception {
         Player player = (Player) socketSession.getAttributes().get("sessionPlayer");
-        roomDao.playerLeaveRoom(player.getRoomId(), player);
+        Room room = roomDao.getRoomById(player.getRoomId());
+        playerDao.playerLeaveRoom(room, player);
         socketSession.getAttributes().remove("sessionPlayer");
         sockets.remove(player.getId());
     }
@@ -100,7 +96,7 @@ public class GameSocketHandler extends AbstractWebSocketHandler {
         }
     }
 
-    // 网游戏
+    // 玩游戏
     private void actionPlay(WebSocketSession socketSession, JSONObject messageObject, String action) {
         Player player = (Player) socketSession.getAttributes().get("sessionPlayer");
         Room room = roomDao.getRoomById(player.getRoomId());
@@ -125,13 +121,5 @@ public class GameSocketHandler extends AbstractWebSocketHandler {
 
     public WebSocketSession getWebsocketById(Long userId) {
         return sockets.get(userId);
-    }
-
-    public Room getRoomById(int roomId) {
-        return rooms.get(roomId);
-    }
-
-    public Map<Integer, Integer> getFreeRoomIds() {
-        return freeRoomIds;
     }
 }

@@ -1,5 +1,6 @@
 package com.doopp.gauss.common.mapper;
 
+import com.doopp.gauss.common.dto.UserDTO;
 import com.doopp.gauss.common.entity.Player;
 import com.doopp.gauss.common.entity.User;
 import org.mapstruct.Mapper;
@@ -10,5 +11,7 @@ public interface UserMapper {
 
     UserMapper INSTANCE = Mappers.getMapper( UserMapper.class );
 
-    Player userToPlay(User user);
+    Player userToPlayer(User user);
+
+    UserDTO userToUserDTO(User user);
 }

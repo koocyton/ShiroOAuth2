@@ -1,26 +1,21 @@
 package com.doopp.gauss.common.task;
 
+import com.doopp.gauss.common.defined.Identity;
 import com.doopp.gauss.common.entity.Room;
 import com.doopp.gauss.common.entity.User;
 import com.doopp.gauss.common.service.PlayService;
 import com.doopp.gauss.common.utils.ApplicationContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Random;
 
 public class WerewolfGameTask implements Runnable {
 
-    private static String WOF_ID = "wolf";
-    private static String VLG_ID = "villager";
-    private static String WIH_ID = "witch";
-    private static String HNT_ID = "hunter";
-    private static String SER_ID = "seer";
-    private static String CPT_ID = "cupid";
-
-    private final String[] identities = new String[] {
-        WOF_ID, WOF_ID, WOF_ID, WOF_ID, VLG_ID, VLG_ID, VLG_ID, VLG_ID, WIH_ID, HNT_ID, SER_ID, CPT_ID
+    private final Identity[] identities = {
+        Identity.WOLF, Identity.WOLF, Identity.WOLF,
+        Identity.VILLAGER, Identity.VILLAGER, Identity.VILLAGER,
+        Identity.SEER, Identity.WITCH, Identity.HUNTER
     };
 
     // logger

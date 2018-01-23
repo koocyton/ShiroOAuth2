@@ -1,7 +1,8 @@
 package com.doopp.gauss.common.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
-import com.doopp.gauss.common.dao.RoomDao;
+import com.doopp.gauss.common.dao.PlayerDao;
+import com.doopp.gauss.common.defined.Identity;
 import com.doopp.gauss.common.entity.Room;
 import com.doopp.gauss.common.entity.Player;
 import com.doopp.gauss.common.service.PlayService;
@@ -25,7 +26,7 @@ public class PlayServiceImpl implements PlayService {
     private final static Logger logger = LoggerFactory.getLogger(PlayServiceImpl.class);
 
     @Resource
-    private RoomDao roomDao;
+    private PlayerDao playerDao;
 
     @Autowired
     private GameSocketHandler gameSocketHandler;
@@ -57,17 +58,15 @@ public class PlayServiceImpl implements PlayService {
 
     // 接受用户准备好了的消息
     @Override
-    public void readyAction(Room room, Player player) {
+    public void readyAction(Room room, Player readyPlayer) {
         boolean allReady = true;
-        for(int ii=0; ii<room.getPlayers().length; ii++) {
-            if (room.getPlayers()[ii]==null) {
-                allReady = false;
-                continue;
+        for(Player player : playerDao.getPlayersByRoom(room)) {
+            // 如果房间内找到用户，设定玩家准备好了
+            if (player.getId().equals(readyPlayer.getId())) {
+                player.setStatus(1);
             }
-            if (room.getPlayers()[ii]==player) {
-                room.getPlayers()[ii].setStatus(1);
-            }
-            if (room.getPlayers()[ii].getStatus()==0) {
+            // 循环获取玩家是否准备好了，如果如果有空座位 || 有没准备好的，设定 false
+            if (player==null || player.getStatus()==0) {
                 allReady = false;
             }
         }
@@ -80,25 +79,31 @@ public class PlayServiceImpl implements PlayService {
 
     // 上行，狼人杀人
     @Override
-    public void werewolfAction(Room room, Player player, JSONObject messageObject) {
-        Long choiceTarget = messageObject.getLong("choice-target");
-        Player choicePlayer = roomDao.getPlayerById(room, choiceTarget);
-        roomDao.wolfChoiceKill(player, choicePlayer);
+    public void werewolfAction(Room room, Player actionPlayer, JSONObject messageObject) {
+        Long playerId = messageObject.getLong("choice-target");
+        Player choicePlayer = playerDao.getPlayerById(playerId);
+        for(Player player : playerDao.getPlayersByRoom(room)) {
+            if (player.getIdentity()==Identity.WOLF) {
+                if (Identity.choice) {
+
+                }
+            }
+        }
     }
 
     // 上行，预言家查身份
     @Override
     public void seerAction(Room room, Player player, JSONObject messageObject) {
-        Long choiceTarget = messageObject.getLong("choice-target");
-        Player choicePlayer = roomDao.getPlayerById(room, choiceTarget);
+        Long playerId = messageObject.getLong("choice-target");
+        Player choicePlayer = playerDao.getPlayerById(playerId);
         roomDao.seerChoiceCheck(player, choicePlayer);
     }
 
     // 上行，女巫救人或毒杀
     @Override
     public void witchAction(Room room, Player player, JSONObject messageObject) {
-        Long choiceTarget = messageObject.getLong("choice-target");
-        Player choicePlayer = roomDao.getPlayerById(room, choiceTarget);
+        Long playerId = messageObject.getLong("choice-target");
+        Player choicePlayer = playerDao.getPlayerById(playerId);
         roomDao.witchChoiceKill(player, choicePlayer);
         roomDao.witchChoiceHelp(player, choicePlayer);
     }
@@ -106,8 +111,8 @@ public class PlayServiceImpl implements PlayService {
     // 上行，猎人杀人
     @Override
     public void hunterAction(Room room, Player player, JSONObject messageObject) {
-        Long choiceTarget = messageObject.getLong("choice-target");
-        Player choicePlayer = roomDao.getPlayerById(room, choiceTarget);
+        Long playerId = messageObject.getLong("choice-target");
+        Player choicePlayer = playerDao.getPlayerById(playerId);
         room.hunterChoiceKill(player, choicePlayer);
     }
 
@@ -116,7 +121,7 @@ public class PlayServiceImpl implements PlayService {
     public void sendMessage(Player player, String message) {
         if (player!=null) {
             TextMessage textMessage = new TextMessage(message);
-            WebSocketSession socketSession = gameSocketHandler.getSocket(player.getId());
+            WebSocketSession socketSession = gameSocketHandler.getWebsocketById(player.getId());
             try {
                 socketSession.sendMessage(textMessage);
             }

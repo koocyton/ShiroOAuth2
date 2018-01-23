@@ -1,13 +1,12 @@
 package com.doopp.gauss.common.dao;
 
 import com.doopp.gauss.common.entity.Room;
-import com.doopp.gauss.common.entity.Player;
-import com.doopp.gauss.server.websocket.GameSocketHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 @Repository("roomDao")
@@ -16,75 +15,39 @@ public class RoomDao {
     // logger
     private final static Logger logger = LoggerFactory.getLogger(RoomDao.class);
 
-    // socket handle
-    @Autowired
-    private GameSocketHandler gameSocketHandler;
+    // room`s session
+    private static final Map<Integer, Room> rooms = new HashMap<>();
 
-    // 拿到制定 ID 的房间
-    private Room getRoomById(int roomId) {
-        return gameSocketHandler.getRoomById(roomId);
-    }
+    // freeRoom`s session
+    private static final Map<Integer, Integer> freeRoomIds = new HashMap<>();
 
-    // 获得一个空闲的房间房间
-    private Room getFreeRoom() {
-        gameSocketHandler.getFreeRoomIds().forEach((k,v)->
-            return this.getRoomById(roomId);
-        );
-        if (gameSocketHandler.getFreeRoomIds().size()!=0) {
-            for (Integer roomId : gameSocketHandler.getFreeRoomIds().forEach(); values()) {
-                return this.getRoomById(roomId);
-            }
+    // last room id
+    private int lastRoomId = 51263;
+
+    // get a free room
+    public Room getFreeRoom() {
+        Iterator<Integer> iterator = freeRoomIds.values().iterator();
+        if (iterator.hasNext()) {
+            return this.getRoomById(iterator.next());
         }
         return  null;
     }
 
-    // 用户离开房间
-    public void playerLeaveRoom(int roomId, Player player) {
-        Room room = this.getRoomById(roomId);
-        this.playerLeave(room, player);
+    // get room by id
+    public Room getRoomById(int roomId) {
+        return rooms.get(roomId);
     }
 
-    // 用户加入房间
-    public Room playerJoinRoom(Player player) {
-        Room room = this.getFreeRoom();
-        if (room==null) {
-            room = playerCreateRoom(player);
-            player.setRoomId(room.getId());
-        }
-        return room;
-    }
-
-    // 用户加入空房间
-    private Room playerCreateRoom(Player player) {
+    // create a free room
+    public Room createRoom() {
         Room room = new Room();
         room.setId(++lastRoomId);
-        room.setPlayers(new Player[]{player});
-        gameSocketHandler.addRoom(roomId);
+        rooms.put(room.getId(), room);
+        freeRoomIds.put(room.getId(), room.getId());
         return room;
     }
 
-    public void playerLeave(Room room, int index) {
-        Player[] players = room.getPlayers();
-        players[index] = null;
-    }
-
-    public void playerLeave(Room room, Player player) {
-        Player[] players = room.getPlayers();
-        for(int ii=0; ii<players.length; ii++) {
-            if (players[ii].getId().equals(player.getId())) {
-                players[ii] = null;
-                break;
-            }
-        }
-    }
-
-    public void playerJoin(Room room, Player player) {
-        Player[] players = room.getPlayers();
-        for(int ii=0; ii<players.length; ii++) {
-            if (players[ii].getId().equals(player.getId())) {
-                players[ii] = null;
-                break;
-            }
-        }
+    public void removeRoom(Room room) {
+        rooms.remove(room.getId());
     }
 }

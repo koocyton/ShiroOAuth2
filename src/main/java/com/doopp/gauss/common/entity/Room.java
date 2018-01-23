@@ -22,9 +22,6 @@ public class Room {
         null, null, null, null, null, null,
     };
 
-    // 房间的用户
-    // private Map<Long, Player> players = new HashMap<>();
-
     // 房间的状态     0:没开始    1:都准备   2:游戏中    3:游戏结束
     private int status = 0;
 
