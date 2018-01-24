@@ -59,17 +59,17 @@ public class CommonUtils {
         return request.getRemoteAddr();
     }
 
-    public static Class<?> Map;<K, V> getMaxValueKey(final Map<K, V> map) {
+    public static Long getMaxValueKey(final Map<Long, Integer> map) {
         if (map == null) return null;
         int ii = 0;
         Integer maxValue = 0;
         Long maxValueKey = null;
-        for(K key : map.keySet()) {
-            maxValue = (maxValueKey==null) ? map.get(playerId) : 0;
-            maxValueKey = (maxValueKey==null) ? playerId : null;
-            if (map.get(playerId)>=maxValue) {
-                maxValue = map.get(playerId);
-                maxValueKey = playerId;
+        for(Long key : map.keySet()) {
+            maxValue = (maxValueKey==null) ? map.get(key) : 0;
+            maxValueKey = (maxValueKey==null) ? key : null;
+            if (map.get(key)>=maxValue) {
+                maxValue = map.get(key);
+                maxValueKey = key;
             }
         }
         return maxValueKey;

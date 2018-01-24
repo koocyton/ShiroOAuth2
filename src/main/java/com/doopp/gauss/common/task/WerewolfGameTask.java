@@ -142,8 +142,8 @@ public class WerewolfGameTask implements Runnable {
                 break;
             }
         }
-        // 汇总狼人杀人
-        CommonUtils.getMaxValue(votes);
+        // 汇总票数狼人杀人
+        Long killPlayer = CommonUtils.getMaxValueKey(votes);
         // 女巫开始行动
         this.callWitch(room);
     }
