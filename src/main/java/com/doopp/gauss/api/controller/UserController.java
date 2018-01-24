@@ -3,6 +3,9 @@ package com.doopp.gauss.api.controller;
 import com.doopp.gauss.common.dto.UserDTO;
 import com.doopp.gauss.common.entity.User;
 import com.doopp.gauss.common.mapper.UserMapper;
+import com.doopp.gauss.common.task.WerewolfGameTask;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 

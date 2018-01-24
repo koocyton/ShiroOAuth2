@@ -62,7 +62,7 @@ public class PlayServiceImpl implements PlayService {
         boolean allReady = true;
         for(Player player : playerDao.getPlayersByRoom(room)) {
             // 如果房间内找到用户，设定玩家准备好了
-            if (player.getId().equals(readyPlayer.getId())) {
+            if (player!=null && player.getId().equals(readyPlayer.getId())) {
                 player.setStatus(1);
             }
             // 循环获取玩家是否准备好了，如果如果有空座位 || 有没准备好的，设定 false
@@ -71,8 +71,9 @@ public class PlayServiceImpl implements PlayService {
             }
         }
         // 都准备好了，就开始游戏
-        if (allReady) {
-            room.setStatus(2);
+        // logger.info(" >>> " +allReady);
+        if (room.getStatus()==0) {//allReady) {
+            room.setStatus(1);
             this.gameTaskExecutor.execute(new WerewolfGameTask(room));
         }
     }
@@ -169,6 +170,9 @@ public class PlayServiceImpl implements PlayService {
     @Override
     public void sendMessage(Room room, String message) {
         for(int ii=0; ii<room.getPlayers().length; ii++) {
+            if (room.getPlayers()[ii]==null) {
+                continue;
+            }
             this.sendMessage(room.getPlayers()[ii], message);
         }
     }

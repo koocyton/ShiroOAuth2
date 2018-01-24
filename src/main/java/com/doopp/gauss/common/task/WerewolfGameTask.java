@@ -50,6 +50,9 @@ public class WerewolfGameTask implements Runnable {
         Identity[] identities = this.getRandomIdentities();
         Player[] players = room.getPlayers();
         for (int ii=0; ii<identities.length; ii++) {
+            if (players[ii]==null) {
+                continue;
+            }
             // 呃，好吧
             switch (identities[ii]) {
                 case SEER :

@@ -120,6 +120,7 @@ public class PlayerDao {
             if (players[ii]==null) {
                 players[ii] = player;
                 players[ii].setRoomId(room.getId());
+                return;
             }
         }
     }

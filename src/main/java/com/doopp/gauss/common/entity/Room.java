@@ -1,6 +1,8 @@
 package com.doopp.gauss.common.entity;
 
 import lombok.Data;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -10,6 +12,9 @@ import lombok.Data;
  */
 @Data
 public class Room {
+
+
+    private final static Logger logger = LoggerFactory.getLogger(Room.class);
 
     // 房间 ID
     private int id;
@@ -51,11 +56,17 @@ public class Room {
     private int gameLevel = 0;
 
     public void addVillagerSeat(int seatIndex) {
+        if (this.villagerSeat==null) {
+            return;
+        }
         int ii = this.villagerSeat.length;
         this.villagerSeat[ii] = seatIndex;
     }
 
     public void addWolfSeat(int seatIndex) {
+        if (this.wolfSeat==null) {
+            return;
+        }
         int ii = this.wolfSeat.length;
         this.wolfSeat[ii] = seatIndex;
     }
