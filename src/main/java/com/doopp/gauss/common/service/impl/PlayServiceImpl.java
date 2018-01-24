@@ -81,39 +81,62 @@ public class PlayServiceImpl implements PlayService {
     @Override
     public void werewolfAction(Room room, Player actionPlayer, JSONObject messageObject) {
         Long playerId = messageObject.getLong("choice-target");
-        Player choicePlayer = playerDao.getPlayerById(playerId);
+        Player targetPlayer = playerDao.getPlayerById(playerId);
         for(Player player : playerDao.getPlayersByRoom(room)) {
-            if (player.getIdentity()==Identity.WOLF) {
-                if (Identity.choice) {
-
-                }
+            if (player.getIdentity()==Identity.WOLF && player.isLiving() && targetPlayer.isLiving()) {
+                playerDao.cacheAction("wolf-choice", actionPlayer, targetPlayer);
             }
         }
     }
 
     // 上行，预言家查身份
     @Override
-    public void seerAction(Room room, Player player, JSONObject messageObject) {
+    public void seerAction(Room room, Player actionPlayer, JSONObject messageObject) {
         Long playerId = messageObject.getLong("choice-target");
-        Player choicePlayer = playerDao.getPlayerById(playerId);
-        roomDao.seerChoiceCheck(player, choicePlayer);
+        Player targetPlayer = playerDao.getPlayerById(playerId);
+        playerDao.cacheAction("seer-choice", actionPlayer, targetPlayer);
+        this.sendMessage(actionPlayer, targetPlayer.getIdentity().toString());
     }
 
     // 上行，女巫救人或毒杀
     @Override
-    public void witchAction(Room room, Player player, JSONObject messageObject) {
+    public void witchAction(Room room, Player actionPlayer, JSONObject messageObject) {
         Long playerId = messageObject.getLong("choice-target");
-        Player choicePlayer = playerDao.getPlayerById(playerId);
-        roomDao.witchChoiceKill(player, choicePlayer);
-        roomDao.witchChoiceHelp(player, choicePlayer);
+        Player targetPlayer = playerDao.getPlayerById(playerId);
+        for(Player player : playerDao.getPlayersByRoom(room)) {
+            if (player.getIdentity()==Identity.WITCH && player.isLiving() && targetPlayer.isLiving()) {
+                playerDao.cacheAction("wolf-choice", actionPlayer, targetPlayer);
+            }
+        }
     }
 
     // 上行，猎人杀人
     @Override
-    public void hunterAction(Room room, Player player, JSONObject messageObject) {
+    public void hunterAction(Room room, Player actionPlayer, JSONObject messageObject) {
         Long playerId = messageObject.getLong("choice-target");
-        Player choicePlayer = playerDao.getPlayerById(playerId);
-        room.hunterChoiceKill(player, choicePlayer);
+        Player targetPlayer = playerDao.getPlayerById(playerId);
+        for(Player player : playerDao.getPlayersByRoom(room)) {
+
+            if (player.getIdentity()==Identity.HUNTER && player.isLiving() && targetPlayer.isLiving()) {
+                playerDao.cacheAction("wolf-choice", actionPlayer, targetPlayer);
+            }
+        }
+    }
+
+    // 发送信息
+    @Override
+    public void sendMessage(Player[] players, String message) {
+        for(Player player : players) {
+            this.sendMessage(player, message);
+        }
+    }
+
+    // 发送信息
+    @Override
+    public void sendMessage(Player[] players, String action, Object data) {
+        for(Player player : players) {
+            this.sendMessage(player, action, data);
+        }
     }
 
     // 发送信息
@@ -133,10 +156,30 @@ public class PlayServiceImpl implements PlayService {
 
     // 发送信息
     @Override
+    public void sendMessage(Player player, String action, Object data) {
+        if (player!=null) {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("action", action);
+            jsonObject.put("data", data);
+            this.sendMessage(player, jsonObject.toJSONString());
+        }
+    }
+
+    // 发送信息
+    @Override
     public void sendMessage(Room room, String message) {
         for(int ii=0; ii<room.getPlayers().length; ii++) {
             this.sendMessage(room.getPlayers()[ii], message);
         }
+    }
+
+    // 发送信息
+    @Override
+    public void sendMessage(Room room, String action, Object data) {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("action", action);
+        jsonObject.put("data", data);
+        this.sendMessage(room, jsonObject.toJSONString());
     }
 
     // 延迟一段时间

@@ -2,8 +2,6 @@ package com.doopp.gauss.common.entity;
 
 import lombok.Data;
 
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * 房间的实体
@@ -22,9 +20,52 @@ public class Room {
         null, null, null, null, null, null,
     };
 
-    // 房间的状态     0:没开始    1:都准备   2:游戏中    3:游戏结束
+    // 记录每个阶段的结果
+    private String[] recordRound = new String[] {};
+
+    // 当前阶段游戏的步骤
+    private PlayerAction[] cacheAction = new PlayerAction[]{};
+
+    // 预言家的座位
+    private int seerSeat;
+
+    // 女巫的座位
+    private int witchSeat;
+
+    // 丘比特的座位
+    private int cupidSeat;
+
+    // 猎人的座位
+    private int hunterSeat;
+
+    // 村民的座位
+    private int[] villagerSeat;
+
+    // 狼人的座位
+    private int[] wolfSeat;
+
+    // 房间的状态     0:准备中<等待开局>    1:游戏进行中<已开局>
     private int status = 0;
 
     // 房间游戏开局的类型      0:普通(normal)    1:高阶(high)
     private int gameLevel = 0;
+
+    public void addVillagerSeat(int seatIndex) {
+        int ii = this.villagerSeat.length;
+        this.villagerSeat[ii] = seatIndex;
+    }
+
+    public void addWolfSeat(int seatIndex) {
+        int ii = this.wolfSeat.length;
+        this.wolfSeat[ii] = seatIndex;
+    }
+
+    public void addCacheAction(PlayerAction playerAction) {
+        int ii = this.cacheAction.length;
+        this.cacheAction[ii] = playerAction;
+    }
+
+    public void flushCacheAction() {
+        this.cacheAction = new PlayerAction[]{};
+    }
 }

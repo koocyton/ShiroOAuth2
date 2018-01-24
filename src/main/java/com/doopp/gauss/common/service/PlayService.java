@@ -25,11 +25,22 @@ public interface PlayService {
     // 上行，猎人杀人
     void hunterAction(Room room, Player player, JSONObject messageObject);
 
+    void sendMessage(Player[] players, String message);
+
+    // 发送信息
+    void sendMessage(Player[] players, String action, Object data);
+
     // 发送消息给用户
     void sendMessage(Player player, String message);
 
-    // 发送信息
+    // 发送消息给用户
+    void sendMessage(Player player, String action, Object data);
+
+    // 发送信息到房间
     void sendMessage(Room room, String message);
+
+    // 发送信息到房间
+    void sendMessage(Room room, String action, Object data);
 
     // 延迟一段时间
     void delay(float second);

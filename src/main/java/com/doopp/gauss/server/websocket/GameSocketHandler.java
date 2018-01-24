@@ -71,7 +71,7 @@ public class GameSocketHandler extends AbstractWebSocketHandler {
     public void afterConnectionClosed(WebSocketSession socketSession, CloseStatus status) throws Exception {
         Player player = (Player) socketSession.getAttributes().get("sessionPlayer");
         Room room = roomDao.getRoomById(player.getRoomId());
-        playerDao.playerLeaveRoom(room, player);
+        playerDao.playerLeaveRoom(player);
         socketSession.getAttributes().remove("sessionPlayer");
         sockets.remove(player.getId());
     }
