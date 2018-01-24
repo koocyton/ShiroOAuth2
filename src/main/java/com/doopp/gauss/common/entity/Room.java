@@ -4,6 +4,9 @@ import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
+import java.util.Map;
+
 
 /**
  * 房间的实体
@@ -29,7 +32,7 @@ public class Room {
     private String[] recordRound = new String[] {};
 
     // 当前阶段游戏的步骤
-    private PlayerAction[] cacheAction = new PlayerAction[]{};
+    private Map<Long, PlayerAction> cacheActions = new HashMap<>();
 
     // 预言家的座位
     private int seerSeat;

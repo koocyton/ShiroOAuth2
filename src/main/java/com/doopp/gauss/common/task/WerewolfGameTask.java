@@ -3,6 +3,7 @@ package com.doopp.gauss.common.task;
 import com.doopp.gauss.common.dao.PlayerDao;
 import com.doopp.gauss.common.defined.Identity;
 import com.doopp.gauss.common.entity.Player;
+import com.doopp.gauss.common.entity.PlayerAction;
 import com.doopp.gauss.common.entity.Room;
 import com.doopp.gauss.common.entity.User;
 import com.doopp.gauss.common.service.PlayService;
@@ -10,6 +11,7 @@ import com.doopp.gauss.common.utils.ApplicationContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Map;
 import java.util.Random;
 
 public class WerewolfGameTask implements Runnable {
@@ -78,7 +80,7 @@ public class WerewolfGameTask implements Runnable {
             // 通知玩家自己身份
             playService.sendMessage(players[ii], "distribute-identity", players[ii].getIdentity());
         }
-        Player[] wolfs = playerDao.getWolfByRoom(room);
+        Player[] wolfs = playerDao.getWolfsByRoom(room);
         // 通知狼的身份
         for(Player wolf : wolfs) {
             playService.sendMessage(wolf, "wolf-identity", room.getWolfSeat());
@@ -98,9 +100,59 @@ public class WerewolfGameTask implements Runnable {
         this.callWolfSeer(room);
     }
 
+    // 狼人开始杀人，预言家查身份
     private void callWolfSeer(Room room) {
-        playService.sendMessage(playerDao.getWolfByRoom(room), "call-wolf", null);
+        playService.sendMessage(playerDao.getWolfsByRoom(room), "call-wolf", null);
         playService.sendMessage(playerDao.getSeerByRoom(room), "call-seer", null);
+        // 检查狼人是否执行完毕
+        while(true) {
+            playService.delay(1);
+            // 如果存活的狼操作完毕
+            Player[] wolfs = playerDao.getWolfsByRoom(room);
+            Map<Long, PlayerAction> cacheActions = room.getCacheActions();
+            boolean allActioned = true;
+            for(Player wolf : wolfs) {
+                if (wolf!=null && wolf.isLiving()) {
+                    if (cacheActions.get(wolf.getId())==null) {
+                        allActioned = false;
+                    }
+                }
+            }
+            if (allActioned) {
+                break;
+            }
+        }
+        // 女巫开始行动
+        this.callWitch(room);
+    }
+
+    // 下发，女巫救人或毒杀
+    private void callWitch(Room room) {
+        // 检查狼人杀人
+        playService.sendMessage(playerDao.getWolfsByRoom(room), "call-witch", null);
+        // 检查狼人是否执行完毕
+        while(true) {
+            playService.delay(1);
+            boolean isActioned = true;
+            Player witch = playerDao.getWitchByRoom(room);
+            Map<Long, PlayerAction> cacheActions = room.getCacheActions();
+            // 如果女巫存活，但没有提交 action
+            if (witch.isLiving() && cacheActions.get(witch.getId())==null) {
+                isActioned = false;
+            }
+            if (isActioned) {
+                break;
+            }
+        }
+    }
+
+    // 处理结果
+
+    // 下发，猎人杀人
+    private void callHunter(Room room) {
+        // 检查猎人是否被杀
+        Map<Long, PlayerAction> cacheActions = room.getCacheActions();
+        playService.sendMessage(playerDao.getHunterByRoom(room), "call-witch", null);
     }
 
     // 下发，进入白天

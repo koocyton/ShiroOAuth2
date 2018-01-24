@@ -37,7 +37,7 @@ public class PlayerDao {
     }
 
     // 获取房间里的狼
-    public Player[] getWolfByRoom(Room room) {
+    public Player[] getWolfsByRoom(Room room) {
         int[] seats = room.getWolfSeat();
         Player[] wolfs = new Player[]{};
         Player[] players = room.getPlayers();
@@ -49,7 +49,7 @@ public class PlayerDao {
     }
 
     // 获取房间里的村民
-    public Player[] getVillagerByRoom(Room room) {
+    public Player[] getVillagersByRoom(Room room) {
         int[] seats = room.getVillagerSeat();
         Player[] villagers = new Player[]{};
         Player[] players = room.getPlayers();
