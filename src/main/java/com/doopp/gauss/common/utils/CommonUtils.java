@@ -1,9 +1,11 @@
 package com.doopp.gauss.common.utils;
 
+import javax.servlet.ServletContainerInitializer;
 import javax.servlet.http.HttpServletRequest;
-import java.util.Arrays;
-import java.util.Collection;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 public class CommonUtils {
 
@@ -57,17 +59,19 @@ public class CommonUtils {
         return request.getRemoteAddr();
     }
 
-    /**
-     * 求Map<K,V>中Value(值)的最大值
-     *
-     * @param map
-     * @return
-     */
-    public static Object getMaxValue(Map<Long, Integer> map) {
+    public static Class<?> Map;<K, V> getMaxValueKey(final Map<K, V> map) {
         if (map == null) return null;
-        Collection<Integer> c = map.values();
-        Object[] obj = c.toArray();
-        Arrays.sort(obj);
-        return obj[obj.length-1];
+        int ii = 0;
+        Integer maxValue = 0;
+        Long maxValueKey = null;
+        for(K key : map.keySet()) {
+            maxValue = (maxValueKey==null) ? map.get(playerId) : 0;
+            maxValueKey = (maxValueKey==null) ? playerId : null;
+            if (map.get(playerId)>=maxValue) {
+                maxValue = map.get(playerId);
+                maxValueKey = playerId;
+            }
+        }
+        return maxValueKey;
     }
 }

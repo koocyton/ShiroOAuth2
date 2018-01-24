@@ -8,6 +8,8 @@ import com.doopp.gauss.common.entity.Room;
 import com.doopp.gauss.common.entity.User;
 import com.doopp.gauss.common.service.PlayService;
 import com.doopp.gauss.common.utils.ApplicationContextUtil;
+import com.doopp.gauss.common.utils.CommonUtils;
+import com.doopp.gauss.server.configuration.CommonUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -105,17 +107,33 @@ public class WerewolfGameTask implements Runnable {
     private void callWolfSeer(Room room) {
         playService.sendMessage(playerDao.getWolfsByRoom(room), "call-wolf", null);
         playService.sendMessage(playerDao.getSeerByRoom(room), "call-seer", null);
+        // 初始化投票结果
+        Map<Long, Integer> votes = new HashMap<>();
         // 检查狼人是否执行完毕
         while(true) {
+            // 初始化投票结果
+            votes = new HashMap<>();
             playService.delay(1);
             // 如果存活的狼操作完毕
             Player[] wolfs = playerDao.getWolfsByRoom(room);
             Map<Long, PlayerAction> cacheActions = room.getCacheActions();
             boolean allActioned = true;
+            // 检查
             for(Player wolf : wolfs) {
+                // 数据完整检查，不能是不活动的狼
                 if (wolf!=null && wolf.isLiving()) {
-                    if (cacheActions.get(wolf.getId())==null) {
+                    // 从缓存里拿这个狼的 action
+                    PlayerAction playerAction = cacheActions.get(wolf.getId());
+                    // 如果没有提交，就标注没有全部完成 action ，继续等待
+                    if (playerAction==null) {
                         allActioned = false;
+                    }
+                    // 有提交，就将投票汇总到 map 里，用被杀的用户ID做索引
+                    else {
+                        // 取得被杀用户的投票数
+                        Integer vote = votes.get(playerAction.getTargetPlayer().getId());
+                        // 投票数 +1
+                        votes.put(wolf.getId(), (vote==null) ? 1 : vote + 1);
                     }
                 }
             }
@@ -125,12 +143,7 @@ public class WerewolfGameTask implements Runnable {
             }
         }
         // 汇总狼人杀人
-        Map<Long, Integer>votes = new HashMap<>();
-        for (PlayerAction playerAction : room.getCacheActions().values()) {
-            Long targetPlayerId = playerAction.getTargetPlayer().getId();
-            int number = votes.get(targetPlayerId);
-            votes.put(targetPlayerId, (votes.get(targetPlayerId)==null) ? 1 : number+1);
-        }
+        CommonUtils.getMaxValue(votes);
         // 女巫开始行动
         this.callWitch(room);
     }
