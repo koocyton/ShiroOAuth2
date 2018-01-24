@@ -11,6 +11,7 @@ import com.doopp.gauss.common.utils.ApplicationContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
@@ -118,9 +119,17 @@ public class WerewolfGameTask implements Runnable {
                     }
                 }
             }
+            // 如果都处理完了
             if (allActioned) {
                 break;
             }
+        }
+        // 汇总狼人杀人
+        Map<Long, Integer>votes = new HashMap<>();
+        for (PlayerAction playerAction : room.getCacheActions().values()) {
+            Long targetPlayerId = playerAction.getTargetPlayer().getId();
+            int number = votes.get(targetPlayerId);
+            votes.put(targetPlayerId, (votes.get(targetPlayerId)==null) ? 1 : number+1);
         }
         // 女巫开始行动
         this.callWitch(room);
@@ -129,6 +138,12 @@ public class WerewolfGameTask implements Runnable {
     // 下发，女巫救人或毒杀
     private void callWitch(Room room) {
         // 检查狼人杀人
+        Map<Long, PlayerAction> cacheActions = room.getCacheActions();
+        Player[] wolfs = playerDao.getWolfsByRoom(room);
+        for(PlayerAction playerAction : cacheActions.values()) {
+
+        }
+
         playService.sendMessage(playerDao.getWolfsByRoom(room), "call-witch", null);
         // 检查狼人是否执行完毕
         while(true) {
@@ -145,8 +160,6 @@ public class WerewolfGameTask implements Runnable {
             }
         }
     }
-
-    // 处理结果
 
     // 下发，猎人杀人
     private void callHunter(Room room) {

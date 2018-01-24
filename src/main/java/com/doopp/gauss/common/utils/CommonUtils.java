@@ -1,6 +1,9 @@
 package com.doopp.gauss.common.utils;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Map;
 
 public class CommonUtils {
 
@@ -54,4 +57,17 @@ public class CommonUtils {
         return request.getRemoteAddr();
     }
 
+    /**
+     * 求Map<K,V>中Value(值)的最大值
+     *
+     * @param map
+     * @return
+     */
+    public static Object getMaxValue(Map<Long, Integer> map) {
+        if (map == null) return null;
+        Collection<Integer> c = map.values();
+        Object[] obj = c.toArray();
+        Arrays.sort(obj);
+        return obj[obj.length-1];
+    }
 }

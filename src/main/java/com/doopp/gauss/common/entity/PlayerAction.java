@@ -1,5 +1,8 @@
 package com.doopp.gauss.common.entity;
 
+import lombok.Data;
+
+@Data
 public class PlayerAction {
 
     // 动作

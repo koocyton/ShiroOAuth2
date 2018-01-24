@@ -75,11 +75,10 @@ public class Room {
     }
 
     public void addCacheAction(PlayerAction playerAction) {
-        int ii = this.cacheAction.length;
-        this.cacheAction[ii] = playerAction;
+        this.cacheActions.put(playerAction.getActionPlayer().getId(), playerAction);
     }
 
     public void flushCacheAction() {
-        this.cacheAction = new PlayerAction[]{};
+        this.cacheActions = new HashMap<>();
     }
 }
