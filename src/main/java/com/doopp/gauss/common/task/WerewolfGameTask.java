@@ -149,7 +149,7 @@ public class WerewolfGameTask implements Runnable {
 
     // 汇总夜晚的结果
     private void summaryNightResult(Room room) {
-        Map<Long, PlayerAction> playerActions = room.getCacheActions();
+        Map<Long, PlayerAction> wolfActions = room.getCacheActions("wolf-action");
         // 狼人杀了谁 a
         // 女巫杀了谁 b
         // 女巫救了谁 c

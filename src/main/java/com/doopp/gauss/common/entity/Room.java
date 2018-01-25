@@ -82,14 +82,20 @@ public class Room {
         this.cacheActions.put(playerAction.getActionPlayer().getId(), playerAction);
     }
 
-    public int cacheActionCount(String action) {
-        int ii = 0;
+    public Map<Long, PlayerAction> getCacheActions(String action) {
+        Map<Long, PlayerAction> actions = new HashMap<>();
         for(Long key : this.cacheActions.keySet()) {
-            if (this.cacheActions.get(key).getAction().equals(action)) {
-                ii++;
+            PlayerAction playerAction = this.cacheActions.get(key);
+            if (playerAction.getAction().equals(action)) {
+                actions.put(playerAction.getActionPlayer().getId(), playerAction);
             }
         }
-        return ii;
+        return actions;
+    }
+
+    public int cacheActionCount(String action) {
+        Map<Long, PlayerAction> actions = this.getCacheActions(action);
+        return actions==null ? 0 : actions.size();
     }
 
     public void flushCacheAction() {
