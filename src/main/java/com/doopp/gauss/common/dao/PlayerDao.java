@@ -99,7 +99,7 @@ public class PlayerDao {
     public void cacheAction(String action, Player actionPlayer, Player targetPlayer) {
         if (actionPlayer.getRoomId()==targetPlayer.getRoomId()) {
             Room room = roomDao.getRoomById(actionPlayer.getRoomId());
-            room.addCacheAction(new PlayerAction(action, actionPlayer, targetPlayer));
+            room.setCacheAction(new PlayerAction(action, actionPlayer, targetPlayer));
         }
     }
 

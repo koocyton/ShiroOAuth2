@@ -1,5 +1,6 @@
 package com.doopp.gauss.common.entity;
 
+import com.doopp.gauss.common.task.WerewolfGameTask;
 import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,6 +59,9 @@ public class Room {
     // 房间游戏开局的类型      0:普通(normal)    1:高阶(high)
     private int gameLevel = 0;
 
+    // 房间里的游戏
+    private WerewolfGameTask gameTask;
+
     public void addVillagerSeat(int seatIndex) {
         if (this.villagerSeat==null) {
             return;
@@ -74,8 +78,18 @@ public class Room {
         this.wolfSeat[ii] = seatIndex;
     }
 
-    public void addCacheAction(PlayerAction playerAction) {
+    public void setCacheAction(PlayerAction playerAction) {
         this.cacheActions.put(playerAction.getActionPlayer().getId(), playerAction);
+    }
+
+    public int cacheActionCount(String action) {
+        int ii = 0;
+        for(Long key : this.cacheActions.keySet()) {
+            if (this.cacheActions.get(key).getAction().equals(action)) {
+                ii++;
+            }
+        }
+        return ii;
     }
 
     public void flushCacheAction() {

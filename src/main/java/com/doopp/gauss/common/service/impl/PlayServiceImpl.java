@@ -3,6 +3,7 @@ package com.doopp.gauss.common.service.impl;
 import com.alibaba.fastjson.JSONObject;
 import com.doopp.gauss.common.dao.PlayerDao;
 import com.doopp.gauss.common.defined.Identity;
+import com.doopp.gauss.common.entity.PlayerAction;
 import com.doopp.gauss.common.entity.Room;
 import com.doopp.gauss.common.entity.Player;
 import com.doopp.gauss.common.service.PlayService;
@@ -71,21 +72,23 @@ public class PlayServiceImpl implements PlayService {
             }
         }
         // 都准备好了，就开始游戏
-        // logger.info(" >>> " +allReady);
-        if (room.getStatus()==0) {//allReady) {
+        if (room.getStatus()==0 && allReady) {
             room.setStatus(1);
-            this.gameTaskExecutor.execute(new WerewolfGameTask(room));
+            room.setGameTask(new WerewolfGameTask(room));
+            this.gameTaskExecutor.execute(room.getGameTask());
         }
     }
 
     // 上行，狼人杀人
     @Override
     public void werewolfAction(Room room, Player actionPlayer, JSONObject messageObject) {
-        Long playerId = messageObject.getLong("choice-target");
-        Player targetPlayer = playerDao.getPlayerById(playerId);
-        for(Player player : playerDao.getPlayersByRoom(room)) {
-            if (player.getIdentity()==Identity.WOLF && player.isLiving() && targetPlayer.isLiving()) {
-                playerDao.cacheAction("wolf-choice", actionPlayer, targetPlayer);
+        if (actionPlayer.getIdentity()==Identity.WOLF) {
+            Long playerId = messageObject.getLong("choice-target");
+            Player targetPlayer = playerDao.getPlayerById(playerId);
+            room.setCacheAction(new PlayerAction("wolf-choice", actionPlayer, targetPlayer));
+            // 如果三个狼人都提交了，就 notify game task continue
+            if (room.cacheActionCount("wolf-choice")==3) {
+                room.getGameTask().notify();
             }
         }
     }
@@ -93,20 +96,24 @@ public class PlayServiceImpl implements PlayService {
     // 上行，预言家查身份
     @Override
     public void seerAction(Room room, Player actionPlayer, JSONObject messageObject) {
-        Long playerId = messageObject.getLong("choice-target");
-        Player targetPlayer = playerDao.getPlayerById(playerId);
-        playerDao.cacheAction("seer-choice", actionPlayer, targetPlayer);
-        this.sendMessage(actionPlayer, targetPlayer.getIdentity().toString());
+        if (actionPlayer.getIdentity()==Identity.SEER) {
+            Long playerId = messageObject.getLong("choice-target");
+            Player targetPlayer = playerDao.getPlayerById(playerId);
+            playerDao.cacheAction("seer-choice", actionPlayer, targetPlayer);
+            this.sendMessage(actionPlayer, targetPlayer.getIdentity().toString());
+        }
     }
 
     // 上行，女巫救人或毒杀
     @Override
     public void witchAction(Room room, Player actionPlayer, JSONObject messageObject) {
-        Long playerId = messageObject.getLong("choice-target");
-        Player targetPlayer = playerDao.getPlayerById(playerId);
-        for(Player player : playerDao.getPlayersByRoom(room)) {
-            if (player.getIdentity()==Identity.WITCH && player.isLiving() && targetPlayer.isLiving()) {
-                playerDao.cacheAction("wolf-choice", actionPlayer, targetPlayer);
+        if (actionPlayer.getIdentity()==Identity.WITCH) {
+            Long playerId = messageObject.getLong("choice-target");
+            Player targetPlayer = playerDao.getPlayerById(playerId);
+            playerDao.cacheAction("witch-choice", actionPlayer, targetPlayer);
+            // 如果女巫提交完毕
+            if (room.cacheActionCount("witch-choice")==1) {
+                room.getGameTask().notify();
             }
         }
     }
@@ -114,12 +121,13 @@ public class PlayServiceImpl implements PlayService {
     // 上行，猎人杀人
     @Override
     public void hunterAction(Room room, Player actionPlayer, JSONObject messageObject) {
-        Long playerId = messageObject.getLong("choice-target");
-        Player targetPlayer = playerDao.getPlayerById(playerId);
-        for(Player player : playerDao.getPlayersByRoom(room)) {
-
-            if (player.getIdentity()==Identity.HUNTER && player.isLiving() && targetPlayer.isLiving()) {
-                playerDao.cacheAction("wolf-choice", actionPlayer, targetPlayer);
+        if (actionPlayer.getIdentity()==Identity.HUNTER) {
+            Long playerId = messageObject.getLong("choice-target");
+            Player targetPlayer = playerDao.getPlayerById(playerId);
+            playerDao.cacheAction("hunter-choice", actionPlayer, targetPlayer);
+            // 如果猎人提交完毕
+            if (room.cacheActionCount("witch-choice")==1) {
+                room.getGameTask().notify();
             }
         }
     }

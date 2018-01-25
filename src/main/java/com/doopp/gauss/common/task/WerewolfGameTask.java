@@ -39,6 +39,12 @@ public class WerewolfGameTask implements Runnable {
         this.room = room;
     }
 
+    // 获得一个随机的身份序列
+    private Identity[] getRandomIdentities() {
+        // Identity[] identities = this.identities.clone();
+        return this.identities.clone();
+    }
+
     public void run() {
         this.callGameStart(room);
     }
@@ -46,7 +52,6 @@ public class WerewolfGameTask implements Runnable {
     // 所有游戏准备好了后，游戏开始
     private void callGameStart(Room room) {
         playService.sendMessage(room, "{\"action\":\"game-start\"}");
-        playService.delay(5);
         this.distributeIdentity(room);
     }
 
@@ -92,12 +97,6 @@ public class WerewolfGameTask implements Runnable {
         this.enterNight(room);
     }
 
-    // 获得一个随机的身份序列
-    private Identity[] getRandomIdentities() {
-        // Identity[] identities = this.identities.clone();
-        return this.identities.clone();
-    }
-
     // 下发，进入夜晚
     private void enterNight(Room room) {
         this.callSeer(room);
@@ -112,114 +111,65 @@ public class WerewolfGameTask implements Runnable {
     // 狼人开始杀人，预言家查身份
     private void callWolf(Room room) {
         playService.sendMessage(playerDao.getWolfsByRoom(room), "call-wolf", null);
-
-        synchronized (room) {
-            try {
-                this.wait(40);
-            }
-            catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-
+        // 等待 40 秒狼操作完毕
+        this.waitPlayerAction(40);
         // 初始化投票结果
         Map<Long, Integer> votes = new HashMap<>();
-        // 检查狼人是否执行完毕
-        while(true) {
-            // 初始化投票结果
-            votes = new HashMap<>();
-            playService.delay(1);
-            // 如果存活的狼操作完毕
-            Player[] wolfs = playerDao.getWolfsByRoom(room);
-            Map<Long, PlayerAction> cacheActions = room.getCacheActions();
-            boolean allActioned = true;
-            // 检查
-            for(Player wolf : wolfs) {
-                // 数据完整检查，不能是不活动的狼
-                if (wolf!=null && wolf.isLiving()) {
-                    // 从缓存里拿这个狼的 action
-                    PlayerAction playerAction = cacheActions.get(wolf.getId());
-                    // 如果没有提交，就标注没有全部完成 action ，继续等待
-                    if (playerAction==null) {
-                        allActioned = false;
-                    }
-                    // 有提交，就将投票汇总到 map 里，用被杀的用户ID做索引
-                    else {
-                        // 取得被杀用户的投票数
-                        Integer vote = votes.get(playerAction.getTargetPlayer().getId());
-                        // 投票数 +1
-                        votes.put(wolf.getId(), (vote==null) ? 1 : vote + 1);
-                    }
-                }
-            }
-            // 如果都处理完了
-            if (allActioned) {
-                break;
-            }
-        }
         // 汇总票数狼人杀人
         Long killPlayerId = CommonUtils.getMaxValueKey(votes);
+        // 记录到 action
+        playerDao.cacheAction("wolf-kill", null, playerDao.getPlayerById(killPlayerId));
         // 女巫开始行动
-        this.callWitch(room, playerDao.getPlayerById(killPlayerId));
+        this.callWitch(room);
     }
 
     // 下发，女巫救人或毒杀
-    private void callWitch(Room room, Player wolfKillPlayer) {
-        // 检查狼人杀人
-        if (wolfKillPlayer!=null) {
-            playService.sendMessage(playerDao.getWolfsByRoom(room), "call-witch", new HashMap<String, Long>(){{
-                put("wolf-kill-player", wolfKillPlayer.getId());
-            }});
-        }
-        else {
-            playService.sendMessage(playerDao.getWolfsByRoom(room), "call-witch", null);
-        }
-        // 检查女巫是否执行完毕
-        while(true) {
-            playService.delay(1);
-            boolean isActioned = true;
-            Player witch = playerDao.getWitchByRoom(room);
-            Map<Long, PlayerAction> cacheActions = room.getCacheActions();
-            // 如果女巫存活，但没有提交 action
-            if (witch.isLiving() && cacheActions.get(witch.getId())==null) {
-                isActioned = false;
-            }
-            if (isActioned) {
-                break;
-            }
+    private void callWitch(Room room) {
+        Player witch = playerDao.getWitchByRoom(room);
+        if (witch.isLiving()) {
+            playService.sendMessage(playerDao.getWitchByRoom(room), "call-witch", null);
+            // 等待女巫操作完毕
+            this.waitPlayerAction(20);
         }
         // 女巫操作完毕进入白天
         this.enterDay(room);
     }
 
+    // 下发，进入白天
+    private void enterDay(Room room) {
+        this.summaryNightResult(room);
+        // 如果胜利
+        if (this.checkVictory()) {
+            this.sendResults(room, "");
+            return;
+        }
+        // 如果昨晚有杀猎人
+        this.callHunter(room);
+    }
+
+    // 汇总夜晚的结果
+    private void summaryNightResult(Room room) {
+        Map<Long, PlayerAction> playerActions = room.getCacheActions();
+        // 狼人杀了谁 a
+        // 女巫杀了谁 b
+        // 女巫救了谁 c
+        // !a !c !b : 平安夜
+        // c && a==c : 平安夜
+        // !c && a :  a 死
+        // b  : b 死
+    }
+
     // 下发，猎人杀人
     private void callHunter(Room room) {
+        Player hunter = playerDao.getHunterByRoom(room);
+        if (hunter.isLiving()) {
+            playService.sendMessage(playerDao.getWitchByRoom(room), "call-witch", null);
+            // 等待女巫操作完毕
+            this.waitPlayerAction(20);
+        }
         // 检查猎人是否被杀
         Map<Long, PlayerAction> cacheActions = room.getCacheActions();
         playService.sendMessage(playerDao.getHunterByRoom(room), "call-witch", null);
-    }
-
-    // 下发，进入白天
-    private void enterDay(Room room) {
-        this.sendLastNightResult(room);
-        this.callHunter(room);
-        if (this.checkVictory()) {
-            this.sendResults(room, "");
-            return;
-        }
-        this.callAllSpeak(room);
-        this.callVoter(room);
-        this.callHunter(room);
-        if (this.checkVictory()) {
-            this.sendResults(room, "");
-            return;
-        }
-        enterNight(room);
-    }
-
-    // 发送昨晚的结果
-    private void sendLastNightResult(Room room) {
-
     }
 
     // 下发，结果
@@ -247,5 +197,14 @@ public class WerewolfGameTask implements Runnable {
     }
 
     private void callVoter(Room room) {
+    }
+
+    private void waitPlayerAction(int second) {
+        try {
+            this.wait(second * 1000);
+        }
+        catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }
