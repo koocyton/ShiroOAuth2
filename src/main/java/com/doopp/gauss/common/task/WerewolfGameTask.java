@@ -112,6 +112,16 @@ public class WerewolfGameTask implements Runnable {
     // 狼人开始杀人，预言家查身份
     private void callWolf(Room room) {
         playService.sendMessage(playerDao.getWolfsByRoom(room), "call-wolf", null);
+
+        synchronized (room) {
+            try {
+                this.wait(40);
+            }
+            catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
         // 初始化投票结果
         Map<Long, Integer> votes = new HashMap<>();
         // 检查狼人是否执行完毕
