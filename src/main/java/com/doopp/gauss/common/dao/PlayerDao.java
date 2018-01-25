@@ -32,8 +32,15 @@ public class PlayerDao {
 
     // 获取 player
     public Player getPlayerById(Long playerId) {
+        if (playerId==null) {
+            return null;
+        }
         WebSocketSession socketSession = gameSocketHandler.getWebsocketById(playerId);
-        return (Player) socketSession.getAttributes().get("sessionPlayer");
+        Object sessionObj = socketSession.getAttributes().get("sessionPlayer");
+        if (sessionObj==null) {
+            return null;
+        }
+        return (Player) sessionObj;
     }
 
     // 获取房间里的狼

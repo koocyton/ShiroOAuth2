@@ -100,13 +100,18 @@ public class WerewolfGameTask implements Runnable {
 
     // 下发，进入夜晚
     private void enterNight(Room room) {
-        this.callWolfSeer(room);
+        this.callSeer(room);
+    }
+
+    // 预言家查身份
+    private void callSeer(Room room) {
+        playService.sendMessage(playerDao.getSeerByRoom(room), "call-seer", null);
+        this.callWolf(room);
     }
 
     // 狼人开始杀人，预言家查身份
-    private void callWolfSeer(Room room) {
+    private void callWolf(Room room) {
         playService.sendMessage(playerDao.getWolfsByRoom(room), "call-wolf", null);
-        playService.sendMessage(playerDao.getSeerByRoom(room), "call-seer", null);
         // 初始化投票结果
         Map<Long, Integer> votes = new HashMap<>();
         // 检查狼人是否执行完毕
@@ -143,22 +148,23 @@ public class WerewolfGameTask implements Runnable {
             }
         }
         // 汇总票数狼人杀人
-        Long killPlayer = CommonUtils.getMaxValueKey(votes);
+        Long killPlayerId = CommonUtils.getMaxValueKey(votes);
         // 女巫开始行动
-        this.callWitch(room);
+        this.callWitch(room, playerDao.getPlayerById(killPlayerId));
     }
 
     // 下发，女巫救人或毒杀
-    private void callWitch(Room room) {
+    private void callWitch(Room room, Player wolfKillPlayer) {
         // 检查狼人杀人
-        Map<Long, PlayerAction> cacheActions = room.getCacheActions();
-        Player[] wolfs = playerDao.getWolfsByRoom(room);
-        for(PlayerAction playerAction : cacheActions.values()) {
-
+        if (wolfKillPlayer!=null) {
+            playService.sendMessage(playerDao.getWolfsByRoom(room), "call-witch", new HashMap<String, Long>(){{
+                put("wolf-kill-player", wolfKillPlayer.getId());
+            }});
         }
-
-        playService.sendMessage(playerDao.getWolfsByRoom(room), "call-witch", null);
-        // 检查狼人是否执行完毕
+        else {
+            playService.sendMessage(playerDao.getWolfsByRoom(room), "call-witch", null);
+        }
+        // 检查女巫是否执行完毕
         while(true) {
             playService.delay(1);
             boolean isActioned = true;
@@ -172,6 +178,8 @@ public class WerewolfGameTask implements Runnable {
                 break;
             }
         }
+        // 女巫操作完毕进入白天
+        this.enterDay(room);
     }
 
     // 下发，猎人杀人
@@ -182,106 +190,52 @@ public class WerewolfGameTask implements Runnable {
     }
 
     // 下发，进入白天
-//    private void enterDay(Room room) {
-//        this.sendLastNightResult(room);
-//        this.callHunter(room);
-//        if (this.checkVictory()) {
-//            this.sendResults(room, "");
-//            return;
-//        }
-//        this.callAllSpeak(room);
-//        this.callVoter(room);
-//        this.callHunter(room);
-//        if (this.checkVictory()) {
-//            this.sendResults(room, "");
-//            return;
-//        }
-//        enterNight(room);
-//    }
+    private void enterDay(Room room) {
+        this.sendLastNightResult(room);
+        this.callHunter(room);
+        if (this.checkVictory()) {
+            this.sendResults(room, "");
+            return;
+        }
+        this.callAllSpeak(room);
+        this.callVoter(room);
+        this.callHunter(room);
+        if (this.checkVictory()) {
+            this.sendResults(room, "");
+            return;
+        }
+        enterNight(room);
+    }
 
     // 发送昨晚的结果
-//    private void sendLastNightResult(Room room) {
-//
-//    }
+    private void sendLastNightResult(Room room) {
 
-    // 下发，狼人出来杀人
-//    private void callWolf(Room room) {
-//        User[] users = room.getUsers();
-//        User[] wolfs = new User[]{};
-//        int ii = 0;
-//        // 拿到谁是狼
-//        for(User user : users) {
-//            if (user!=null && user.getIdentity().equals(WOF_ID)) {
-//                wolfs[ii++] = user;
-//            }
-//        }
-//        // 狼开始行动
-//        for(User user : wolfs) {
-//            playService.sendMessage(user, "{\"action\":\"wolf-killings\"");
-//        }
-//        int maxLoopNumber = 40;
-//        int nowLoopNumber = 0;
-//        // 遍历检擦狼是否执行完成
-//        while(true) {
-//            playService.delay(1);
-//            boolean allAction = true;
-//            for(User user : wolfs) {
-//                if (user.getAction == false) {
-//                    allAction = false;
-//                }
-//            }
-//            nowLoopNumber++;
-//            if (allAction || nowLoopNumber>maxLoopNumber) {
-//                this.callWitch(room);
-//            }
-//        }
-//    }
-//
-//    // 下发，预言家查身份
-//    private void callSeer(Room room) {
-//        playService.delay(40);
-//    }
-//
-//    // 下发，女巫救人或毒杀
-//    private void callWitch(Room room) {
-//        playService.delay(40);
-//    }
-//
-//    // 下发，猎人杀人
-//    private void callHunter(Room room) {
-//        playService.delay(40);
-//    }
-//
-//
-//
-//    // 下发，结果
-//    private void sendResults(Room room, String message) {
-//
-//    }
-//
-//    // 下发，游戏结束
-//    private void callGameOver(Room room) {
-//
-//    }
-//
-//    // 检查胜利
-//    private boolean checkVictory() {
-//        return true;
-//    }
-//
-//    private void callAllSpeak(Room room) {
-//        for(User user : room.getUsers()) {
-//            if (user.isLiving()) {
-//                this.callOneSpeak(user);
-//                playService.delay(30);
-//            }
-//        }
-//    }
-//
-//    private void callVoter(Room room) {
-//    }
-//
-//    private void callOneSpeak(User user) {
-//        playService.sendMessage(user, "{\"action\":\"speak\", \"user\":"+user.getId()+", \"timeLimit\":30}");
-//    }
+    }
+
+    // 下发，结果
+    private void sendResults(Room room, String message) {
+
+    }
+
+    // 下发，游戏结束
+    private void callGameOver(Room room) {
+
+    }
+
+    // 检查胜利
+    private boolean checkVictory() {
+        return true;
+    }
+
+    private void callAllSpeak(Room room) {
+        for(Player player : room.getPlayers()) {
+            if (player.isLiving()) {
+                playService.sendMessage(player, "{\"action\":\"speak\", \"user\":"+player.getId()+", \"timeLimit\":30}");
+                playService.delay(30);
+            }
+        }
+    }
+
+    private void callVoter(Room room) {
+    }
 }
