@@ -32,9 +32,6 @@ public class GameSocketHandler extends AbstractWebSocketHandler {
     private PlayService playService;
 
     @Resource
-    private PlayerDao playerDao;
-
-    @Resource
     private RoomDao roomDao;
 
     // text message
@@ -63,7 +60,7 @@ public class GameSocketHandler extends AbstractWebSocketHandler {
     public void afterConnectionEstablished(WebSocketSession socketSession) throws Exception {
         socketSession.sendMessage(new TextMessage("{\"action\":\"player-connected\"}"));
         Player player = (Player) socketSession.getAttributes().get("sessionPlayer");
-        playerDao.playerJoinRoom(player);
+        roomDao.playerJoinRoom(player);
         sockets.put(player.getId(), socketSession);
     }
 
@@ -71,7 +68,9 @@ public class GameSocketHandler extends AbstractWebSocketHandler {
     public void afterConnectionClosed(WebSocketSession socketSession, CloseStatus status) throws Exception {
         Player player = (Player) socketSession.getAttributes().get("sessionPlayer");
         Room room = roomDao.getRoomById(player.getRoomId());
-        playerDao.playerLeaveRoom(player);
+        if (room.getStatus()==0) {
+            roomDao.playerLeaveRoom(player);
+        }
         socketSession.getAttributes().remove("sessionPlayer");
         sockets.remove(player.getId());
     }

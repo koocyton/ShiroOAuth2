@@ -137,6 +137,8 @@ public class WerewolfGameTask implements Runnable {
             }
             // 等待女巫操作完毕
             this.waitPlayerAction(20, room, Action.WITCH_CHOICE);
+            // 查询投票最多的玩家
+            Player mostTargetPlayer = roomDao.mostTargetPlayer(room, Action.WITCH_CHOICE);
         }
         // 女巫操作完毕进入白天
         this.enterDay(room);

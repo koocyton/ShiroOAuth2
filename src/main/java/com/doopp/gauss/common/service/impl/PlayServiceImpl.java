@@ -42,23 +42,36 @@ public class PlayServiceImpl implements PlayService {
 
     // 用户发送的命令转发
     @Override
-    public void actionDispatcher(Room room, Player player, String playAction, JSONObject messageObject) {
-        switch(playAction) {
-            case "play-ready":
-                this.readyAction(room, player);
-                break;
-            case "play-werewolf":
-                this.werewolfAction(room, player, messageObject);
-                break;
-            case "play-seer":
-                this.seerAction(room, player, messageObject);
-                break;
-            case "play-witch":
-                this.witchAction(room, player, messageObject);
-                break;
-            case "play-hunter":
-                this.hunterAction(room, player, messageObject);
-                break;
+    public void actionDispatcher(Room room, Player player, String playerAction, JSONObject messageObject) {
+        // 校验房间正在等待的状态
+        if (room.getWaitAction().equals(playerAction)) {
+            // 转发 action
+            switch (playerAction) {
+                // 用户准备
+                case Action.PLAYER_READY:
+                    this.readyAction(room, player);
+                    break;
+                // 狼选择杀人
+                case Action.WOLF_CHOICE:
+                    this.werewolfAction(room, player, messageObject);
+                    break;
+                // 先知选择查看
+                case Action.SEER_CHOICE:
+                    this.seerAction(room, player, messageObject);
+                    break;
+                // 女巫选择杀人或救人
+                case Action.WITCH_CHOICE:
+                    this.witchAction(room, player, messageObject);
+                    break;
+                // 猎人杀人
+                case Action.HUNTER_CHOICE:
+                    this.hunterAction(room, player, messageObject);
+                    break;
+                // 玩家说话
+                case Action.PLAYER_SPEAK:
+                    // this.playerSpeak(room, player, messageObject);
+                    break;
+            }
         }
     }
 
