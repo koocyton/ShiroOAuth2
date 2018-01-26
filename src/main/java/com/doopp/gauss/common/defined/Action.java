@@ -1,21 +1,23 @@
 package com.doopp.gauss.common.defined;
 
-public enum Action {
+public class Action {
 
-    WOLF_CHOICE("wolf-choice"),
-    VILLAGER_CHOICE("village-choice"),
-    WITCH_CHOICE("village-choice"),
-    HUNTER_CHOICE("village-choice"),
-    SEER_CHOICE("village-choice"),
-    CUPID_CHOICE("village-choice");
+    // 下行
+    public static String WOLF_CALL = "wolf-call";
+    public static String VILLAGER_CALL = "village-call";
+    public static String WITCH_CALL = "witch-call";
+    public static String HUNTER_CALL = "village-call";
+    public static String SEER_CALL = "village-call";
+    public static String CUPID_CALL = "village-call";
 
-    String value;
+    // 上行
+    public static String WOLF_CHOICE = "wolf-choice";
+    public static String VILLAGER_CHOICE = "village-choice";
+    public static String WITCH_CHOICE = "witch-choice";
+    public static String HUNTER_CHOICE = "hunter-choice";
+    public static String SEER_CHOICE = "seer-choice";
+    public static String CUPID_CHOICE = "cupid-choice";
 
-    Action(String value) {
-        this.value = value;
-    }
-
-    public String getValue() {
-        return this.value;
-    }
+    // 总结
+    public static String WOLF_KILL = "wolf-kill";
 }

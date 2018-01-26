@@ -1,6 +1,8 @@
 package com.doopp.gauss.common.task;
 
 import com.doopp.gauss.common.dao.PlayerDao;
+import com.doopp.gauss.common.dao.RoomDao;
+import com.doopp.gauss.common.defined.Action;
 import com.doopp.gauss.common.defined.Identity;
 import com.doopp.gauss.common.entity.Player;
 import com.doopp.gauss.common.entity.PlayerAction;
@@ -28,6 +30,8 @@ public class WerewolfGameTask implements Runnable {
     private final static PlayService playService = (PlayService) ApplicationContextUtil.getBean("playService");
 
     private final static PlayerDao playerDao = (PlayerDao) ApplicationContextUtil.getBean("playerDao");
+
+    private final static RoomDao roomDao = (RoomDao) ApplicationContextUtil.getBean("roomDao");
 
     // 这个线程处理的房间
     private final Room room;
@@ -101,21 +105,19 @@ public class WerewolfGameTask implements Runnable {
 
     // 预言家查身份
     private void callSeer(Room room) {
-        playService.sendMessage(playerDao.getSeerByRoom(room), "call-seer", null);
+        playService.sendMessage(playerDao.getSeerByRoom(room), Action.SEER_CALL, null);
         this.callWolf(room);
     }
 
     // 狼人开始杀人，预言家查身份
     private void callWolf(Room room) {
-        playService.sendMessage(playerDao.getWolfsByRoom(room), "call-wolf", null);
+        playService.sendMessage(playerDao.getWolfsByRoom(room), Action.WOLF_CALL, null);
         // 等待 40 秒狼操作完毕
-        this.waitPlayerAction(40);
-        // 初始化投票结果
-        Map<Long, Integer> votes = new HashMap<>();
-        // 汇总票数狼人杀人
-        Long killPlayerId = CommonUtils.getMaxValueKey(votes);
+        this.waitPlayerAction(40, room, Action.WOLF_CHOICE);
+        // 查询投票最多的玩家
+        Player mostTargetPlayer = roomDao.mostTargetPlayer(room, Action.WOLF_CHOICE);
         // 记录到 action
-        playerDao.cacheAction("wolf-kill", null, playerDao.getPlayerById(killPlayerId));
+        roomDao.cacheAction(Action.WOLF_KILL, null, mostTargetPlayer);
         // 女巫开始行动
         this.callWitch(room);
     }
@@ -123,10 +125,18 @@ public class WerewolfGameTask implements Runnable {
     // 下发，女巫救人或毒杀
     private void callWitch(Room room) {
         Player witch = playerDao.getWitchByRoom(room);
+        // 如果女巫活着
         if (witch.isLiving()) {
-            playService.sendMessage(playerDao.getWitchByRoom(room), "call-witch", null);
+            // 检查狼杀的目标
+            Map<Long, PlayerAction> wolfKill = room.getCacheActions(Action.WOLF_KILL);
+            if (wolfKill!=null) {
+                playService.sendMessage(playerDao.getWitchByRoom(room), Action.WITCH_CALL, null);
+            }
+            else {
+                playService.sendMessage(playerDao.getWitchByRoom(room), Action.WITCH_CALL, null);
+            }
             // 等待女巫操作完毕
-            this.waitPlayerAction(20);
+            this.waitPlayerAction(20, room, Action.WITCH_CHOICE);
         }
         // 女巫操作完毕进入白天
         this.enterDay(room);
@@ -146,7 +156,7 @@ public class WerewolfGameTask implements Runnable {
 
     // 汇总夜晚的结果
     private void summaryNightResult(Room room) {
-        Map<Long, PlayerAction> wolfActions = room.getCacheActions("wolf-action");
+        Map<Long, PlayerAction> wolfActions = room.getCacheActions(Action.SEER_CALL);
         Long bbbbb = CommonUtils::getMaxValueKey(wolfActions);
 
         // 狼人杀了谁 a
@@ -198,8 +208,9 @@ public class WerewolfGameTask implements Runnable {
     private void callVoter(Room room) {
     }
 
-    private void waitPlayerAction(int second) {
+    private void waitPlayerAction(int second, Room room, String action) {
         try {
+            room.setWaitAction(action);
             this.wait(second * 1000);
         }
         catch (InterruptedException e) {

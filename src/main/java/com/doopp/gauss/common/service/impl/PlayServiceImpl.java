@@ -90,9 +90,9 @@ public class PlayServiceImpl implements PlayService {
         if (actionPlayer.getIdentity()==Identity.WOLF) {
             Long playerId = messageObject.getLong("choice-target");
             Player targetPlayer = playerDao.getPlayerById(playerId);
-            room.setCacheAction(new PlayerAction(Action.WOLF_CHOICE.getValue(), actionPlayer, targetPlayer));
+            room.setCacheAction(new PlayerAction(Action.WOLF_CHOICE, actionPlayer, targetPlayer));
             // 如果三个狼人都提交了，就 notify game task continue
-            if (room.cacheActionCount(Action.WOLF_CHOICE.getValue())==3) {
+            if (room.cacheActionCount(Action.WOLF_CHOICE)==3) {
                 room.getGameTask().notify();
             }
         }
@@ -104,7 +104,7 @@ public class PlayServiceImpl implements PlayService {
         if (actionPlayer.getIdentity()==Identity.SEER) {
             Long playerId = messageObject.getLong("choice-target");
             Player targetPlayer = playerDao.getPlayerById(playerId);
-            roomDao.cacheAction(Action.SEER_CHOICE.getValue(), actionPlayer, targetPlayer);
+            roomDao.cacheAction(Action.SEER_CHOICE, actionPlayer, targetPlayer);
             this.sendMessage(actionPlayer, targetPlayer.getIdentity().toString());
         }
     }
@@ -115,9 +115,9 @@ public class PlayServiceImpl implements PlayService {
         if (actionPlayer.getIdentity()==Identity.WITCH) {
             Long playerId = messageObject.getLong("choice-target");
             Player targetPlayer = playerDao.getPlayerById(playerId);
-            roomDao.cacheAction(Action.WITCH_CHOICE.getValue(), actionPlayer, targetPlayer);
+            roomDao.cacheAction(Action.WITCH_CHOICE, actionPlayer, targetPlayer);
             // 如果女巫提交完毕
-            if (room.cacheActionCount(Action.WITCH_CHOICE.getValue())==1) {
+            if (room.cacheActionCount(Action.WITCH_CHOICE)==1) {
                 room.getGameTask().notify();
             }
         }
@@ -129,9 +129,9 @@ public class PlayServiceImpl implements PlayService {
         if (actionPlayer.getIdentity()==Identity.HUNTER) {
             Long playerId = messageObject.getLong("choice-target");
             Player targetPlayer = playerDao.getPlayerById(playerId);
-            roomDao.cacheAction(Action.HUNTER_CHOICE.getValue(), actionPlayer, targetPlayer);
+            roomDao.cacheAction(Action.HUNTER_CHOICE, actionPlayer, targetPlayer);
             // 如果猎人提交完毕
-            if (room.cacheActionCount(Action.HUNTER_CHOICE.getValue())==1) {
+            if (room.cacheActionCount(Action.HUNTER_CHOICE)==1) {
                 room.getGameTask().notify();
             }
         }

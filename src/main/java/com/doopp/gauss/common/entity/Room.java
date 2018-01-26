@@ -62,6 +62,9 @@ public class Room {
     // 房间里的游戏
     private WerewolfGameTask gameTask;
 
+    // 进行的队列指定等待用户的上发的类型
+    private String waitAction;
+
     public void addVillagerSeat(int seatIndex) {
         if (this.villagerSeat==null) {
             return;

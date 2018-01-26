@@ -62,7 +62,7 @@ public class RoomDao {
     }
 
     // 投票结果
-    public void mostVoteByAction(Room room, String action) {
+    public Player mostTargetPlayer(Room room, String action) {
         Map<Long, PlayerAction> playerActions = room.getCacheActions(action);
         Map<Long, Integer> actionNumbers = new HashMap<>();
         for(PlayerAction playerAction : playerActions.values()) {
@@ -70,7 +70,11 @@ public class RoomDao {
             Integer actionNumber = actionNumbers.get(actionKey);
             actionNumber = (actionNumber==null) ? 1 : actionNumber + 1;
             actionNumbers.put(actionKey, actionNumber);
+            if (actionNumber>playerActions.size()/2) {
+                return playerAction.getTargetPlayer();
+            }
         }
+        return null;
     }
 
     // 用户离开房间
