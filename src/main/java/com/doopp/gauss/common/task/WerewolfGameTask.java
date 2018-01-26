@@ -13,7 +13,6 @@ import com.doopp.gauss.common.utils.CommonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
 import java.util.Map;
 
 public class WerewolfGameTask implements Runnable {
