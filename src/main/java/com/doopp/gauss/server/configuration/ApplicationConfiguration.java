@@ -1,6 +1,5 @@
 package com.doopp.gauss.server.configuration;
 
-import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.*;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
@@ -8,7 +7,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 // @EnableCaching
 
 @Import({
-    CommonUtil.class,
+    CommonConfiguration.class,
     WebSocketConfiguration.class
 })
 

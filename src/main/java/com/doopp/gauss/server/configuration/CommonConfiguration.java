@@ -9,7 +9,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import java.io.IOException;
 import java.util.Properties;
 
-public class CommonUtil {
+public class CommonConfiguration {
 
     @Bean
     public Properties applicationProperties() {

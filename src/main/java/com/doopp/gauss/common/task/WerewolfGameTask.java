@@ -5,17 +5,14 @@ import com.doopp.gauss.common.defined.Identity;
 import com.doopp.gauss.common.entity.Player;
 import com.doopp.gauss.common.entity.PlayerAction;
 import com.doopp.gauss.common.entity.Room;
-import com.doopp.gauss.common.entity.User;
 import com.doopp.gauss.common.service.PlayService;
 import com.doopp.gauss.common.utils.ApplicationContextUtil;
 import com.doopp.gauss.common.utils.CommonUtils;
-import com.doopp.gauss.server.configuration.CommonUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 
 public class WerewolfGameTask implements Runnable {
 
@@ -150,6 +147,8 @@ public class WerewolfGameTask implements Runnable {
     // 汇总夜晚的结果
     private void summaryNightResult(Room room) {
         Map<Long, PlayerAction> wolfActions = room.getCacheActions("wolf-action");
+        Long bbbbb = CommonUtils::getMaxValueKey(wolfActions);
+
         // 狼人杀了谁 a
         // 女巫杀了谁 b
         // 女巫救了谁 c

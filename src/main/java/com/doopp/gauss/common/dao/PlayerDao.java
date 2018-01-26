@@ -1,6 +1,5 @@
 package com.doopp.gauss.common.dao;
 
-import com.doopp.gauss.common.entity.PlayerAction;
 import com.doopp.gauss.common.entity.Room;
 import com.doopp.gauss.common.entity.Player;
 import com.doopp.gauss.server.websocket.GameSocketHandler;
@@ -10,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.socket.WebSocketSession;
 
-import javax.annotation.Resource;
 
 @Repository("playerDao")
 public class PlayerDao {
@@ -18,8 +16,6 @@ public class PlayerDao {
     // logger
     private final static Logger logger = LoggerFactory.getLogger(PlayerDao.class);
 
-    @Resource
-    private RoomDao roomDao;
 
     // socket handle
     @Autowired
@@ -93,42 +89,5 @@ public class PlayerDao {
         int nn = room.getCupidSeat();
         Player[] players = room.getPlayers();
         return players[nn];
-    }
-
-    // 记录用户的操作
-    public void cacheAction(String action, Player actionPlayer, Player targetPlayer) {
-        if (actionPlayer.getRoomId()==targetPlayer.getRoomId()) {
-            Room room = roomDao.getRoomById(actionPlayer.getRoomId());
-            room.setCacheAction(new PlayerAction(action, actionPlayer, targetPlayer));
-        }
-    }
-
-    // 用户离开房间
-    public void playerLeaveRoom(Player player) {
-        Room room = roomDao.getRoomById(player.getRoomId());
-        Player[] players = room.getPlayers();
-        for(int ii=0; ii<players.length; ii++) {
-            if (players[ii].getId().equals(player.getId())) {
-                players[ii].setRoomId(0);
-                players[ii] = null;
-                break;
-            }
-        }
-    }
-
-    // 用户加入房间
-    public void playerJoinRoom(Player player) {
-        Room room = roomDao.getFreeRoom();
-        if (room==null) {
-            room = roomDao.createRoom();
-        }
-        Player[] players = room.getPlayers();
-        for(int ii=0; ii<players.length; ii++) {
-            if (players[ii]==null) {
-                players[ii] = player;
-                players[ii].setRoomId(room.getId());
-                return;
-            }
-        }
     }
 }
