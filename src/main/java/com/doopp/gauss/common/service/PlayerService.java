@@ -22,4 +22,7 @@ public interface PlayerService {
 
     // 通过ID获取用户
     Player getPlayer(Long uid);
+
+    // 用户准备
+    void iamReady(Player player);
 }

@@ -1,7 +1,17 @@
 package com.doopp.gauss.common.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
+import com.doopp.gauss.common.defined.Action;
+import com.doopp.gauss.common.entity.Player;
+import com.doopp.gauss.common.entity.Room;
 import com.doopp.gauss.common.service.GameService;
+import com.doopp.gauss.common.service.PlayerService;
+import com.doopp.gauss.common.service.RoomService;
+import com.doopp.gauss.common.service.SocketChannelService;
+import com.doopp.gauss.common.task.WerewolfGameTask;
 import io.undertow.websockets.core.WebSocketChannel;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 
 import org.slf4j.Logger;
@@ -13,76 +23,69 @@ public class GameServiceImpl implements GameService {
     // logger
     private final static Logger logger = LoggerFactory.getLogger(GameServiceImpl.class);
 
+    @Autowired
+    private PlayerService playerService;
+
+    @Autowired
+    private RoomService roomService;
+
+    @Autowired
+    private SocketChannelService socketChannelService;
+
+    @Autowired
+    private ThreadPoolTaskExecutor gameTaskExecutor;
+
     @Override
-    public void actionDispatcher(WebSocketChannel socketChannel) {
-        logger.info(" >> " + socketChannel);
+    public void actionDispatcher(WebSocketChannel socketChannel, String playerAction, Object actionData) {
+        Player player = playerService.getPlayer((Long) socketChannel.getAttribute("userId"));
+        Room room = roomService.getRoom(player.getRoom_id());
+        // logger.info(" >> " + room.getId() +  " / " + player.getId() + " : " + playerAction + " : " + actionData);
+
+        // 校验房间正在等待的状态
+        if (room.getAcceptAction().equals(playerAction)) {
+            // 转发 action
+            switch (playerAction) {
+                // 用户准备
+                case Action.PLAYER_READY:
+                    this.readyAction(room, player);
+                    break;
+                // 狼选择杀人
+                case Action.WOLF_CHOICE:
+                    //this.werewolfAction(room, player, messageObject);
+                    break;
+                // 先知选择查看
+                case Action.SEER_CHOICE:
+                    //this.seerAction(room, player, messageObject);
+                    break;
+                // 女巫选择杀人或救人
+                case Action.WITCH_CHOICE:
+                    //this.witchAction(room, player, messageObject);
+                    break;
+                // 猎人杀人
+                case Action.HUNTER_CHOICE:
+                    //this.hunterAction(room, player, messageObject);
+                    break;
+                // 玩家说话
+                case Action.PLAYER_SPEAK:
+                    // this.playerSpeak(room, player, messageObject);
+                    break;
+                // 玩家投票
+                case Action.PLAYER_VOTE:
+                    //this.playerVote(room, player, messageObject);
+                    break;
+            }
+        }
     }
 
-    // 用户发送的命令转发
-//    @Override
-//    public void actionDispatcher(Room room, Player player, String playerAction, JSONObject messageObject) {
-//
-//        // 校验房间正在等待的状态
-//        if (room.getWaitAction().equals(playerAction)) {
-//            // 转发 action
-//            switch (playerAction) {
-//                // 用户准备
-//                case Action.PLAYER_READY:
-//                    this.readyAction(room, player);
-//                    break;
-//                // 狼选择杀人
-//                case Action.WOLF_CHOICE:
-//                    this.werewolfAction(room, player, messageObject);
-//                    break;
-//                // 先知选择查看
-//                case Action.SEER_CHOICE:
-//                    this.seerAction(room, player, messageObject);
-//                    break;
-//                // 女巫选择杀人或救人
-//                case Action.WITCH_CHOICE:
-//                    this.witchAction(room, player, messageObject);
-//                    break;
-//                // 猎人杀人
-//                case Action.HUNTER_CHOICE:
-//                    this.hunterAction(room, player, messageObject);
-//                    break;
-//                // 玩家说话
-//                case Action.PLAYER_SPEAK:
-//                    // this.playerSpeak(room, player, messageObject);
-//                    break;
-//                // 玩家投票
-//                case Action.PLAYER_VOTE:
-//                    this.playerVote(room, player, messageObject);
-//                    break;
-//            }
-//        }
-//    }
+    // 接受用户准备好了的消息
+    @Override
+    public void readyAction(Room room, Player readyPlayer) {
+        playerService.iamReady(readyPlayer);
+        if (room.allReady()) {
+            gameTaskExecutor.execute(new WerewolfGameTask(room));
+        }
+    }
 
-//    // 接受用户准备好了的消息
-//    @Override
-//    public void readyAction(Room room, Player readyPlayer) {
-//        // logger.info(">>>" + room);
-//        boolean allReady = true;
-//        for(Player player : playerDao.getPlayersByRoom(room)) {
-//            // 如果房间内找到用户，设定玩家准备好了
-//            if (player!=null && player.getId().equals(readyPlayer.getId())) {
-//                player.setStatus(1);
-//                this.sendMessage(player, Action.PLAYER_READY, 1);
-//            }
-//            // 循环获取玩家是否准备好了，如果如果有空座位 || 有没准备好的，设定 false
-//            if (player==null || player.getStatus()==0) {
-//                allReady = false;
-//            }
-//        }
-//        // logger.info(">>>" + allReady + " " + playerDao.getPlayersByRoom(room));
-//        // 都准备好了，就开始游戏
-//        if (room.getStatus()==0 && allReady) {
-//            room.setStatus(1);
-//            room.setGameTask(new WerewolfGameTask(room));
-//            this.gameTaskExecutor.execute(room.getGameTask());
-//        }
-//    }
-//
 //    // 上行，狼人杀人
 //    @Override
 //    public void werewolfAction(Room room, Player actionPlayer, JSONObject messageObject) {
@@ -145,72 +148,50 @@ public class GameServiceImpl implements GameService {
 //            roomDao.cacheAction(Action.PLAYER_VOTE, actionPlayer, targetPlayer);
 //        }
 //    }
-//
-//    // 发送信息
-//    @Override
-//    public void sendMessage(Player[] players, String message) {
-//        for(Player player : players) {
-//            this.sendMessage(player, message);
-//        }
-//    }
-//
-//    // 发送信息
-//    @Override
-//    public void sendMessage(Player[] players, String action, Object data) {
-//        for(Player player : players) {
-//            this.sendMessage(player, action, data);
-//        }
-//    }
-//
-//    // 发送信息
-//    @Override
-//    public void sendMessage(Player player, String message) {
-//        if (player!=null) {
-//            // logger.info(" >>> " + message);
-//            TextMessage textMessage = new TextMessage(message);
-//            WebSocketSession socketSession = socketGroup.get(player.getId());
-//            // logger.info(" >>> " + socketSession);
-//            try {
-//                socketSession.sendMessage(textMessage);
-//            }
-//            catch (IOException e) {
-//                // logger.info(e.getMessage());
-//                roomDao.playerLeaveRoom(player);
-//            }
-//        }
-//    }
-//
-//    // 发送信息
-//    @Override
-//    public void sendMessage(Player player, String action, Object data) {
-//        if (player!=null && player.isLiving()) {
-//            JSONObject jsonObject = new JSONObject();
-//            jsonObject.put("action", action);
-//            jsonObject.put("data", data);
-//            this.sendMessage(player, jsonObject.toJSONString());
-//        }
-//    }
-//
-//    // 发送信息
-//    @Override
-//    public void sendMessage(Room room, String message) {
-//        for(int ii=0; ii<room.getPlayers().length; ii++) {
-//            if (room.getPlayers()[ii]==null || !room.getPlayers()[ii].isLiving()) {
-//                continue;
-//            }
-//            this.sendMessage(room.getPlayers()[ii], message);
-//        }
-//    }
-//
-//    // 发送信息
-//    @Override
-//    public void sendMessage(Room room, String action, Object data) {
-//        JSONObject jsonObject = new JSONObject();
-//        jsonObject.put("action", action);
-//        jsonObject.put("data", data);
-//        this.sendMessage(room, jsonObject.toJSONString());
-//    }
-//
+
+    // ************** 发送信息到某个用户
+    @Override
+    public void sendMessage(Player player, String message) {
+        if (player!=null && message!=null && player.isLiving()) {
+            socketChannelService.sendMessage(player.getId(), message);
+        }
+    }
+    @Override
+    public void sendMessage(Player player, String action, Object data) {
+        if (player!=null && player.isLiving() && action!=null) {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("action", action);
+            jsonObject.put("data", data);
+            this.sendMessage(player, jsonObject.toJSONString());
+        }
+    }
+    // ************** 发送信息到多个用户
+    @Override
+    public void sendMessage(Player[] players, String message) {
+        for(Player player : players) {
+            this.sendMessage(player, message);
+        }
+    }
+    @Override
+    public void sendMessage(Player[] players, String action, Object data) {
+        for(Player player : players) {
+            this.sendMessage(player, action, data);
+        }
+    }
+    // ************** 发送信息到房间
+    @Override
+    public void sendMessage(Room room, String message) {
+        if (room!=null) {
+            this.sendMessage(room.getSeats(), message);
+        }
+    }
+    @Override
+    public void sendMessage(Room room, String action, Object data) {
+        if (room!=null) {
+            this.sendMessage(room.getSeats(), action, data);
+        }
+    }
+
 //    // 房间内公共频道说话
 //    private void actionSpeak(WebSocketSession socketSession, JSONObject messageObject) throws IOException {
 //        WebSocketSession[] inRoomSockets = this.getSocketsInRoom(socketSession);

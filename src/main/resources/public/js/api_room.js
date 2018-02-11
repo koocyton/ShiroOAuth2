@@ -21,6 +21,10 @@ let ApiRoomController = function($scope, $http) {
         $scope.ws[ii] = null;
     }
 
+    $scope.readyPlayer = function(ii) {
+        sendMessage(ii, {action: "player-ready"})
+    };
+
     $scope.callPlayer = function(ii) {
         sendMessage(ii, {action: "callPlayer", gameType: 1})
     };

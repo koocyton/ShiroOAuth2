@@ -61,7 +61,7 @@ public class RoomServiceImpl implements RoomService {
     {
         Room room = new Room();
         room.setId(++roomId);
-        room.setCurrentAction(Action.PLAYER_READY);
+        room.setAcceptAction(Action.PLAYER_READY);
         room.addPlayer(player);
         roomGroup.put(room.getId(), room);
         spaceRoomGroup.put(room.getId(), room.getId());
@@ -79,12 +79,6 @@ public class RoomServiceImpl implements RoomService {
             }
         }
         return  null;
-    }
-
-    // get room by id
-    @Override
-    public Room getRoom(WebSocketChannel socketChannel) {
-        return roomGroup.get(roomId);
     }
 
     // get room by id

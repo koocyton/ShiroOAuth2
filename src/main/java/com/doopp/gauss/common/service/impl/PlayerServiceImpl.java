@@ -1,6 +1,8 @@
 package com.doopp.gauss.common.service.impl;
 
+import com.doopp.gauss.common.defined.PlayerStatus;
 import com.doopp.gauss.common.entity.Player;
+import com.doopp.gauss.common.entity.Room;
 import com.doopp.gauss.common.entity.User;
 import com.doopp.gauss.common.mapper.UserMapper;
 import com.doopp.gauss.common.service.AccountService;
@@ -75,5 +77,15 @@ public class PlayerServiceImpl implements PlayerService {
     @Override
     public Player getPlayer(Long uid) {
         return playerGroup.get(uid);
+    }
+
+    @Override
+    public void iamReady(Player player) {
+        if (player!=null) {
+            Room room = roomService.getRoom(player.getRoom_id());
+            if (room != null) {
+                player.setStatus(PlayerStatus.READY);
+            }
+        }
     }
 }

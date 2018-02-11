@@ -4,15 +4,15 @@ import com.alibaba.fastjson.JSONObject;
 import com.doopp.gauss.common.service.GameService;
 import com.doopp.gauss.common.service.PlayerService;
 import com.doopp.gauss.common.service.SocketChannelService;
-import io.undertow.websockets.core.BufferedTextMessage;
-import io.undertow.websockets.core.StreamSourceFrameChannel;
-import io.undertow.websockets.core.WebSocketChannel;
+import io.undertow.connector.PooledByteBuffer;
+import io.undertow.websockets.core.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -39,12 +39,10 @@ public class SocketChannelServiceImpl implements SocketChannelService {
             return;
         }
         // Get action
-        String action = messageObject.getString("action");
-        if (action==null) {
-            return;
+        String playerAction = messageObject.getString("action");
+        if (playerAction!=null) {
+            gameService.actionDispatcher(socketChannel, playerAction, messageObject.getString("data"));
         }
-        // Dispatch
-        // gameService.actionDispatcher();
     }
 
     @Override
@@ -67,6 +65,14 @@ public class SocketChannelServiceImpl implements SocketChannelService {
     @Override
     public Long getUidByChannel(WebSocketChannel socketChannel) {
         return (Long) socketChannel.getAttribute("userId");
+    }
+
+    @Override
+    public void sendMessage(Long socketChannelKey, String message) {
+        WebSocketChannel socketChannel = socketGroup.get(socketChannelKey);
+        if (socketChannel!=null) {
+            WebSockets.sendText(message, socketChannel, null);
+        }
     }
 
     // socket 建立连接

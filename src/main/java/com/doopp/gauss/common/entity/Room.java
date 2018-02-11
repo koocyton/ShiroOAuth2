@@ -1,6 +1,10 @@
 package com.doopp.gauss.common.entity;
 
+import com.doopp.gauss.common.defined.Identity;
+import com.doopp.gauss.common.defined.PlayerStatus;
 import lombok.Data;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,6 +16,9 @@ import java.util.Map;
  */
 @Data
 public class Room {
+
+    // logger
+    private final static Logger logger = LoggerFactory.getLogger(Room.class);
 
     // 房间 ID
     private int id;
@@ -52,7 +59,17 @@ public class Room {
     private int gameLevel = 0;
 
     // 进行的队列指定等待用户的上发的类型
-    private String currentAction;
+    private String acceptAction;
+
+    public boolean allReady() {
+        int maxLength = (this.gameLevel==1) ? 12 : 9;
+        for(int ii=0; ii<maxLength; ii++) {
+            if (seats[ii]==null || seats[ii].getStatus().equals(PlayerStatus.WAITING)) {
+                return false;
+            }
+        }
+        return true;
+    }
 
     public int playerCount() {
         int maxLength = (this.gameLevel==1) ? 12 : 9;
@@ -105,22 +122,22 @@ public class Room {
         }
     }
 
-//    public void addVillagerSeat(int seatIndex) {
-//        if (this.villagerSeat==null) {
-//            return;
-//        }
-//        int ii = this.villagerSeat.length;
-//        this.villagerSeat[ii] = seatIndex;
-//    }
-//
-//    public void addWolfSeat(int seatIndex) {
-//        if (this.wolfSeat==null) {
-//            return;
-//        }
-//        int ii = this.wolfSeat.length;
-//        this.wolfSeat[ii] = seatIndex;
-//    }
-//
+    public void addVillagerSeat(int seatIndex) {
+        if (this.villagerSeat==null) {
+            return;
+        }
+        int ii = this.villagerSeat.length;
+        this.villagerSeat[ii] = seatIndex;
+    }
+
+    public void addWolfSeat(int seatIndex) {
+        if (this.wolfSeat==null) {
+            return;
+        }
+        int ii = this.wolfSeat.length;
+        this.wolfSeat[ii] = seatIndex;
+    }
+
 //    public void setCacheAction(PlayerAction playerAction) {
 //        this.cacheActions.put(playerAction.getActionPlayer().getId(), playerAction);
 //    }
@@ -144,4 +161,64 @@ public class Room {
 //    public void flushCacheAction() {
 //        this.cacheActions = new HashMap<>();
 //    }
+
+
+
+    // 获取房间里的狼
+    public Player[] getWolfs() {
+        Player[] wolfs = (this.gameLevel==1)
+                ? new Player[]{null, null, null, null}
+                : new Player[]{null, null, null};
+        int ii = 0;
+        for(Player player : this.getSeats()) {
+            if (player!=null && player.getIdentity()==Identity.WOLF) {
+                wolfs[ii] = player;
+                ii++;
+            }
+        }
+        return wolfs;
+    }
+
+    // 获取房间里的村民
+    public Player[] getVillagers() {
+        Player[] villagers = (this.gameLevel==1)
+                ? new Player[]{null, null, null, null}
+                : new Player[]{null, null, null};
+        int ii = 0;
+        for(Player player : this.getSeats()) {
+            if (player!=null && player.getIdentity()== Identity.VILLAGER) {
+                villagers[ii] = player;
+                ii++;
+            }
+        }
+        return villagers;
+    }
+
+    // 获取房间里的先知
+    public Player getSeer() {
+        int nn = this.getSeerSeat();
+        Player[] players = this.getSeats();
+        return players[nn];
+    }
+
+    // 获取房间里的猎人
+    public Player getHunter() {
+        int nn = this.getSeerSeat();
+        Player[] players = this.getSeats();
+        return players[nn];
+    }
+
+    // 获取房间里的女巫
+    public Player getWitch() {
+        int nn = this.getWitchSeat();
+        Player[] players = this.getSeats();
+        return players[nn];
+    }
+
+    // 获取房间里的丘比特
+    public Player getCupid() {
+        int nn = this.getCupidSeat();
+        Player[] players = this.getSeats();
+        return players[nn];
+    }
 }

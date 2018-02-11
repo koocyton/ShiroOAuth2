@@ -10,9 +10,6 @@ public interface RoomService {
 
     void playerLeave(Player player);
 
-    // 通过 socket channel 获取房间
-    Room getRoom(WebSocketChannel socketChannel);
-
     // 通过 房间 id 获取房间
     Room getRoom(int roomId);
 }

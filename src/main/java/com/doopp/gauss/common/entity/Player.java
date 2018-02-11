@@ -1,6 +1,7 @@
 package com.doopp.gauss.common.entity;
 
 import com.doopp.gauss.common.defined.Identity;
+import com.doopp.gauss.common.defined.PlayerStatus;
 import lombok.Data;
 
 @Data
@@ -16,7 +17,7 @@ public class Player {
     private String avatar_url;
 
     // 游戏状态
-    private int status = 1;
+    private String status = PlayerStatus.WAITING;
 
     // 游戏里的身份
     private Identity identity;
@@ -29,6 +30,6 @@ public class Player {
 
     // 是否存活
     public boolean isLiving() {
-        return (this.status==1);
+        return !this.status.equals(PlayerStatus.DEATH) && !this.status.equals(PlayerStatus.LEAVE);
     }
 }

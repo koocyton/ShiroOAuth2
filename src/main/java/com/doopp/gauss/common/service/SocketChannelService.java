@@ -13,4 +13,6 @@ public interface SocketChannelService {
     void onClose(WebSocketChannel socketChannel, StreamSourceFrameChannel channel);
 
     Long getUidByChannel(WebSocketChannel channel);
+
+    void sendMessage(Long socketChannelKey, String message);
 }
