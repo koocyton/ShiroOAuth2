@@ -1,0 +1,76 @@
+<div>
+    <div class="scroll-container opacity-92" id="message_${id}"
+         style="resize: none;width:400px;height:300px;overflow:scroll; padding:20px;">
+        <code ng-repeat="message in clients[${id}].messageList track by $index">
+            {{ message }}
+            <br>
+        </code>
+    </div>
+
+    <div class="input-group" style="margin:5px auto;">
+        <input type="text" class="form-control" placeholder="what are you say ?" ng-model="clients[${id}].talkMessage"/>
+        <span class="input-group-btn">
+        <button class="btn btn-success" type="button" ng-click="publicTalk(${id})">发言</button>
+    </span>
+    </div>
+
+    <div>
+        <div class="input-group" style="margin:5px auto;width:48%;float:left;">
+            <input type="text" class="form-control" value="">
+            <span class="input-group-btn">
+            <button class="btn btn-success" type="button">投票</button>
+        </span>
+        </div>
+        <div class="input-group" style="margin:5px auto;width:48%;float:right;">
+            <input type="text" class="form-control" value="">
+            <span class="input-group-btn">
+            <button class="btn btn-success" type="button">狼人杀人</button>
+        </span>
+        </div>
+    </div>
+
+    <div>
+        <div class="input-group" style="margin:5px auto;width:48%;float:left;">
+            <input type="text" class="form-control" value="">
+            <span class="input-group-btn">
+            <button class="btn btn-success" type="button">女巫救人</button>
+        </span>
+        </div>
+        <div class="input-group" style="margin:5px auto;width:48%;float:right;">
+            <input type="text" class="form-control" value="">
+            <span class="input-group-btn">
+            <button class="btn btn-success" type="button">女巫毒杀</button>
+        </span>
+        </div>
+    </div>
+
+    <div>
+        <div class="input-group" style="margin:5px auto;width:48%;float:left;">
+            <input type="text" class="form-control" value="">
+            <span class="input-group-btn">
+            <button class="btn btn-success" type="button">预言家查看</button>
+        </span>
+        </div>
+        <div class="input-group" style="margin:5px auto;width:48%;float:right;">
+            <input type="text" class="form-control" value="">
+            <span class="input-group-btn">
+            <button class="btn btn-success" type="button">猎人杀人</button>
+        </span>
+        </div>
+    </div>
+
+    <div>
+        <div class="input-group" style="margin:5px auto;width:100%;float:left;">
+        <span class="input-group-btn">
+            <button class="btn btn-info" type="button" ng-click="callPlayer(${id})">发起游戏</button>
+        </span>
+            <span class="input-group-btn">
+            <button class="btn btn-success" type="button" ng-click="joinGame(${id})">参加游戏</button>
+        </span>
+            <span class="input-group-btn">
+            <button class="btn btn-warning" type="button" ng-click="leaveGame(${id})">退出游戏</button>
+        </span>
+        </div>
+    </div>
+
+</div>
