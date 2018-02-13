@@ -1,6 +1,5 @@
 package com.doopp.gauss.server.configuration;
 
-import com.doopp.gauss.common.utils.ApplicationContextUtil;
 import com.doopp.gauss.common.utils.IdWorker;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.ClassPathResource;

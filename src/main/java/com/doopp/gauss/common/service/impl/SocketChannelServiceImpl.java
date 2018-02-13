@@ -1,6 +1,7 @@
 package com.doopp.gauss.common.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.doopp.gauss.common.entity.Player;
 import com.doopp.gauss.common.service.GameService;
 import com.doopp.gauss.common.service.PlayerService;
 import com.doopp.gauss.common.service.SocketChannelService;
@@ -41,7 +42,15 @@ public class SocketChannelServiceImpl implements SocketChannelService {
         // Get action
         String playerAction = messageObject.getString("action");
         if (playerAction!=null) {
-            gameService.actionDispatcher(socketChannel, playerAction, messageObject.getString("data"));
+            String dataMessage = messageObject.getString("data");
+            JSONObject jsonObject;
+            try {
+                jsonObject = JSONObject.parseObject(dataMessage);
+            }
+            catch(Exception e) {
+                jsonObject = new JSONObject();
+            }
+            gameService.actionDispatcher(socketChannel, playerAction, jsonObject);
         }
     }
 
@@ -51,16 +60,20 @@ public class SocketChannelServiceImpl implements SocketChannelService {
         this.socketConnect(socketChannel);
         // 用户建立连接
         playerService.join(socketChannel);
+        // 给用户发消息
+        Player player = playerService.getPlayer(socketChannel);
+        if (player!=null) {
+            this.sendMessage(player.getId(), player.getRoom_id() + " : Hi " + player.getId() + " Welcome");
+        }
     }
 
     @Override
     public void onClose(WebSocketChannel socketChannel, StreamSourceFrameChannel channel) {
+        // 删除用户
+        playerService.leave(socketChannel);
         // 断开连接
         this.socketDisconnect(socketChannel);
-        // 用户断开连接
-        playerService.leave(socketChannel);
     }
-
 
     @Override
     public Long getUidByChannel(WebSocketChannel socketChannel) {

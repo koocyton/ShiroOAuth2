@@ -3,10 +3,13 @@ package com.doopp.gauss.common.defined;
 public class Action {
 
     // 空等
-    public static final String ONLY_WAIT    = "ONLY_WAIT";
+    public static final String ONLY_WAIT    = "only-wait";
+
+    // 拒接 Action
+    public static final String REJECT_ACTION    = "reject-action";
 
     // 拿到所有的房间内的用户信息
-    public static final String ALL_PLAYER    = "all_player";
+    public static final String ALL_PLAYER    = "all-player";
 
     // 玩家加入
     public static final String PLAYER_JOIN   = "player-join";
@@ -36,9 +39,9 @@ public class Action {
     public static final String WOLF_CALL     = "wolf-call";
     public static final String VILLAGER_CALL = "village-call";
     public static final String WITCH_CALL    = "witch-call";
-    public static final String HUNTER_CALL   = "village-call";
-    public static final String SEER_CALL     = "village-call";
-    public static final String CUPID_CALL    = "village-call";
+    public static final String HUNTER_CALL   = "hunter-call";
+    public static final String SEER_CALL     = "seer-call";
+    public static final String CUPID_CALL    = "cupid-call";
 
     // 上行
     public static final String WOLF_CHOICE     = "wolf-choice";
@@ -47,6 +50,9 @@ public class Action {
     public static final String HUNTER_CHOICE   = "hunter-choice";
     public static final String SEER_CHOICE     = "seer-choice";
     public static final String CUPID_CHOICE    = "cupid-choice";
+
+    public static final String WOLF_KILL     = "wolf-kill";
+    public static final String VILLAGER_KILL = "village-kill";
 
     // 总结
     public static final String SHOW_RESULT     = "show-result";

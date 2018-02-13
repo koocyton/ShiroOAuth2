@@ -1,5 +1,6 @@
 package com.doopp.gauss.server.configuration;
 
+import com.alibaba.druid.filter.stat.StatFilter;
 import com.alibaba.druid.pool.DruidDataSource;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.mapper.MapperScannerConfigurer;
@@ -14,29 +15,19 @@ public class MyBatisConfiguration {
     @Bean
     public DruidDataSource druidDataSource(Properties applicationProperties) throws Exception {
 
-        String driver = applicationProperties.getProperty("jdbc.user.driver");
-        String url = applicationProperties.getProperty("jdbc.user.url");
-        String username = applicationProperties.getProperty("jdbc.user.username");
-        String password = applicationProperties.getProperty("jdbc.user.password");
-        int initialSize = Integer.parseInt(applicationProperties.getProperty("jdbc.initialSize"));
-        int maxActive = Integer.parseInt(applicationProperties.getProperty("jdbc.maxActive"));
-        // int maxIdle = Integer.parseInt(applicationProperties.getProperty("jdbc.maxIdle"));
-        int minIdle = Integer.parseInt(applicationProperties.getProperty("jdbc.minIdle"));
-        int maxWait = Integer.parseInt(applicationProperties.getProperty("jdbc.maxWait"));
-
         DruidDataSource druidDataSource = new DruidDataSource();
         // 基本属性 url、user、password
-        druidDataSource.setDriverClassName(driver);
-        druidDataSource.setUrl(url);
-        druidDataSource.setUsername(username);
-        druidDataSource.setPassword(password);
+        druidDataSource.setDriverClassName(applicationProperties.getProperty("jdbc.user.driver"));
+        druidDataSource.setUrl(applicationProperties.getProperty("jdbc.user.url"));
+        druidDataSource.setUsername(applicationProperties.getProperty("jdbc.user.username"));
+        druidDataSource.setPassword(applicationProperties.getProperty("jdbc.user.password"));
         // 配置初始化大小、最小、最大
-        druidDataSource.setInitialSize(initialSize);
-        druidDataSource.setMinIdle(minIdle);
+        druidDataSource.setInitialSize(Integer.parseInt(applicationProperties.getProperty("jdbc.initialSize")));
+        druidDataSource.setMinIdle(Integer.parseInt(applicationProperties.getProperty("jdbc.minIdle")));
         // druidDataSource.setMaxIdle(maxIdle);
-        druidDataSource.setMaxActive(maxActive);
+        druidDataSource.setMaxActive(Integer.parseInt(applicationProperties.getProperty("jdbc.maxActive")));
         // 配置获取连接等待超时的时间
-        druidDataSource.setMaxWait(maxWait);
+        druidDataSource.setMaxWait(Integer.parseInt(applicationProperties.getProperty("jdbc.maxWait")));
 
         // 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒
         druidDataSource.setTimeBetweenEvictionRunsMillis(60000);
@@ -55,10 +46,18 @@ public class MyBatisConfiguration {
         druidDataSource.setMaxPoolPreparedStatementPerConnectionSize(20);
 
         // 配置监控统计拦截的filters
-        druidDataSource.setFilters("stat,log4j");
+        // druidDataSource.setFilters("stat,log4j");
 
         return druidDataSource;
     }
+
+    // @Bean
+    // public StatFilter statFilter() {
+    //     StatFilter statFilter = new StatFilter();
+    //     statFilter.setLogSlowSql(true);
+    //     statFilter.setSlowSqlMillis(200);
+    //     return statFilter;
+    // }
 
     @Bean
     public SqlSessionFactoryBean sqlSessionFactoryBean(DruidDataSource druidDataSource) throws Exception {

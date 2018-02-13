@@ -8,53 +8,53 @@
     </div>
 
     <div class="input-group" style="margin:5px auto;">
-        <input type="text" class="form-control" placeholder="what are you say ?" ng-model="clients[${id}].talkMessage"/>
+        <input type="text" class="form-control" placeholder="what are you say ?" ng-model="clients[${id}].playerSpeakInput">
         <span class="input-group-btn">
-        <button class="btn btn-success" type="button" ng-click="publicTalk(${id})">发言</button>
+        <button class="btn btn-success" type="button" ng-click="playerSpeak(${id})">发言</button>
     </span>
     </div>
 
     <div>
         <div class="input-group" style="margin:5px auto;width:48%;float:left;">
-            <input type="text" class="form-control" value="">
+            <input type="text" class="form-control" ng-model="clients[${id}].playerVoteInput">
             <span class="input-group-btn">
-            <button class="btn btn-success" type="button">投票</button>
+            <button class="btn btn-success" type="button" ng-click="playerVote(${id})">投票</button>
         </span>
         </div>
         <div class="input-group" style="margin:5px auto;width:48%;float:right;">
-            <input type="text" class="form-control" value="">
+            <input type="text" class="form-control" ng-model="clients[${id}].wolfChoiceInput">
             <span class="input-group-btn">
-            <button class="btn btn-success" type="button">狼人杀人</button>
+            <button class="btn btn-success" type="button" ng-click="wolfChoice(${id})">狼人杀人</button>
         </span>
         </div>
     </div>
 
     <div>
         <div class="input-group" style="margin:5px auto;width:48%;float:left;">
-            <input type="text" class="form-control" value="">
+            <input type="text" class="form-control" ng-model="clients[${id}].witchHelpInput">
             <span class="input-group-btn">
-            <button class="btn btn-success" type="button">女巫救人</button>
+            <button class="btn btn-success" type="button" ng-click="witchHelp(${id})">女巫救人</button>
         </span>
         </div>
         <div class="input-group" style="margin:5px auto;width:48%;float:right;">
-            <input type="text" class="form-control" value="">
+            <input type="text" class="form-control" ng-model="clients[${id}].witchKillInput">
             <span class="input-group-btn">
-            <button class="btn btn-success" type="button">女巫毒杀</button>
+            <button class="btn btn-success" type="button" ng-click="witchKill(${id})">女巫毒杀</button>
         </span>
         </div>
     </div>
 
     <div>
         <div class="input-group" style="margin:5px auto;width:48%;float:left;">
-            <input type="text" class="form-control" value="">
+            <input type="text" class="form-control"  ng-model="clients[${id}].seerChoiceInput">
             <span class="input-group-btn">
-            <button class="btn btn-success" type="button">预言家查看</button>
+            <button class="btn btn-success" type="button" ng-click="seerChoice(${id})">预言家查看</button>
         </span>
         </div>
         <div class="input-group" style="margin:5px auto;width:48%;float:right;">
-            <input type="text" class="form-control" value="">
+            <input type="text" class="form-control" ng-model="clients[${id}].hunterChoiceInput">
             <span class="input-group-btn">
-            <button class="btn btn-success" type="button">猎人杀人</button>
+            <button class="btn btn-success" type="button" ng-click="hunterChoice(${id})">猎人杀人</button>
         </span>
         </div>
     </div>

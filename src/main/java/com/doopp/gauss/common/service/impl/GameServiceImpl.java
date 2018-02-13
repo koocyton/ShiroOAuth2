@@ -2,7 +2,9 @@ package com.doopp.gauss.common.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.doopp.gauss.common.defined.Action;
+import com.doopp.gauss.common.defined.Identity;
 import com.doopp.gauss.common.entity.Player;
+import com.doopp.gauss.common.entity.PlayerAction;
 import com.doopp.gauss.common.entity.Room;
 import com.doopp.gauss.common.service.GameService;
 import com.doopp.gauss.common.service.PlayerService;
@@ -36,118 +38,115 @@ public class GameServiceImpl implements GameService {
     private ThreadPoolTaskExecutor gameTaskExecutor;
 
     @Override
-    public void actionDispatcher(WebSocketChannel socketChannel, String playerAction, Object actionData) {
+    public void actionDispatcher(WebSocketChannel socketChannel, String playerAction, JSONObject actionData) {
+        // 必须是一个在线，并活着的玩家，才能操作
         Player player = playerService.getPlayer((Long) socketChannel.getAttribute("userId"));
-        Room room = roomService.getRoom(player.getRoom_id());
-        // logger.info(" >> " + room.getId() +  " / " + player.getId() + " : " + playerAction + " : " + actionData);
-
-        // 校验房间正在等待的状态
-        if (room.getAcceptAction().equals(playerAction)) {
-            // 转发 action
-            switch (playerAction) {
-                // 用户准备
-                case Action.PLAYER_READY:
-                    this.readyAction(room, player);
-                    break;
-                // 狼选择杀人
-                case Action.WOLF_CHOICE:
-                    //this.werewolfAction(room, player, messageObject);
-                    break;
-                // 先知选择查看
-                case Action.SEER_CHOICE:
-                    //this.seerAction(room, player, messageObject);
-                    break;
-                // 女巫选择杀人或救人
-                case Action.WITCH_CHOICE:
-                    //this.witchAction(room, player, messageObject);
-                    break;
-                // 猎人杀人
-                case Action.HUNTER_CHOICE:
-                    //this.hunterAction(room, player, messageObject);
-                    break;
-                // 玩家说话
-                case Action.PLAYER_SPEAK:
-                    // this.playerSpeak(room, player, messageObject);
-                    break;
-                // 玩家投票
-                case Action.PLAYER_VOTE:
-                    //this.playerVote(room, player, messageObject);
-                    break;
+        if (player!=null && player.isLiving()) {
+            // 存在的房间
+            Room room = roomService.getRoom(player.getRoom_id());
+            if (room!=null) {
+                // 转发 action
+                switch (playerAction) {
+                    // 用户准备
+                    case Action.PLAYER_READY:
+                        this.readyAction(room, player);
+                        break;
+                    // 狼选择杀人
+                    case Action.WOLF_CHOICE:
+                        this.wolfAction(room, player, actionData);
+                        break;
+                    // 先知选择查看
+                    case Action.SEER_CHOICE:
+                        this.seerAction(room, player, actionData);
+                        break;
+                    // 女巫选择杀人或救人
+                    case Action.WITCH_CHOICE:
+                        this.witchAction(room, player, actionData);
+                        break;
+                    // 猎人杀人
+                    case Action.HUNTER_CHOICE:
+                        this.hunterAction(room, player, actionData);
+                        break;
+                    // 玩家投票
+                    case Action.PLAYER_VOTE:
+                        this.playerVote(room, player, actionData);
+                        break;
+                    // 玩家聊天
+                    case Action.PLAYER_SPEAK:
+                        this.playerSpeak(room, player, actionData);
+                        break;
+                }
             }
         }
     }
 
     // 接受用户准备好了的消息
-    @Override
-    public void readyAction(Room room, Player readyPlayer) {
-        playerService.iamReady(readyPlayer);
-        if (room.allReady()) {
-            gameTaskExecutor.execute(new WerewolfGameTask(room));
+    private void readyAction(Room room, Player readyPlayer) {
+        if (room.getAcceptAction().equals(Action.PLAYER_READY)) {
+            playerService.iamReady(readyPlayer);
+            this.sendMessage(room, Action.PLAYER_READY, room.getSeats());
+            if (room.allReady()) {
+                room.setAcceptAction(Action.REJECT_ACTION);
+                room.setGameTask(new WerewolfGameTask(room));
+                gameTaskExecutor.execute(room.getGameTask());
+            }
         }
     }
 
-//    // 上行，狼人杀人
-//    @Override
-//    public void werewolfAction(Room room, Player actionPlayer, JSONObject messageObject) {
-//        if (actionPlayer.getIdentity()==Identity.WOLF) {
-//            Long playerId = messageObject.getLong("choice-target");
-//            Player targetPlayer = playerDao.getPlayerById(playerId);
-//            room.setCacheAction(new PlayerAction(Action.WOLF_CHOICE, actionPlayer, targetPlayer));
-//            // 如果三个狼人都提交了，就 notify game task continue
-//            if (room.cacheActionCount(Action.WOLF_CHOICE)==3) {
-//                room.getGameTask().notify();
-//            }
-//        }
-//    }
-//
-//    // 上行，预言家查身份
-//    @Override
-//    public void seerAction(Room room, Player actionPlayer, JSONObject messageObject) {
-//        if (actionPlayer.getIdentity()==Identity.SEER) {
-//            Long playerId = messageObject.getLong("choice-target");
-//            Player targetPlayer = playerDao.getPlayerById(playerId);
-//            roomDao.cacheAction(Action.SEER_CHOICE, actionPlayer, targetPlayer);
-//            this.sendMessage(actionPlayer, targetPlayer.getIdentity().toString());
-//        }
-//    }
-//
-//    // 上行，女巫救人或毒杀
-//    @Override
-//    public void witchAction(Room room, Player actionPlayer, JSONObject messageObject) {
-//        if (actionPlayer.getIdentity()==Identity.WITCH) {
-//            Long playerId = messageObject.getLong("choice-target");
-//            Player targetPlayer = playerDao.getPlayerById(playerId);
-//            roomDao.cacheAction(Action.WITCH_CHOICE, actionPlayer, targetPlayer);
-//            // 如果女巫提交完毕
-//            if (room.cacheActionCount(Action.WITCH_CHOICE)==1) {
-//                room.getGameTask().notify();
-//            }
-//        }
-//    }
-//
-//    // 上行，猎人杀人
-//    @Override
-//    public void hunterAction(Room room, Player actionPlayer, JSONObject messageObject) {
-//        if (actionPlayer.getIdentity()==Identity.HUNTER) {
-//            Long playerId = messageObject.getLong("choice-target");
-//            Player targetPlayer = playerDao.getPlayerById(playerId);
-//            roomDao.cacheAction(Action.HUNTER_CHOICE, actionPlayer, targetPlayer);
-//            // 如果猎人提交完毕
-//            if (room.cacheActionCount(Action.HUNTER_CHOICE)==1) {
-//                room.getGameTask().notify();
-//            }
-//        }
-//    }
-//
-//    // 玩家投票
-//    @Override
-//    public void playerVote(Room room, Player actionPlayer, JSONObject messageObject) {
-//        if (actionPlayer.isLiving()) {
-//            Long playerId = messageObject.getLong("choice-target");
-//            Player targetPlayer = playerDao.getPlayerById(playerId);
-//            roomDao.cacheAction(Action.PLAYER_VOTE, actionPlayer, targetPlayer);
-//        }
-//    }
+    // 房间内公共频道说话
+    private void playerSpeak(Room room, Player speakPlayer, JSONObject speakData) {
+        speakData.put("speakPlayer", speakPlayer.getId());
+        this.sendMessage(room, Action.PLAYER_SPEAK, speakData);
+    }
+
+    // 上行，狼人杀人
+    private void wolfAction(Room room, Player actionPlayer, JSONObject actionData) {
+        // 如果房间的状态为等待狼选择，并且，玩家身份是狼
+        if (room.getAcceptAction().equals(Action.WOLF_CHOICE) && actionPlayer.getIdentity() == Identity.WOLF) {
+            Long targetPlayerId = actionData.getLong("target-player");
+            room.addCacheAction(new PlayerAction(Action.WOLF_CHOICE, actionPlayer.getId(), targetPlayerId));
+            if (room.countCacheAction(Action.WOLF_CHOICE)==3) {
+                room.gameContinue();
+            }
+        }
+    }
+
+    // 上行，预言家查身份
+    private void seerAction(Room room, Player actionPlayer, JSONObject actionData) {
+        if (room.getAcceptAction().equals(Action.WOLF_CHOICE) && actionPlayer.getIdentity()==Identity.SEER) {
+            Long targetPlayerId = actionData.getLong("target-player");
+            room.addCacheAction(new PlayerAction(Action.SEER_CHOICE, actionPlayer.getId(), targetPlayerId));
+            actionData.put("identity", playerService.getPlayer(targetPlayerId).getIdentity());
+            this.sendMessage(actionPlayer, Action.SEER_CHOICE, actionData);
+        }
+    }
+
+    // 上行，女巫救人或毒杀
+    private void witchAction(Room room, Player actionPlayer, JSONObject actionData) {
+        if (room.getAcceptAction().equals(Action.WITCH_CHOICE) && actionPlayer.getIdentity()==Identity.WITCH) {
+            Long targetPlayerId = actionData.getLong("target-player");
+            room.addCacheAction(new PlayerAction(Action.WITCH_CHOICE, actionPlayer.getId(), targetPlayerId));
+            room.gameContinue();
+        }
+    }
+
+    // 上行，猎人杀人
+    private void hunterAction(Room room, Player actionPlayer, JSONObject actionData) {
+        if (room.getAcceptAction().equals(Action.HUNTER_CHOICE) && actionPlayer.getIdentity()==Identity.HUNTER) {
+            Long targetPlayerId = actionData.getLong("target-player");
+            room.addCacheAction(new PlayerAction(Action.HUNTER_CHOICE, actionPlayer.getId(), targetPlayerId));
+            room.gameContinue();
+        }
+    }
+
+    // 玩家投票
+    private void playerVote(Room room, Player actionPlayer, JSONObject actionData) {
+        if (room.getAcceptAction().equals(Action.PLAYER_VOTE)) {
+            Long targetPlayerId = actionData.getLong("target-player");
+            room.addCacheAction(new PlayerAction(Action.PLAYER_VOTE, actionPlayer.getId(), targetPlayerId));
+            room.gameContinue();
+        }
+    }
 
     // ************** 发送信息到某个用户
     @Override
@@ -191,115 +190,4 @@ public class GameServiceImpl implements GameService {
             this.sendMessage(room.getSeats(), action, data);
         }
     }
-
-//    // 房间内公共频道说话
-//    private void actionSpeak(WebSocketSession socketSession, JSONObject messageObject) throws IOException {
-//        WebSocketSession[] inRoomSockets = this.getSocketsInRoom(socketSession);
-//        Player player = (Player) socketSession.getAttributes().get("sessionPlayer");
-//        for (WebSocketSession userSocketSession : inRoomSockets) {
-//            if (!userSocketSession.equals(socketSession)) {
-//                messageObject.put("sender", player.getNickname());
-//                TextMessage message = new TextMessage(messageObject.toJSONString());
-//                userSocketSession.sendMessage(message);
-//            }
-//        }
-//    }
-//
-//    // 玩游戏
-//    private void actionPlay(WebSocketSession socketSession, JSONObject messageObject, String action) {
-//        Player player = (Player) socketSession.getAttributes().get("sessionPlayer");
-//        Room room = roomDao.getRoomById(player.getRoom_id());
-//        this.actionDispatcher(room, player, action, messageObject);
-//    }
-//
-//    // 取出当前用户所在房间的 sockets
-//    private WebSocketSession[] getSocketsInRoom(WebSocketSession socketSession) {
-//        Player player = (Player) socketSession.getAttributes().get("sessionPlayer");
-//        Room room = roomDao.getRoomById(player.getRoom_id());
-//        Player[] players = room.getPlayers();
-//        WebSocketSession[] inRoomSockets = {};
-//        int ii = inRoomSockets.length;
-//        for (Player otherPlayer : players) {
-//            if (otherPlayer!=null) {
-//                inRoomSockets[ii] = socketGroup.get(otherPlayer.getId());
-//                ii++;
-//            }
-//        }
-//        return inRoomSockets;
-//    }
-//
-//    public WebSocketSession getWebsocketById(Long userId) {
-//        return socketGroup.get(userId);
-//    }
-
-
-//    // 用户建立连接
-//    private void playerJoin(WebSocketSession socketSession) {
-//        // 索引
-//        Long userId = (Long) socketSession.getAttributes().get("userId");
-//        // 将用户保存在用户组
-//        this.playerJoin(userId);
-//    }
-//
-//    // 用户断开连接
-//    private void playerLeave(WebSocketSession socketSession) {
-//        // 索引
-//        Long userId = (Long) socketSession.getAttributes().get("userId");
-//        // 从用户组里移除
-//        this.playerLeave(userId);
-//    }
-//
-//    // 用户建立连接
-//    private void playerJoin(Long userId) {
-//        // 将用户保存在用户组
-//        User user = accountService.getCacheUser(userId);
-//        Player player = UserMapper.INSTANCE.userToPlayer(user);
-//        playerGroup.put(userId, player);
-//    }
-//
-//    // 用户断开连接
-//    private void playerLeave(Long userId) {
-//        // 从用户组里移除
-//        playerGroup.remove(userId);
-//    }
-//
-//    // 用户进入房间
-//    private void joinRoom(Player player) {
-//
-//    }
-//
-//    // 用户离开房间
-//    private void leaveRoom(Player player) {
-//        int roomId = player.getRoom_id();
-//        Room room = roomGroup.get(roomId);
-//        room.playerLeave(player);
-//    }
-//
-//    // socket 建立连接
-//    private void socketConnect(WebSocketSession socketSession) {
-//        if (socketSession!=null) {
-//            // 索引
-//            Long userId = (Long) socketSession.getAttributes().get("userId");
-//            // 先断开
-//            this.socketDisconnect(socketGroup.get(userId));
-//            // 将连接保存到 socket group 里
-//            socketGroup.put(userId, socketSession);
-//        }
-//    }
-//
-//    // socket 断开连接
-//    private void socketDisconnect(WebSocketSession socketSession) {
-//        if (socketSession!=null) {
-//            Long userId = (Long) socketSession.getAttributes().get("userId");
-//            if (socketSession.isOpen()) {
-//                try {
-//                    socketSession.close();
-//                } catch (IOException e) {
-//                    logger.warn("WARN : User {} socketSession IOException on closing", userId);
-//                }
-//            }
-//            // 从socket组里移除
-//            socketGroup.remove(userId);
-//        }
-//    }
 }

@@ -3,15 +3,14 @@ package com.doopp.gauss.common.service.impl;
 import com.doopp.gauss.common.defined.Action;
 import com.doopp.gauss.common.entity.Player;
 import com.doopp.gauss.common.entity.Room;
+import com.doopp.gauss.common.service.GameService;
 import com.doopp.gauss.common.service.RoomService;
-import com.sun.tools.javac.code.Type;
-import io.undertow.websockets.core.WebSocketChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 @Service("roomService")
@@ -26,6 +25,9 @@ public class RoomServiceImpl implements RoomService {
 
     private static int roomId = 51263;
 
+    @Autowired
+    private GameService gameService;
+
     // 用户进入房间
     @Override
     public void playerJoin(Player player) {
@@ -39,8 +41,8 @@ public class RoomServiceImpl implements RoomService {
     }
 
     // get a free room
-    private Room joinRoom(Player player) {
-        Room room = null;
+    private void joinRoom(Player player) {
+        Room room;
         synchronized (RoomService.class) {
             if (spaceRoomGroup.size()==0) {
                 room = this.createSpaceRoom(player);
@@ -54,31 +56,38 @@ public class RoomServiceImpl implements RoomService {
                 }
             }
         }
-        return room;
+        if (room!=null) {
+            gameService.sendMessage(room, Action.PLAYER_JOIN, room.getSeats());
+        }
     }
 
     private Room createSpaceRoom(Player player)
     {
-        Room room = new Room();
-        room.setId(++roomId);
-        room.setAcceptAction(Action.PLAYER_READY);
-        room.addPlayer(player);
-        roomGroup.put(room.getId(), room);
-        spaceRoomGroup.put(room.getId(), room.getId());
-        return room;
+        synchronized (RoomService.class) {
+            Room room = new Room();
+            room.setId(++roomId);
+            room.setAcceptAction(Action.PLAYER_READY);
+            room.addPlayer(player);
+            roomGroup.put(room.getId(), room);
+            spaceRoomGroup.put(room.getId(), room.getId());
+            return room;
+        }
     }
 
     // get a free room
-    private Room leaveRoom(Player player) {
+    private void leaveRoom(Player player) {
+        Room room;
         synchronized (RoomService.class) {
             int roomId = player.getRoom_id();
-            Room room = this.getRoom(roomId);
+            room = this.getRoom(roomId);
             if (room!=null) {
                 room.delPlayer(player);
                 spaceRoomGroup.put(roomId, roomId);
             }
         }
-        return  null;
+        if (room!=null) {
+            gameService.sendMessage(room, Action.PLAYER_LEAVE, room.getSeats());
+        }
     }
 
     // get room by id

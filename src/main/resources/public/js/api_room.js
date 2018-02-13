@@ -14,16 +14,20 @@ let ApiRoomController = function($scope, $http) {
             account  : $scope.namePrefix + "_" + ii + "@gmail.com",
             password : "123456",
             roomName : "西屋独居",
-            talkMessage : "你是一头铁狼",
+            playerSpeakInput : "你是一头铁狼",
             messageList : [],
-            nickName: $scope.namePrefix + "_" + ii
+            nickName: $scope.namePrefix + "_" + ii,
+            playerVoteInput: 0,
+            witchHelpInput:0,
+            witchKillInput:0,
+            seerChoiceInput:0,
+            hunterChoiceInput:0,
+            wolfChoiceInput:0
         };
         $scope.ws[ii] = null;
     }
 
-    $scope.readyPlayer = function(ii) {
-        sendMessage(ii, {action: "player-ready"})
-    };
+
 
     $scope.callPlayer = function(ii) {
         sendMessage(ii, {action: "callPlayer", gameType: 1})
@@ -37,17 +41,45 @@ let ApiRoomController = function($scope, $http) {
         sendMessage(ii, {action: "leaveGame"})
     };
 
-    $scope.publicTalk = function(ii) {
-        sendMessage(ii, {action: "publicTalk", roomName: $scope.clients[ii].talkMessage})
+    $scope.readyPlayer = function(ii) {
+        sendMessage(ii, {action: "player-ready"})
     };
 
-    $scope.autoCreateRoom = function(ii) {
-        sendMessage(ii, {action: "createRoom", roomName: $scope.clients[ii].roomName})
+    $scope.playerSpeak = function(ii) {
+        sendMessage(ii, {action: "player-speak", data: {message: $scope.clients[ii].playerSpeakInput}});
     };
 
-    $scope.autoJoinRoom = function(ii) {
-        sendMessage(ii, {action: "joinRoom", roomId: $scope.roomId})
+    $scope.playerVote = function(ii) {
+        sendMessage(ii, {action: "player-vote", data: {"target-player":$scope.clients[ii].playerVoteInput}})
     };
+
+    $scope.wolfChoice = function(ii) {
+        sendMessage(ii, {action: "wolf-choice", data: {"target-player":$scope.clients[ii].wolfChoiceInput}})
+    };
+
+    $scope.witchHelp = function(ii) {
+        sendMessage(ii, {action: "witch-choice", data: {"target-player":$scope.clients[ii].witchHelpInput}})
+    };
+
+    $scope.witchKill = function(ii) {
+        sendMessage(ii, {action: "witch-choice", data: {"target-player":$scope.clients[ii].witchKillInput}})
+    };
+
+    $scope.seerChoice = function(ii) {
+        sendMessage(ii, {action: "seer-choice", data: {"target-player":$scope.clients[ii].seerChoiceInput}})
+    };
+
+    $scope.hunterChoice = function(ii) {
+        sendMessage(ii, {action: "hunter-choice", data: {"target-player":$scope.clients[ii].hunterChoiceInput}})
+    };
+
+    // $scope.autoCreateRoom = function(ii) {
+    //     sendMessage(ii, {action: "createRoom", data: $scope.clients[ii].roomName})
+    // };
+    //
+    // $scope.autoJoinRoom = function(ii) {
+    //     sendMessage(ii, {action: "joinRoom", data: $scope.roomId})
+    // };
 
     let scrollWindow=function(ii) {
         setTimeout(function() {
@@ -60,7 +92,7 @@ let ApiRoomController = function($scope, $http) {
         let nn = $scope.clients[ii].messageList.length;
         $scope.clients[ii].messageList[nn] = " >>> " + angular.toJson(messageObject);
         $scope.ws[ii].send(angular.toJson(messageObject));
-        $scope.$apply();
+        // $scope.apply();
         scrollWindow(ii);
     };
 
@@ -71,21 +103,28 @@ let ApiRoomController = function($scope, $http) {
                 .onClose(function (e) {
                 })
                 .onMessage(function(e) {
+                    let dataObj = null;
+                    try { dataObj = JSON.parse(e.data); } catch(e) {}
                     let nn = $scope.clients[ii].messageList.length;
-                    $scope.clients[ii].messageList[nn] = " <<< " + e.data;
+                    if (dataObj===null) {
+                        $scope.clients[ii].messageList[nn] = " <<< " + e.data;
+                    }
+                    else if (dataObj.action!=="player-join" && dataObj.action!=="player-leave" && dataObj.action!=="player-ready") {
+                        $scope.clients[ii].messageList[nn] = " <<< " + e.data;
+                    }
                     $scope.$apply();
                     scrollWindow(ii);
-                })
-                .onOpen(function(e){
-                    if (ii===0) {
-                        $scope.autoCreateRoom(ii);
-                    }
-                    else {
-                        setTimeout(function(){
-                            $scope.autoJoinRoom(ii);
-                        }, 1000);
-                    }
                 });
+                // .onOpen(function(e){
+                //     if (ii===0) {
+                //         $scope.autoCreateRoom(ii);
+                //     }
+                //     else {
+                //         setTimeout(function(){
+                //             $scope.autoJoinRoom(ii);
+                //         }, 1000);
+                //     }
+                // });
         }
     };
 

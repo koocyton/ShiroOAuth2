@@ -1,4 +1,4 @@
-package com.doopp.gauss.server.websocket;
+package com.doopp.gauss.server.undertow;
 
 import com.doopp.gauss.common.entity.User;
 import com.doopp.gauss.common.service.AccountService;
@@ -16,9 +16,9 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.List;
 
-public class GameSocketCallback implements WebSocketConnectionCallback
+public class GameSocketConnectionCallback implements WebSocketConnectionCallback
 {
-    private final Logger logger = LoggerFactory.getLogger(GameSocketCallback.class);
+    private final Logger logger = LoggerFactory.getLogger(GameSocketConnectionCallback.class);
 
     private AccountService accountService = (AccountService) ApplicationContextUtil.getBean("accountService");
 
@@ -46,6 +46,12 @@ public class GameSocketCallback implements WebSocketConnectionCallback
                     socketChannelService.onClose(socketChannel, channel);
                     super.onClose(socketChannel, channel);
                 }
+
+                @Override
+                protected void onError(WebSocketChannel socketChannel, Throwable error) {
+                    socketChannelService.onClose(socketChannel, null);
+                    super.onError(channel, error);
+                }
             });
             channel.resumeReceives();
         }
@@ -61,7 +67,7 @@ public class GameSocketCallback implements WebSocketConnectionCallback
                 channel.close();
             }
             catch(IOException e) {
-                ;
+                logger.info("{}", e.getMessage());
             }
         }
         return user;

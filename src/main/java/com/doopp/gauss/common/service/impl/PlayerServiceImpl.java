@@ -10,6 +10,8 @@ import com.doopp.gauss.common.service.PlayerService;
 import com.doopp.gauss.common.service.RoomService;
 import com.doopp.gauss.common.service.SocketChannelService;
 import io.undertow.websockets.core.WebSocketChannel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +20,9 @@ import java.util.Map;
 
 @Service("playerService")
 public class PlayerServiceImpl implements PlayerService {
+
+    // logger
+    private final static Logger logger = LoggerFactory.getLogger(PlayerServiceImpl.class);
 
     private static Map<Long, Player> playerGroup = new HashMap<>();
 
@@ -76,6 +81,7 @@ public class PlayerServiceImpl implements PlayerService {
     // 获取用户
     @Override
     public Player getPlayer(Long uid) {
+        // logger.info(" >>> " + playerGroup);
         return playerGroup.get(uid);
     }
 

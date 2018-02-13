@@ -9,12 +9,12 @@ public class PlayerAction {
     private String action;
 
     // 行动人
-    private Player actionPlayer;
+    private Long actionPlayer;
 
     // 目标用户
-    private Player targetPlayer;
+    private Long targetPlayer;
 
-    public PlayerAction(String action, Player actionPlayer, Player targetPlayer) {
+    public PlayerAction(String action, Long actionPlayer, Long targetPlayer) {
         this.action = action;
         this.actionPlayer = actionPlayer;
         this.targetPlayer = targetPlayer;

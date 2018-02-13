@@ -1,6 +1,5 @@
 package com.doopp.gauss.server.undertow;
 
-import com.doopp.gauss.server.websocket.GameSocketCallback;
 import io.undertow.Undertow;
 import io.undertow.server.HttpHandler;
 
@@ -10,7 +9,6 @@ import io.undertow.servlet.api.DeploymentInfo;
 import io.undertow.servlet.api.DeploymentManager;
 import io.undertow.servlet.api.InstanceFactory;
 import io.undertow.servlet.api.ServletContainerInitializerInfo;
-import io.undertow.servlet.handlers.DefaultServlet;
 import io.undertow.servlet.util.ImmediateInstanceFactory;
 
 import static io.undertow.Handlers.path;
@@ -45,17 +43,17 @@ public class UndertowServer implements InitializingBean, DisposableBean {
         ServletContainerInitializerInfo sciInfo = new ServletContainerInitializerInfo(WebAppServletContainerInitializer.class, instanceFactory, new HashSet<>());
         DeploymentInfo deploymentInfo = Servlets.deployment()
                 .addServletContainerInitalizer(sciInfo)
+                // .addServlet(Servlets.servlet("default", DefaultServlet.class))
+                .setResourceManager(new FileResourceManager(webAppRoot.getFile(), 0))
                 .setClassLoader(UndertowServer.class.getClassLoader())
                 .setContextPath(webAppName)
-                .setDeploymentName(webAppName + "-war")
-                .setResourceManager(new FileResourceManager(webAppRoot.getFile(), 0))
-                .addServlet(Servlets.servlet("default", DefaultServlet.class));
+                .setDeploymentName(webAppName + "-war");
 
         manager = Servlets.defaultContainer().addDeployment(deploymentInfo);
         manager.deploy();
         HttpHandler httpHandler = path()
                 .addPrefixPath("/", manager.start())
-                .addPrefixPath("/game-socket", websocket(new GameSocketCallback()));
+                .addPrefixPath("/game-socket", websocket(new GameSocketConnectionCallback()));
 
         SSLContext sslContext = SSLContext.getInstance("TLS");
         sslContext.init(getKeyManagers(), null, null);
