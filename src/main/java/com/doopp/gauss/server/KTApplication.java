@@ -9,6 +9,7 @@ public class KTApplication {
 
         // init applicationContext
         final AbstractApplicationContext ctx = new FileSystemXmlApplicationContext("classpath:config/spring-undertow.xml");
+        // final AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(UndertowConfiguration.class);
 
         // add a shutdown hook for the above context...
         ctx.registerShutdownHook();

@@ -2,6 +2,9 @@ package com.doopp.gauss.common.defined;
 
 public class Action {
 
+    // 进入房间
+    public static final String JOIN_ROOM = "join-room";
+
     // 空等
     public static final String ONLY_WAIT    = "only-wait";
 

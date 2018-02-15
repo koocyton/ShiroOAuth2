@@ -97,7 +97,7 @@ public class AccountServiceImpl implements AccountService {
      * @return User
      */
     @Override
-    public User getUserOnPlatformLogin(String platform, String data) {
+    public User getUserOnPlatformLogin(String platform, String data) throws Exception {
         switch (platform) {
             case Platform.WX:
                 return wxPlatformService.login(data);

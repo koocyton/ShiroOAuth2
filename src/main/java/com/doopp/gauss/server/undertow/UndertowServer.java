@@ -16,10 +16,12 @@ import static io.undertow.Handlers.websocket;
 
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
 import javax.net.ssl.*;
 import javax.servlet.ServletContainerInitializer;
+import java.io.InputStream;
 import java.security.KeyStore;
 import java.util.HashSet;
 
@@ -30,7 +32,7 @@ public class UndertowServer implements InitializingBean, DisposableBean {
     private String host = "127.0.0.1";
     private int port = 8088;
     private int sslPort = 8089;
-    private String jksFile = "";
+    private InputStream jksStream;
     private ServletContainerInitializer servletContainerInitializer;
 
     private Undertow server;
@@ -79,7 +81,7 @@ public class UndertowServer implements InitializingBean, DisposableBean {
     private KeyManager[] getKeyManagers() {
         try {
             KeyStore keyStore = KeyStore.getInstance("JKS");
-            keyStore.load(UndertowServer.class.getResourceAsStream(jksFile), "1234567890".toCharArray());
+            keyStore.load(jksStream, "1234567890".toCharArray());
             KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
             keyManagerFactory.init(keyStore, "214338424690893".toCharArray());
             return keyManagerFactory.getKeyManagers();
@@ -90,7 +92,7 @@ public class UndertowServer implements InitializingBean, DisposableBean {
     }
 
     public void setWebAppRoot(Resource webAppRoot) {
-        this.webAppRoot = webAppRoot;
+        this.webAppRoot = webAppRoot;//new ClassPathResource(webAppRoot);
     }
 
     public void setWebAppName(String webAppName) {
@@ -106,7 +108,7 @@ public class UndertowServer implements InitializingBean, DisposableBean {
     }
 
     public void setJksFile(String jksFile) {
-        this.jksFile = jksFile;
+        this.jksStream = UndertowServer.class.getResourceAsStream(jksFile);
     }
 
     public void setSslPort(int sslPort) {

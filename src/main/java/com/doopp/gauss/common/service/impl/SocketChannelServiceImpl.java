@@ -1,6 +1,7 @@
 package com.doopp.gauss.common.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.doopp.gauss.common.defined.Action;
 import com.doopp.gauss.common.entity.Player;
 import com.doopp.gauss.common.service.GameService;
 import com.doopp.gauss.common.service.PlayerService;
@@ -63,7 +64,11 @@ public class SocketChannelServiceImpl implements SocketChannelService {
         // 给用户发消息
         Player player = playerService.getPlayer(socketChannel);
         if (player!=null) {
-            this.sendMessage(player.getId(), player.getRoom_id() + " : Hi " + player.getId() + " Welcome");
+            JSONObject jsonObject = new JSONObject() {{
+                put("id", player.getId());
+                put("room_id", player.getRoom_id());
+            }};
+            gameService.sendMessage(player, Action.JOIN_ROOM, jsonObject);
         }
     }
 

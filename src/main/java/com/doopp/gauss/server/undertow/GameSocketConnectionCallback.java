@@ -34,34 +34,21 @@ public class GameSocketConnectionCallback implements WebSocketConnectionCallback
             // create connect
             socketChannelService.onConnect(channel);
             // set receive
-            channel.getReceiveSetter().set(new AbstractReceiveListener() {
-
-                @Override
-                protected void onFullTextMessage(WebSocketChannel socketChannel, BufferedTextMessage message) {
-                    socketChannelService.onFullTextMessage(socketChannel, message);
-                }
-
-                @Override
-                protected void onClose(WebSocketChannel socketChannel, StreamSourceFrameChannel channel) throws IOException {
-                    socketChannelService.onClose(socketChannel, channel);
-                    super.onClose(socketChannel, channel);
-                }
-
-                @Override
-                protected void onError(WebSocketChannel socketChannel, Throwable error) {
-                    socketChannelService.onClose(socketChannel, null);
-                    super.onError(channel, error);
-                }
-            });
+            channel.getReceiveSetter().set(new GameReceiveListener());
             channel.resumeReceives();
         }
     }
 
     private User sessionFilter(WebSocketHttpExchange exchange, WebSocketChannel channel) {
-        // get user
-        List<String> sessionTokens = exchange.getRequestParameters().get("session-token");
-        String sessionToken = sessionTokens.get(0);
-        User user =accountService.getCacheUser(sessionToken);
+        String sessionToken = exchange.getRequestHeader("session-token");
+        if (sessionToken==null) {
+            List<String> sessionTokens = exchange.getRequestParameters().get("session-token");
+            sessionToken = sessionTokens.get(0);
+        }
+        User user = null;
+        if (sessionToken!=null) {
+            user = accountService.getCacheUser(sessionToken);
+        }
         if (user==null) {
             try {
                 channel.close();
@@ -71,5 +58,25 @@ public class GameSocketConnectionCallback implements WebSocketConnectionCallback
             }
         }
         return user;
+    }
+
+    private class GameReceiveListener extends AbstractReceiveListener {
+
+        @Override
+        protected void onFullTextMessage(WebSocketChannel socketChannel, BufferedTextMessage message) {
+            socketChannelService.onFullTextMessage(socketChannel, message);
+        }
+
+        @Override
+        protected void onClose(WebSocketChannel socketChannel, StreamSourceFrameChannel channel) throws IOException {
+            socketChannelService.onClose(socketChannel, channel);
+            super.onClose(socketChannel, channel);
+        }
+
+        @Override
+        protected void onError(WebSocketChannel socketChannel, Throwable error) {
+            socketChannelService.onClose(socketChannel, null);
+            super.onError(socketChannel, error);
+        }
     }
 }

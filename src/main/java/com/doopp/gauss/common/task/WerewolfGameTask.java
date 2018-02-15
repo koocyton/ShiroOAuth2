@@ -34,11 +34,7 @@ public class WerewolfGameTask implements Runnable {
 
     private final static GameService gameService = (GameService) ApplicationContextUtil.getBean("gameService");
 
-    // private final static PlayerDao playerDao = (PlayerDao) ApplicationContextUtil.getBean("playerDao");
-
-    // private final static RoomDao roomDao = (RoomDao) ApplicationContextUtil.getBean("roomDao");
-
-    // 这个线程处理的房间
+    // 这个房间
     private final Room room;
 
     public WerewolfGameTask(Room room) {
@@ -238,7 +234,7 @@ public class WerewolfGameTask implements Runnable {
     // 所有存活玩家发言
     private void callAllPlayerSpeak() {
         for(Player player : room.getSeats()) {
-            if (player.isLiving()) {
+            if (player!=null && player.isLiving()) {
                 JSONObject jsonObject = new JSONObject(){{
                     put("wait-time", 30);
                 }};
@@ -262,7 +258,7 @@ public class WerewolfGameTask implements Runnable {
         int wolfCount = 0;
         int personCount = 0;
         for(Player player : room.getSeats()) {
-            if (player.isLiving()) {
+            if (player!=null && player.isLiving()) {
                 if (player.getIdentity()==Identity.WOLF) {
                     wolfCount++;
                 }

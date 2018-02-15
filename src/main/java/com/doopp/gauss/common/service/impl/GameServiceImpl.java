@@ -159,6 +159,7 @@ public class GameServiceImpl implements GameService {
     public void sendMessage(Player player, String action, Object data) {
         if (player!=null && player.isLiving() && action!=null) {
             JSONObject jsonObject = new JSONObject();
+            jsonObject.put("time", System.currentTimeMillis());
             jsonObject.put("action", action);
             jsonObject.put("data", data);
             this.sendMessage(player, jsonObject.toJSONString());

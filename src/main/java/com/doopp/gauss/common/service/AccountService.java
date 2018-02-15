@@ -32,7 +32,7 @@ public interface AccountService {
     /**
      * 第三方登陆
      */
-    User getUserOnPlatformLogin(String platform, String data);
+    User getUserOnPlatformLogin(String platform, String data) throws Exception;
 
 
     /**

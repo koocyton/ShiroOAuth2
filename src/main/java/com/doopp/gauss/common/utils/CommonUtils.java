@@ -2,6 +2,9 @@ package com.doopp.gauss.common.utils;
 
 import javax.servlet.ServletContainerInitializer;
 import javax.servlet.http.HttpServletRequest;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
@@ -74,4 +77,28 @@ public class CommonUtils {
         }
         return maxValueKey;
     }
+
+    public static String simpleHttpGet(String url) {
+        HttpURLConnection http = null;
+        InputStream is = null;
+        try {
+            URL urlGet = new URL(url);
+            http = (HttpURLConnection) urlGet.openConnection();
+            http.setRequestMethod("GET");
+            http.setRequestProperty("Content-Type", "text/html; charset=UTF-8");
+            http.setDoOutput(true);
+            http.setDoInput(true);
+            http.connect();
+            is = http.getInputStream();
+            int size = is.available();
+            byte[] jsonBytes = new byte[size];
+            is.read(jsonBytes);
+            return new String(jsonBytes, "UTF-8");
+        }
+        catch (Exception e) {
+            return null;
+        }
+    }
+
+
 }

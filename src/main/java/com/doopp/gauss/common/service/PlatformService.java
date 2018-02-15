@@ -4,5 +4,5 @@ import com.doopp.gauss.common.entity.User;
 
 public interface PlatformService {
 
-    User login(String loginData);
+    User login(String loginData) throws Exception;
 }
